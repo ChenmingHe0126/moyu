@@ -48,6 +48,16 @@ def check_private(name, data):
                 sys.exit(f"{name} contains '{m}' ({enc}); fix the build (PathMap) or the file before releasing")
 
 
+def check_keywords(manifest):
+    """The Yak server rejects a push (400) unless every keyword is letters, digits, dashes and underscores; yak build
+    does not check. The guid:<id> keywords that tie a Grasshopper plug-in to its package are the one allowed form."""
+    block = re.search(r"^keywords:\n((?:[ \t]+.*\n?)*)", manifest, re.M)
+    words = re.findall(r"^[ \t]+-[ \t]*(\S.*?)[ \t]*$", block.group(1), re.M) if block else []
+    bad = [w for w in words if not re.fullmatch(r"[A-Za-z0-9_-]+|guid:[0-9A-Fa-f-]{36}", w)]
+    if bad:
+        sys.exit(f"manifest.yml keywords the Yak server would reject: {bad} (use letters, digits, - and _ only)")
+
+
 def payload():
     """(archive name, source path) of the extra files every package carries."""
     files = [("QUICKSTART.md", PACKAGING / "QUICKSTART.md"), ("LICENSE.txt", ROOT / "LICENSE")]
@@ -121,6 +131,7 @@ def stage(ver):
         (yak_dir / folder).mkdir()
         shutil.copy2(gha, yak_dir / folder / "Moyu.gha")
     manifest = (PACKAGING / "manifest.yml").read_text(encoding="utf-8").replace("{version}", ver)
+    check_keywords(manifest)
     (yak_dir / "manifest.yml").write_text(manifest, encoding="utf-8")
     shutil.copy2(PACKAGING / "icon.png", yak_dir / "icon.png")
     for name, src in payload():

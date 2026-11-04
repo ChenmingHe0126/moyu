@@ -11,7 +11,7 @@ description: >
   time logs are on GitHub. Windows only.
 url: https://github.com/ChenmingHe0126/moyu
 keywords:
-  - topology optimisation
+  - topology-optimisation
   - simp
   - structural
   - voxel
@@ -19,7 +19,7 @@ keywords:
   - game
   - research
   - teaching
-  - claude code
+  - claude-code
   # The plug-in's GH_AssemblyInfo.Id: lets Grasshopper's package restore find this package (yak adds it only for flat layouts).
   - guid:b27a1bf2-7386-436b-846f-b4f9002b5395
 icon: icon.png
