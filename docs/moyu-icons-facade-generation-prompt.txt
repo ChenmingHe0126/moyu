@@ -1,0 +1,36 @@
+Moyu Facade icon sheet — generation record
+Mode: built-in image_gen
+Style reference: docs/images/moyu-icons-landscape-source.png
+Final output: docs/images/moyu-icons-facade-source.png
+Actual size: 1774 x 887 px, RGBA PNG
+Layout: 2 columns x 1 row; Facade Study on the left, Brick Bond on the right
+
+GENERATION PROMPT
+
+Create ONE original transparent PNG sprite sheet with exactly TWO Grasshopper toolbar component icons for Moyu's FACADE panel.
+
+REFERENCE IMAGE ROLE: the attached Moyu Landscape sheet is ONLY a visual-family reference: consistent dark-indigo outlines, blue/violet and icy-white palette, compact three-quarter/isometric architectural glyphs. Do not copy its terrain, path or surface glyphs. The new output must have TWO icons in ONE HORIZONTAL ROW.
+
+LAYOUT:
+Canvas aspect ratio exactly 2:1, two equal square cells side by side, 2 columns × 1 row.
+LEFT CELL = Facade Study. RIGHT CELL = Brick Bond.
+Center each complete icon within its own square cell. Keep every shape inside the central 68–70% of its cell, with at least 15% transparent clearance on every side. Equal visual size and line weight. No part crosses the center border. Actual transparent alpha background everywhere outside the glyphs. No extra row or empty cell. No visible grid borders, backing tiles, labels, text, letters, numbers, watermark or UI screenshot.
+
+FUNCTIONAL CONTEXT:
+These tools should read naturally as professional FACADE DESIGN components in Rhino and Grasshopper.
+The panel's underlying activity is Rebound, a brick-breaker game played on a wall laid in real brick bonds; a boss key presents it as a facade elevation study: the bricks still standing are opaque panels, the bricks knocked out are windows, with floor lines, levels and window-to-wall ratio. Use the professional facade-design interpretation for the icon imagery. The game context is explanatory only; no overt game imagery (no ball, paddle, bat, explosions or score).
+
+LEFT ICON — FACADE STUDY:
+Starts and stops the interactive study, sets mode, level, facade plane and module. In design mode it outputs opaque panel outlines and window openings with window-to-wall ratio, glazing area, U-value, daylight and embodied carbon.
+Make a FACADE ELEVATION the unmistakable dominant idea: a compact upright wall panel seen slightly in three-quarter view, a regular grid of opaque blue panels with a few window openings picked out in icy-white glass and ONE violet window or panel suggesting the analysed/active element. A thin horizontal floor line may cross the wall. Strong, simple silhouette: one building face, not a whole building.
+
+RIGHT ICON — BRICK BOND:
+Generates brick wall layouts: stretcher, stack, English and Flemish bond, perforated screen walls, an arched opening, or panels from drawn closed curves; the number of courses is adjustable.
+Make the BRICK BOND PATTERN itself the unmistakable dominant idea: a small square swatch of brickwork in three-quarter view, four or five courses of clearly staggered bricks (half-brick offset between courses), with one course of short header bricks and one violet brick marking the editable pattern unit. Bricks must be large and few enough to count at 24×24. Clearly different from the left icon: the left is a facade with windows, the right is the bond pattern of bricks.
+
+COHERENT DESIGN:
+Palette direction: dark indigo #263867 contours, cornflower blue #477DDA main faces, soft iris violet #8067C7 functional accents, ice-white #EFF4FF light regions.
+Crisp flat color planes with consistent sturdy outlines. Volume indicated by shape and discrete face colors, not smooth gradients. Clean, architectural, understated, technically legible. Designed to remain recognizable as 24×24 Grasshopper toolbar icons. Few broad features and generous negative space; avoid fine repeated lines.
+No gloss, photorealism, cast shadow, glow, texture, drop shadows or backdrop.
+No text, letters, numbers, balls, paddles, explosions, debris or game symbols.
+Output only ONE wide 2:1 transparent sprite sheet containing exactly these TWO new Facade icons, left to right in the specified order.

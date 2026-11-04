@@ -1,0 +1,11 @@
+# Build output
+bin/
+obj/
+*.user
+.vs/
+
+# Rhino integration test scratch output
+tests/Moyu.RhinoTests/out/
+
+# Release packages (built by tools/package.py)
+dist/

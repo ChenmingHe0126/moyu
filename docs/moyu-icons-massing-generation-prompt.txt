@@ -1,0 +1,46 @@
+Moyu Massing icon sheet — generation record
+Mode: built-in image_gen
+Style reference: docs/images/moyu-icons-3d-blue-violet-source.png
+Final output: docs/images/moyu-icons-massing-source.png
+Actual size: 1254 x 1254 px, RGBA PNG
+Layout: 2 columns x 2 rows; Massing Study, Voxel Unit, Unit Library; bottom-right empty
+
+GENERATION PROMPT
+
+Create ONE new transparent PNG sprite sheet containing exactly THREE Grasshopper toolbar icons for Moyu's Massing panel.
+
+REFERENCE IMAGE ROLE: the attached Moyu 3D icon sheet is solely a visual FAMILY reference: its dark indigo contours, blue-violet and icy-white palette, compact isometric engineering symbols, and consistent line weight. Invent the THREE new architectural icons described below. Do not reuse any of the old seven designs, their arrangement, arrows, clocks, or cutaway optimization cubes.
+
+CRITICAL COMPOSITION: square canvas, exactly TWO COLUMNS by TWO ROWS of equal square cells. Three icons only:
+TOP LEFT = Massing Study.
+TOP RIGHT = Voxel Unit.
+BOTTOM LEFT = Unit Library.
+BOTTOM RIGHT = COMPLETELY EMPTY transparent alpha.
+Center each icon within its own cell and fit the whole silhouette into the central 68–70% of the cell, leaving at least 15% clear transparent padding on all sides. Leave the entire lower-right quarter fully transparent without stray marks or fragments. Do not recenter the bottom icon across the canvas. No visible cell borders, backing tiles, captions or dividers.
+
+INTENDED USE AND MEANING:
+These are believable architectural massing-design tools in Rhino/Grasshopper. Behind this architectural presentation is VoxStack, a 3D voxel layer-clearing game played in the Rhino viewport. Pieces fall into a 5×5×12 well; keyboard input moves/rotates them, complete layers clear and score, filling the well ends the game. A boss key changes the viewport to a professional white architectural massing study with a site, surrounding buildings, and development metrics. The toolbar icons should naturally read as normal architectural design components. The game background explains the functions but should NOT become overt game imagery.
+
+TOP LEFT — MASSING STUDY:
+The main component starts or stops the interactive study/session, sets volume dimensions, mode and starting level. In architectural mode, the stacked voxels become building massing, each cell representing a structural bay and three floors, producing floor area, FAR, floor count, coverage and height.
+Dominant visual idea: an architectural MASSING STUDY on a simple site plate, with a purposeful stepped or terraced arrangement of solid building volumes at different heights. It should read as a composed development model or parametric building-massing generator. One restrained violet volume can indicate the active design portion. Use broad clean faces and a confident architectural silhouette. Do not try to depict the entire game well or write metrics.
+
+TOP RIGHT — VOXEL UNIT:
+Creates one custom spatial voxel module from a closed solid, voxel center points, or a text pattern. Cells are retained when their centers lie inside the solid; the result is face-connected, no more than 10 cubes and at most 4 units along any axis. Larger and stranger units alter scoring.
+Dominant visual idea: ONE isolated, compact, face-connected three-dimensional polycube module assembled from roughly four or five readily countable cubic cells, one cell picked out in violet to suggest editability. Clearly a reusable volumetric building unit. Make its spatial shape easy to recognize, with intentional negative space. No disconnected floating cubes, letter shapes or text.
+
+BOTTOM LEFT — UNIT LIBRARY:
+Combines a built-in catalog of units with custom voxel units into one reusable collection that feeds Massing Study.
+Dominant visual idea: an ORGANIZED COLLECTION of two or three visibly different compact volumetric modules, held together by one simple architectural sample tray, catalog rack or shared collection frame. It should convey several reusable unit types gathered into one library. Distinct from the single Voxel Unit and the site/building model above. Use one violet accent to distinguish a custom unit from blue standard units. Keep the collection compact, clear and sparse.
+
+BOTTOM RIGHT: pure transparent empty space, absolutely no fourth icon or decoration.
+
+STYLE:
+Professional Grasshopper toolbar pictograms with silhouettes readable when reduced to 24×24. Cohesive isometric / three-quarter view, sturdy consistent dark-indigo contours and crisp flat-color faces. Match the reference family's blue-violet and ice-white identity while making these icons look architectural.
+Palette direction: deep indigo #263867 contours; cornflower blue #477DDA main forms; iris violet #8067C7 accents; ice-white #EFF4FF top faces and light areas.
+Three distinct dominant silhouettes: a terraced building on a site; a single connected module; an organized module collection. Balanced visual weight across the three.
+No tiny decorative geometry, dense voxel grids, gradients, drop shadows, ambient background, glossy rendering, glow or photographic textures.
+No text, letters, numbers, equations, interface labels, logos, watermark, gamepad, score display, play button, falling-piece arrow, cartoon faces or overt game symbols.
+Use actual transparent alpha, not a white or checkerboard background.
+Deliver exactly ONE square 2×2 sprite sheet with THREE icons and the lower-right cell empty.
+

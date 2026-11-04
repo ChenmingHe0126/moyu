@@ -1,0 +1,115 @@
+/* Moyu user guide: A4 pages printed by tools/make_guide.py. Palette from the icons (docs/visual-style.md). */
+@page { size: A4; margin: 0; }
+:root {
+  --ink: #263867; --blue: #477DDA; --iris: #8067C7; --ice: #EFF4FF; --coral: #E8735F;
+  --text: #2B3040; --muted: #687085; --line: #E1E5EE; --warm: #FBF5EF;
+}
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body {
+  margin: 0; background: #FFFFFF; color: var(--text);
+  font-family: "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", sans-serif; font-size: 9.4pt; line-height: 1.5;
+}
+html[lang="zh-CN"] body { font-family: "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif; font-size: 9.1pt; }
+.page {
+  width: 210mm; height: 297mm; padding: 12mm 15mm 14mm; position: relative; overflow: hidden;
+  break-after: page; page-break-after: always;
+}
+.page:last-child { break-after: auto; page-break-after: auto; }
+.ph { display: flex; gap: 2.5mm; align-items: baseline; font-size: 7.2pt; letter-spacing: .16em; font-weight: 600;
+      color: var(--coral); text-transform: uppercase; }
+.ph .num { color: var(--ink); }
+h1 { font-size: 34pt; margin: 0; color: var(--ink); font-weight: 600; letter-spacing: -.02em; line-height: 1.1; }
+h1 span { font-size: 15pt; color: var(--coral); font-weight: 600; letter-spacing: 0; margin-left: 2mm; }
+h2 { font-size: 19pt; margin: 1.2mm 0 1mm; color: var(--ink); font-weight: 600; letter-spacing: -.01em; line-height: 1.2; }
+h2 small { font-size: 11pt; color: var(--muted); font-weight: 400; margin-left: 2mm; letter-spacing: 0; }
+h3 { font-size: 10.6pt; margin: 3.6mm 0 1.6mm; color: var(--ink); font-weight: 600; }
+p { margin: 0 0 2mm; }
+.lead { font-size: 10.2pt; color: #4A5266; margin: 0 0 3.5mm; line-height: 1.5; }
+figure { margin: 0; }
+figure img { width: 100%; display: block; border-radius: 2.2mm; }
+figcaption { font-size: 7.7pt; color: var(--muted); margin-top: 1.1mm; line-height: 1.4; }
+figcaption b { color: var(--ink); font-weight: 600; }
+.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm 4mm; }
+.g3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.g23 { display: grid; grid-template-columns: 1.55fr 1fr; gap: 4mm; align-items: start; }
+.comps { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 5mm; margin: 1mm 0 1mm; }
+.comps.one { grid-template-columns: 1fr; }
+.comp { display: flex; gap: 2.6mm; align-items: flex-start; }
+.comp img { width: 9.5mm; height: 9.5mm; flex: none; margin-top: .4mm; }
+.comp b { display: block; color: var(--ink); font-size: 8.9pt; }
+.comp span { display: block; font-size: 8.1pt; color: #434A5B; line-height: 1.42; }
+.keys { display: grid; grid-template-columns: max-content 1fr; gap: 1.5mm 3.5mm; align-items: baseline; font-size: 8.4pt; }
+kbd {
+  display: inline-block; min-width: 5.4mm; padding: .15mm 1.3mm; margin: 0 .5mm .5mm 0; border: 1px solid #C9D0DE;
+  border-bottom-width: 2px; border-radius: 1.2mm; background: #FFFFFF; color: var(--ink); text-align: center;
+  font-family: "Segoe UI", "Microsoft YaHei UI", sans-serif; font-size: 7.7pt; line-height: 1.5; white-space: nowrap;
+}
+.note { background: var(--ice); border-radius: 2.4mm; padding: 2.6mm 3.6mm; font-size: 8.3pt; line-height: 1.5; }
+.note.warm { background: var(--warm); }
+.note b { color: var(--ink); }
+.note ul { margin: 0; padding-left: 4mm; }
+.note li { margin: .5mm 0; }
+.pf {
+  position: absolute; left: 15mm; right: 15mm; bottom: 7mm; display: flex; justify-content: space-between;
+  border-top: 1px solid var(--line); padding-top: 1.4mm; font-size: 6.9pt; color: #9AA1B2;
+}
+svg { display: block; width: 100%; height: auto; }
+code { font-family: Consolas, "Microsoft YaHei UI", monospace; font-size: 7.8pt; background: #F2F4F8; padding: 0 .9mm;
+       border-radius: .8mm; color: #3A4256; }
+.tag { display: inline-block; font-size: 7pt; font-weight: 600; letter-spacing: .08em; color: var(--coral);
+       text-transform: uppercase; }
+.chip { display: inline-flex; align-items: center; gap: 1.3mm; margin: 0 2.6mm 1.3mm 0; font-size: 8.1pt; }
+.chip i { width: 3.4mm; height: 3.4mm; border-radius: .9mm; background: var(--c); display: inline-block;
+          border: 1px solid rgba(0, 0, 0, .12); }
+.items { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.6mm 3mm; }
+.item { display: flex; align-items: center; gap: 1.8mm; font-size: 8.1pt; }
+.item svg { width: 5mm; height: 5mm; flex: none; }
+.steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2mm; }
+.step { background: var(--ice); border-radius: 2.4mm; padding: 2.4mm 2.6mm; font-size: 7.9pt; line-height: 1.42; position: relative; }
+.step b { display: block; color: var(--ink); font-size: 8.6pt; margin-bottom: .6mm; }
+.step em { font-style: normal; color: var(--coral); font-weight: 700; margin-right: 1mm; }
+.study { display: grid; grid-template-columns: 9mm 1fr; gap: 1.6mm 3mm; align-items: start; font-size: 8.2pt; }
+.study img { width: 9mm; height: 9mm; }
+.study b { color: var(--ink); }
+.install { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.install > div { border: 1px solid var(--line); border-radius: 2.4mm; padding: 2.8mm 3.2mm; font-size: 8.2pt; }
+.install h4 { margin: 0 0 1.2mm; font-size: 9.4pt; color: var(--ink); }
+.install ol { margin: 0; padding-left: 4.2mm; }
+.install li { margin: .5mm 0; }
+.ex { display: grid; grid-template-columns: 34mm 1fr; gap: 3mm; align-items: start; }
+.ex img { width: 34mm; height: 21mm; object-fit: cover; border-radius: 1.8mm; display: block; }
+.pcards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3.5mm 3.5mm; }
+.pcards img { width: 100%; height: 30mm; object-fit: cover; border-radius: 1.8mm; display: block; }
+.pcards b { display: block; color: var(--ink); font-size: 9pt; margin-top: 1.2mm; }
+.pcards span { display: block; font-size: 7.9pt; color: #434A5B; line-height: 1.42; }
+.proto { display: grid; grid-template-columns: 1fr 8mm 1fr; gap: 2mm; align-items: center; }
+.proto img { height: 30mm; object-fit: cover; }
+.where { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.where > div { background: var(--ice); border-radius: 2.4mm; padding: 2.6mm 3mm; font-size: 8pt; }
+.where h4 { margin: 0 0 1mm; font-size: 9pt; color: var(--ink); }
+.where code { display: block; background: #FFFFFF; margin: .8mm 0; white-space: normal; word-break: break-all; }
+.ex b { color: var(--ink); font-size: 9pt; display: block; }
+.ex span { font-size: 8.1pt; color: #434A5B; display: block; line-height: 1.42; }
+.panels { display: grid; grid-template-columns: max-content 1fr; gap: 1.6mm 4mm; font-size: 8.4pt; align-items: baseline; }
+.panels b { color: var(--ink); }
+.cover .top { display: flex; gap: 7mm; align-items: center; margin: 6mm 0 7mm; }
+.cover .fish { width: 34mm; height: 34mm; }
+.cover .kick { font-size: 7.4pt; letter-spacing: .18em; color: var(--coral); font-weight: 600; margin-bottom: 1.5mm; }
+.cover .lead { font-size: 12pt; margin: 2mm 0 1mm; color: #3B4357; }
+.cover .sub { font-size: 10pt; color: var(--muted); margin: 0; }
+.mosaic { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3mm; }
+.mosaic figure img { height: 47mm; object-fit: cover; }
+img.fit { object-fit: contain !important; background: #D6D6D6; }
+.toc { columns: 2; column-gap: 8mm; margin: 0; padding: 0; list-style: none; font-size: 8.8pt; }
+.toc li { display: flex; justify-content: space-between; border-bottom: 1px dotted #CCD2DE; padding: .9mm 0; break-inside: avoid; }
+.toc li span:last-child { color: var(--muted); }
+.qa { display: grid; grid-template-columns: 1fr 1fr; gap: 2.6mm 6mm; font-size: 8.3pt; }
+.qa b { display: block; color: var(--ink); font-size: 8.8pt; margin-bottom: .4mm; }
+.arrow { display: flex; align-items: center; justify-content: center; font-size: 8pt; color: var(--muted); flex-direction: column; gap: 1mm; }
+.boss { display: grid; grid-template-columns: 1fr 15mm 1fr; gap: 2mm; align-items: center; }
+.runstop { display: flex; gap: 3mm; align-items: flex-start; }
+.runstop img { height: 33mm; width: auto; border-radius: 1.5mm; border: 1px solid var(--line); }
+.mt { margin-top: 3mm; }
+.mt2 { margin-top: 2mm; }
+.small { font-size: 7.8pt; color: var(--muted); }

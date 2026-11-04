@@ -1,0 +1,36 @@
+Moyu Section icon sheet — generation record
+Mode: built-in image_gen
+Style reference: docs/images/moyu-icons-facade-source.png
+Final output: docs/images/moyu-icons-section-source.png
+Actual size: 1774 x 887 px, RGBA PNG (alpha 0–255), generated once
+Layout: 2 columns x 1 row; Airflow Study on the left, Storey Grid on the right
+
+GENERATION PROMPT
+
+Create ONE original transparent PNG sprite sheet with exactly TWO Grasshopper toolbar component icons for Moyu's SECTION panel.
+
+REFERENCE IMAGE ROLE: the attached Moyu Facade sheet is ONLY a visual-family reference: consistent dark-indigo outlines, blue/violet and icy-white palette, compact three-quarter/isometric architectural glyphs. Do not copy its facade or brick glyphs. The new output must have TWO icons in ONE HORIZONTAL ROW.
+
+LAYOUT:
+Canvas aspect ratio exactly 2:1, two equal square cells side by side, 2 columns × 1 row.
+LEFT CELL = Airflow Study. RIGHT CELL = Storey Grid.
+Center each complete icon within its own square cell. Keep every shape inside the central 68–70% of its cell, with at least 15% transparent clearance on every side. Equal visual size and line weight. No part crosses the center border. Actual transparent alpha background everywhere outside the glyphs. No extra row or empty cell. No visible grid borders, backing tiles, labels, text, letters, numbers, watermark or UI screenshot.
+
+FUNCTIONAL CONTEXT:
+These tools should read naturally as professional BUILDING SECTION / NATURAL VENTILATION AND DAYLIGHT components in Rhino and Grasshopper.
+The panel's underlying activity is Swift, a one-button flyer through an endless building section; a boss key presents it as a house section with daylight and ventilation analysis: cut walls and slabs in solid poché, a pitched roof with eaves, sun rays at the solstices, and cross and stack airflow lines passing through openings. Use the professional section/ventilation interpretation for the icon imagery. The game context is explanatory only; no overt game imagery (no bird, feathers or score).
+
+LEFT ICON — AIRFLOW STUDY:
+Starts and stops the interactive study, takes the section grid settings, the section plane and scale. In design mode it outputs the flight path curve, the section's cut outlines, and daylight and air-change figures.
+Make NATURAL VENTILATION THROUGH A HOUSE SECTION the unmistakable dominant idea: a simple two-storey house section outline with a pitched roof in dark indigo, and ONE bold violet curved airflow arrow entering low on one side and rising out near the ridge, plus a small icy-white sun ray or two from the upper left. Few, bold elements; the roof outline and the arrow must read at 24×24.
+
+RIGHT ICON — STOREY GRID:
+Sets the section grid: wind exposure class, mode, opening height factor, bay width factor and a fixed seed, and previews the first walls of the layout.
+Make a SECTION SETTING-OUT GRID the unmistakable dominant idea: a rectangular section frame (a floor line and a ceiling line) divided by three or four evenly spaced vertical cross walls, each with ONE opening at a different height, one opening highlighted in violet; a small dimension tick on top. Clearly different from the left icon: the left is one house with airflow, the right is a regular grid of walls and openings.
+
+COHERENT DESIGN:
+Palette direction: dark indigo #263867 contours and poché, cornflower blue #477DDA main faces, soft iris violet #8067C7 functional accents, ice-white #EFF4FF light regions.
+Crisp flat color planes with consistent sturdy outlines. Volume indicated by shape and discrete face colors, not smooth gradients. Clean, architectural, understated, technically legible. Designed to remain recognizable as 24×24 Grasshopper toolbar icons. Few broad features and generous negative space; avoid fine repeated lines.
+No gloss, photorealism, cast shadow, glow, texture, drop shadows or backdrop.
+No text, letters, numbers, birds, feathers, wings or game symbols.
+Output only ONE wide 2:1 transparent sprite sheet containing exactly these TWO new Section icons, left to right in the specified order.

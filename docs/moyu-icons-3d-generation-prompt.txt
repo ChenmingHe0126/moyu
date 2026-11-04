@@ -1,0 +1,59 @@
+Moyu 3D icon sheet — generation record
+Mode: built-in image_gen
+Style reference: docs/images/moyu-icons-blue-violet-source.png
+Final output: docs/images/moyu-icons-3d-blue-violet-source.png
+Final size: 1774 x 887 px, RGBA PNG
+
+INITIAL GENERATION PROMPT
+
+Create ONE new transparent PNG sprite sheet for the SEVEN 3D topology-optimisation components of the Grasshopper plugin Moyu.
+
+REFERENCE IMAGE ROLE: the attached existing Moyu 2D icon sheet is a STYLE AND COLOR reference only. Match its authored icon family, bold dark-indigo outlines, clean blue and violet shapes, icy-white details and compact engineering-symbol character. Invent new THREE-DIMENSIONAL icons from the functional briefs below. Do not copy the old 2D symbols, do not include a plugin logo, and do not reproduce eight filled cells.
+
+LAYOUT IS CRITICAL: exactly FOUR equal square columns and TWO equal square rows, wide 2:1 sheet. Seven icons total. Top row has four icons. Bottom row has three icons in its LEFT THREE cells. The bottom-right EIGHTH cell is completely empty transparent space. Do not recenter the bottom row or fill the last cell with any mark. Keep an ample transparent margin of about 15% inside every cell, equal visual weight, consistent centering and scale. No visible tile borders, backing cards, dividers, UI chrome, labels, letters, numbers, captions or watermark. Genuine transparent alpha background, not white or checkerboard.
+
+ART DIRECTION: professional Grasshopper toolbar pictograms designed for legibility at 24×24 pixels. Three-dimensional engineering concepts expressed in clear, compact isometric / three-quarter glyphs; controlled flat face colors convey volume. Deep indigo #263867 outlines, cornflower blue #477DDA main bodies, restrained iris violet #8067C7 functional accents, ice-white #EFF4FF light areas. Maintain the blue-violet / ice-white Moyu family. Consistent sturdy contours, distinct silhouettes, generous internal negative space. No photorealism, shiny 3D rendering, shadows, glow or gradients. Use a few LARGE voxel units rather than busy fine meshes. A single dominant idea plus at most one compact secondary cue per icon. This is a small toolbar asset set, not an infographic. Form follows the functions; freely choose the most intelligible geometry.
+
+FUNCTIONAL BRIEFS AND EXACT CELL ORDER:
+
+ROW 1, COLUMN 1 — BOUNDARY 3D:
+Convert a closed solid Brep or mesh into a voxel grid defining the three-dimensional space where material may exist. Solids nested inside the outer solid create holes. Communicate a volumetric design domain and a meaningful internal void, with a few visible voxel cells. Clear volume and inside/outside, not a flat 2D boundary.
+
+ROW 1, COLUMN 2 — LOAD 3D:
+Apply an external force to points, curves or surfaces, evenly distributing it over the contacted nodes. Communicate a directional force acting across contact locations of a three-dimensional body. An easily recognized force direction and distributed contact are more important than depicting every supported input type.
+
+ROW 1, COLUMN 3 — SUPPORT 3D:
+Constrain a structure at points, curves or surfaces; independently lock displacements in the X, Y and Z spatial directions. Communicate anchoring or restraint in THREE dimensions, using orthogonal spatial relationships. Do not draw letters X/Y/Z. Distinct from a load arrow or an unconstrained axis gizmo.
+
+ROW 1, COLUMN 4 — AREA 3D:
+Specify local regions of the design volume that must remain solid, such as a floor slab, or must remain void, such as a passage. Communicate retained material and an intentionally open route/region within the same small volumetric patch. The filled-versus-empty distinction must be immediate; violet accents may identify the designated region.
+
+ROW 2, COLUMN 1 — MATERIAL 3D:
+Set Young's modulus and Poisson's ratio. Communicate a three-dimensional elastic material and its deformation response, including axial deformation with lateral response. One unified compact elastic-material glyph; no equations, text or tiny plotted axes.
+
+ROW 2, COLUMN 2 — SIMP SOLVER 3D:
+Iteratively optimise the topology on a voxel grid, advancing one or more steps with each timer Trigger until the result converges. Communicate iterative refinement of a volumetric structure with a modest timing cue. Keep a strong readable iteration identity, a few visible voxel forms, and a small simple timer indication; avoid dense machinery.
+
+ROW 2, COLUMN 3 — VISUALIZE 3D:
+Display the computed topology as voxel blocks or a smooth surface, with loads and supports shown. Communicate viewing a three-dimensional structural result, with a clear transition or comparison between blocky voxels and a smooth optimized surface. Tiny force/restraint cues may be integrated if they remain legible. Prioritize the result itself and keep the silhouette recognizable.
+
+ROW 2, COLUMN 4 — COMPLETELY EMPTY:
+Pure transparent space. No icon, no placeholder, no logo, no ornament.
+
+Deliver one cohesive seven-icon sheet. Seven distinct functional silhouettes, coherent Moyu colors and line weight, clear spatial forms, balanced 4×2 grid, transparent background, absolutely no text.
+
+LAYOUT REFINEMENT PROMPT
+
+Edit this existing seven-icon Moyu 3D sheet ONLY TO CORRECT LAYOUT AND SPACING. Preserve all seven icon designs, exact component order, colors, strokes and transparent background.
+
+Keep the 2:1 aspect ratio and divide the canvas conceptually into exactly 4 equal columns and 2 equal rows. Uniformly reduce each COMPLETE icon to fit comfortably within the CENTRAL 70% of its own cell, and center it horizontally and vertically within that cell. This means each glyph has at least 15% of cell width/height of perfectly transparent clearance on all sides. Each icon and all of its sub-symbols must remain together within its cell. Do not crop off any arrow, stop, timer, or edge.
+
+Especially the bottom-row THIRD icon (voxel-to-smooth visualization) must move/scale inward so NONE of its pixels reaches the fourth column. The entire rightmost quarter of the lower half of the canvas (bottom-right eighth cell, x=75%..100%, y=50%..100%) must be PERFECTLY EMPTY TRANSPARENT ALPHA. Absolutely no fragments, stray marks, background texture, border or placeholder inside that last cell.
+
+The seven designs stay:
+Top row: Boundary 3D, Load 3D, Support 3D, Area 3D.
+Bottom row left three cells: Material 3D, SIMP Solver 3D, Visualize 3D.
+Bottom row fourth cell EMPTY.
+
+No labels or text. No cell borders. No shadows. Keep the blue-purple and ice-white artwork, and actual transparent alpha. Only change scale and positioning, not design. Deliver one corrected sprite sheet.
+

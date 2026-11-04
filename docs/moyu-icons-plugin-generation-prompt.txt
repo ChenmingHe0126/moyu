@@ -1,0 +1,33 @@
+Moyu plug-in icon sheet — generation record
+Mode: built-in image_gen
+Style reference: docs/images/moyu-icons-section-source.png
+Final output: docs/images/moyu-icons-plugin-candidates.png (two candidate designs; the chosen cell becomes docs/images/moyu-icons-plugin-source.png)
+Actual size: 1774 x 887 px, RGBA PNG (alpha range 0–255); generated 2026-11-04 with codex-cli 0.166.0
+Layout: 2 columns x 1 row; candidate A (fish alone) on the left, candidate B (fish with the touching hand) on the right
+
+GENERATION PROMPT
+
+Create ONE original transparent PNG sprite sheet with exactly TWO candidate designs for the MAIN PLUG-IN ICON of Moyu, a Grasshopper plug-in for Rhino. The two cells are two alternatives for the same icon, not two different tools.
+
+REFERENCE IMAGE ROLE: the attached Moyu Section sheet is ONLY a visual-family reference: consistent dark-indigo outlines, blue/violet and icy-white palette, compact flat-colour glyphs with sturdy contours. Do not copy its building section, arrows or storey grid, and DO NOT copy its layout beyond the fact that icons sit in equal square cells. The new output must have TWO icons in ONE HORIZONTAL ROW.
+
+LAYOUT:
+Canvas aspect ratio exactly 2:1, two equal square cells side by side, 2 columns × 1 row.
+LEFT CELL = candidate A. RIGHT CELL = candidate B.
+Center each complete icon within its own square cell. Keep every shape inside the central 68–70% of its cell, with at least 15% transparent clearance on every side. Equal visual size and line weight. No part crosses the centre border. Actual transparent alpha background everywhere outside the glyphs. No extra row or empty cell. No visible grid borders, backing tiles, labels, text, letters, numbers, watermark or UI screenshot.
+
+CONTEXT:
+"Moyu" is the Chinese 摸鱼, literally "touching fish", everyday slang for slacking off at work. The plug-in is a topology-optimisation toolkit (2D pixel and 3D voxel SIMP) that also hides four small games behind architecture study tools. This icon appears on the Grasshopper ribbon tab (24 × 24 px), in Rhino's Package Manager and on the food4rhino page, so it must put a FISH at the centre as the slacking-off pun while still belonging to the same crisp, technical icon family as the reference. A fish built from blocky voxel cells also hints at the plug-in's voxel grids.
+
+CANDIDATE A — VOXEL FISH (left cell):
+One single plump fish in side view, swimming to the LEFT, filling the cell as one unified silhouette. Its body is assembled from three to five chunky rounded voxel blocks in cornflower blue, with a lighter ice-white belly block, so the fish reads as pixelated/voxelised but still unmistakably a fish. A crescent tail fin and one small dorsal fin in iris violet. One large round ice-white eye with a dark-indigo pupil near the front. Two tiny square "pixels" drifting off behind the tail like bubbles, suggesting a density field dissolving. Nothing else.
+
+CANDIDATE B — TOUCHING THE FISH (right cell):
+The same voxel fish, slightly smaller and raised toward the upper part of the cell, with a very simplified open hand reaching up from the lower-left to touch its belly with one extended finger: the literal "touching fish" gesture. The hand is a smooth mitten-like silhouette in ice-white with a dark-indigo outline, one raised index finger, no wrist, no sleeve, no nails, no knuckle lines. Hand and fish must read as two clear shapes that still form one compact unified glyph. Nothing else.
+
+COHERENT DESIGN:
+Palette direction: dark indigo #263867 contours, cornflower blue #477DDA main faces, soft iris violet #8067C7 fins/accents, ice-white #EFF4FF light regions.
+Crisp flat colour planes with consistent sturdy outlines. Volume indicated by shape and discrete face colours, not gradients. Friendly but understated and technically legible, like an authored product icon, not a cartoon mascot: no mouth smile, no eyelashes, no cheeks.
+Designed to remain recognisable at 24 × 24 pixels: few broad features, generous negative space, no scale texture, no thin repeated lines, no water, no waves, no seaweed, no bowl, no hook, no bubbles beyond the two square pixels described.
+No gloss, photorealism, cast shadow, glow, texture, drop shadows or backdrop. No text, letters or numbers anywhere.
+Output only ONE wide 2:1 transparent sprite sheet containing exactly these TWO candidate icons, left to right in the specified order.

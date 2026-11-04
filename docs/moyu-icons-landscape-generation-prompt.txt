@@ -1,0 +1,38 @@
+Moyu Landscape icon sheet — generation record
+Mode: built-in image_gen
+Style reference: docs/images/moyu-icons-massing-source.png
+Final output: docs/images/moyu-icons-landscape-source.png
+Actual size: 1774 x 887 px, RGBA PNG
+Layout: 2 columns x 1 row; Path Study on the left, Site Surface on the right
+
+GENERATION PROMPT
+
+Create ONE original transparent PNG sprite sheet with exactly TWO Grasshopper toolbar component icons for Moyu's LANDSCAPE panel.
+
+REFERENCE IMAGE ROLE: the attached Moyu Massing sheet is ONLY a visual-family reference: consistent dark-indigo outlines, blue/violet and icy-white palette, compact three-quarter/isometric architectural glyphs. Do not copy its buildings, cube modules or library tray, and DO NOT copy its 2-by-2 layout. The new output must have TWO icons in ONE HORIZONTAL ROW.
+
+LAYOUT:
+Canvas aspect ratio exactly 2:1, two equal square cells side by side, 2 columns × 1 row.
+LEFT CELL = Path Study. RIGHT CELL = Site Surface.
+Center each complete icon within its own square cell. Keep every shape inside the central 68–70% of its cell, with at least 15% transparent clearance on every side. Equal visual size and line weight. No part crosses the center border. Actual transparent alpha background everywhere outside the glyphs. No extra row or empty cell. No visible grid borders, backing tiles, labels, text, letters, numbers, watermark or UI screenshot.
+
+FUNCTIONAL CONTEXT:
+These tools should read naturally as professional LANDSCAPE DESIGN / SURFACE ANALYSIS components in Rhino and Grasshopper.
+The panel's underlying activity is Serpentine, a snake game constrained to a terrain or other surface: the route follows surface-grid cells, grows when collecting fruit, can wrap around closed surface directions, and is affected by slope. A boss key presents it as a landscape circulation study: topographic contours and slope analysis, a draped walking route, destination nodes, route length and elevation/slope metrics. Use the professional landscape-design interpretation for the icon imagery. The game context is explanatory only; no overt game or snake imagery.
+
+LEFT ICON — PATH STUDY:
+Receives a site surface, starts/stops the interactive study, sets grid density/mode/level and slope influence. In design mode it outputs a walking path curve that stays ON the terrain, route length, cumulative ascent, average/maximum slope and accessible-slope proportion.
+Make the ROUTE the unmistakable dominant idea: a confident winding violet path laid directly on a gently undulating blue-and-ice-white terrain patch, with one modest node at each end. The path must visibly follow the surface rather than float above it. Keep terrain low and restrained so the path is obvious at small scale. One or two broad topographic cues are enough. Communicate landscape circulation, ascent and surface-following study without text or charts. Simple unified silhouette, no vehicles, road lane markings or game objects.
+
+RIGHT ICON — SITE SURFACE:
+Generates ready-to-use parametric site surfaces: undulating terrain, torus, S-shaped circular tube, saddle roof, sphere; size and random seed are configurable.
+Make the SURFACE itself the unmistakable dominant idea: one clean standalone curved patch with visibly changing elevation and a few bold surface-grid curves, suggesting editable/generated geometry. Choose a simple graceful saddle or wave-like patch with a distinct raised/curving silhouette. A representative surface communicates the family of generated forms; do not assemble five miniature objects. Use a restrained violet boundary or control accent to distinguish editable geometry. No walking path or paired destination nodes on this icon.
+
+COHERENT DESIGN:
+The two glyphs must be visibly distinct: the left is about a flowing route over low terrain, the right is about a sculptural editable surface. Same authored icon family as the reference.
+Palette direction: dark indigo #263867 contours, cornflower blue #477DDA main faces, soft iris violet #8067C7 functional accents, ice-white #EFF4FF light regions.
+Crisp flat color planes with consistent sturdy outlines. Volume indicated by shape and discrete face colors, not smooth gradients. Clean, architectural, understated, technically legible. Designed to remain recognizable as 24×24 Grasshopper toolbar icons. Few broad features and generous negative space; avoid fine repeated mesh lines.
+No gloss, photorealism, cast shadow, glow, texture, drop shadows or backdrop.
+No snake head/eyes/tongue, fruit, bombs, gamepad, score, play button, stopwatch, flags with letters, equations or annotation text.
+Output only ONE wide 2:1 transparent sprite sheet containing exactly these TWO new Landscape icons, left to right in the specified order.
+

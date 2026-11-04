@@ -1,0 +1,67 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- Select the framework(s) you wish to target.
+        Rhino 6: net45
+        Rhino 7: net48
+        Rhino 8 Windows: net48, net7.0, net7.0-windows, net7.0-windows10.0.22000.0, etc
+        Rhino 8 Mac: net7.0, net7.0-macos, net7.0-macos12.0, etc
+    -->
+    <TargetFrameworks>net7.0-windows;net7.0;net48</TargetFrameworks>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <TargetExt>.gha</TargetExt>
+    <!-- CA1416: System.Drawing is Windows-only in .NET, but Rhino for Mac ships its own implementation. -->
+    <NoWarn>NU1701;NETSDK1086;CA1416</NoWarn>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <LangVersion>latest</LangVersion>
+    <!-- The FE solver is unusably slow without JIT optimisation (SIMD), so optimise Debug builds too. -->
+    <Optimize>true</Optimize>
+    <!-- Released .gha files must not carry this machine's folders: map the source and PDB paths to a neutral root. -->
+    <Deterministic>true</Deterministic>
+    <PathMap>$(MSBuildProjectDirectory)=/_/Moyu</PathMap>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Specifies information for Assembly and Yak. MoyuInfo reads Description and the informational version (Version
+         without the "+commit" metadata, pre-release suffix kept) back from the assembly, and tools/package.py reads Version
+         and refuses Release outputs built from a different one, so the Grasshopper library dialog, manifest.yml and the
+         packages all agree. -->
+    <Version>1.0.0</Version>
+    <Title>Moyu</Title>
+    <Authors>Ming</Authors>
+    <Company>Ming</Company>
+    <Copyright>Copyright (c) 2026 Ming</Copyright>
+    <Description>A research and teaching project on developing a Rhino plugin quickly with an AI coding agent (written mostly by Claude Code): live 2D/3D topology optimisation for Grasshopper, plus four small viewport games that study interaction and display in Rhino, each disguised as an architecture study with a boss key. Source, plans and time logs are on GitHub. Windows only.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/ChenmingHe0126/moyu</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/ChenmingHe0126/moyu</RepositoryUrl>
+    <!-- The Rhino that Properties/launchSettings.json starts. Rhino installed elsewhere: set RhinoExe in Moyu.csproj.user (git-ignored). -->
+    <RhinoExe Condition="'$(RhinoExe)' == ''">C:\Program Files\Rhino 8\System\Rhino.exe</RhinoExe>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grasshopper" Version="8.0.23304.9001" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+  <!-- 24x24 icons named after the component class (BoundaryComponent.png …) plus Moyu.png for the tab. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Icons\*.png" LogicalName="Moyu.Icons.%(Filename).png" />
+  </ItemGroup>
+
+  <!-- For Windows only builds -->
+  <PropertyGroup Condition="$(TargetFramework.Contains('-windows')) or $(TargetFramework.StartsWith('net4'))">
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <!-- Reference WinForms for .NET 7.0 on macOS -->
+  <ItemGroup Condition="!($(TargetFramework.Contains('-windows')) or $(TargetFramework.StartsWith('net4')))">
+    <!-- Rhino 8.11 and later you can use this -->
+    <!-- <FrameworkReference Include="Microsoft.WindowsDesktop.App.WindowsForms" /> -->
+
+    <!-- Rhino 8.10 and earlier -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" ExcludeAssets="all" GeneratePathProperty="true" />
+    <Reference Include="$(PkgMicrosoft_NETFramework_ReferenceAssemblies_net48)\build\.NETFramework\v4.8\System.Windows.Forms.dll" Private="False" />
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" ExcludeAssets="runtime" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,404 @@
+<!doctype html>
+<!-- Source of the user guide PDFs. Build with: python tools/make_guide.py (see the script for the markers). -->
+<html lang="@@LANG@@">
+<head>
+<meta charset="utf-8">
+<title><zh>Moyu @@VERSION@@ 用户手册</zh><en>Moyu @@VERSION@@ user guide</en></title>
+<link rel="stylesheet" href="guide.css">
+</head>
+<body>
+
+<!-- 1 · Cover -->
+<section class="page cover">
+  <div class="top">
+    <img class="fish" src="icons/Moyu.png" alt="">
+    <div>
+      <div class="kick">GRASSHOPPER PLUGIN · RHINO 8 FOR WINDOWS</div>
+      <h1>Moyu<span>@@VERSION@@</span></h1>
+      <p class="lead"><zh>交互式拓扑优化，加上四个伪装成建筑研究工具的视口小游戏</zh><en>Interactive topology optimisation, plus four viewport games disguised as architecture study tools</en></p>
+      <p class="sub"><zh>用户手册 · 一个用 AI 编程代理快速开发插件的研究与教学项目</zh><en>User guide · a research and teaching project on building a plugin quickly with an AI coding agent</en></p>
+    </div>
+  </div>
+  <div class="mosaic">
+    <figure><img class="fit" src="img/vis_pixels.jpg" alt=""><figcaption><b><zh>2D 像素拓扑优化</zh><en>2D pixel optimisation</en></b> · 2D</figcaption></figure>
+    <figure><img class="fit" src="img/c3d_final.jpg" alt=""><figcaption><b><zh>3D 体素拓扑优化</zh><en>3D voxel optimisation</en></b> · 3D</figcaption></figure>
+    <figure><img src="img/vox.jpg" alt=""><figcaption><b><zh>VoxStack 叠楼</zh><en>VoxStack</en></b> · Massing</figcaption></figure>
+    <figure><img src="img/snake.jpg" alt=""><figcaption><b><zh>Serpentine 蜿蜒</zh><en>Serpentine</en></b> · Landscape</figcaption></figure>
+    <figure><img src="img/rebound.jpg" alt=""><figcaption><b><zh>Rebound 回弹</zh><en>Rebound</en></b> · Facade</figcaption></figure>
+    <figure><img src="img/swift.jpg" alt=""><figcaption><b><zh>Swift 雨燕</zh><en>Swift</en></b> · Section</figcaption></figure>
+  </div>
+  <h3 class="mt"><zh>目录</zh><en>Contents</en></h3>
+  <ol class="toc">
+    <li><span><zh>关于这个项目</zh><en>About this project</en></span><span>2</span></li>
+    <li><span><zh>安装与面板</zh><en>Install and panels</en></span><span>3</span></li>
+    <li><span><zh>示例文件</zh><en>Example files</en></span><span>4</span></li>
+    <li><span><zh>2D 拓扑优化</zh><en>2D topology optimisation</en></span><span>5</span></li>
+    <li><span><zh>3D 拓扑优化</zh><en>3D topology optimisation</en></span><span>6</span></li>
+    <li><span><zh>游戏的共同操作</zh><en>Playing the games</en></span><span>7</span></li>
+    <li><span>VoxStack <zh>叠楼</zh></span><span>8</span></li>
+    <li><span>Serpentine <zh>蜿蜒</zh></span><span>9</span></li>
+    <li><span>Rebound <zh>回弹</zh></span><span>10</span></li>
+    <li><span>Swift <zh>雨燕</zh></span><span>11</span></li>
+    <li><span><zh>常见问题与卸载</zh><en>Troubleshooting and uninstall</en></span><span>12</span></li>
+  </ol>
+  <div class="note mt">
+    <zh><b>研究与教学项目。</b>代码、测试和文档几乎都由 Claude Code（Anthropic 的编程代理）编写，作者提需求、看结果、试玩。拓扑优化的结果只用于学习和概念设计，不能替代工程分析。插件不联网，只在 <code>%APPDATA%\Moyu\</code> 写最高分。MIT 许可，源码与开发记录：https://github.com/ChenmingHe0126/moyu</zh>
+    <en><b>A research and teaching project.</b> Almost all of the code, tests and documentation were written by Claude Code (Anthropic's coding agent); the author asked for each part, reviewed it and play-tested it. Optimisation results are for study and concept design, not a substitute for engineering analysis. The plugin never goes online and only writes high scores to <code>%APPDATA%\Moyu\</code>. MIT licence; source and development logs: https://github.com/ChenmingHe0126/moyu</en>
+  </div>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>1</span></footer>
+</section>
+
+<!-- 2 · About -->
+<section class="page">
+  <div class="ph"><span class="num">01</span><span><zh>关于这个项目</zh><en>About this project</en></span></div>
+  <h2><zh>用 AI 编程代理快速做一个 Rhino 插件</zh><en>Building a Rhino plugin quickly with an AI coding agent</en></h2>
+  <p class="lead"><zh>Moyu 是一个研究和教学项目：看一个编程代理能多快、多可靠地做出一个完整的 Grasshopper 插件，包括数值求解器、自定义视口显示、键盘鼠标交互和测试。几乎所有代码、测试和文档都由 <b>Claude Code</b> 编写；作者提需求、看结果、在 Rhino 里试玩；图标由 OpenAI Codex 生成。</zh><en>Moyu is a research and teaching project: how quickly and how reliably can a coding agent build a complete Grasshopper plugin, with numerical solvers, custom viewport display, keyboard and mouse interaction, and tests? Almost all of the code, tests and documentation were written by <b>Claude Code</b>; the author asked for each part, reviewed it and play-tested it in Rhino; the icons were drawn with OpenAI Codex.</en></p>
+
+  <h3><zh>每个部分大概用了多久</zh><en>Roughly how long each part took</en></h3>
+  @@TIMECHART@@
+  <p class="small"><zh>Claude Code 的工作时间，按会话记录的时间戳逐轮相加。作者看结果、试玩的时间和 Rhino 本身的故障（约 34 分钟）不算。共约 @@TOTAL@@，分布在四天里。明细：仓库里的 docs/dev-time-stats.md。</zh><en>Claude Code's working time, summed turn by turn from the session timestamps. The author's reviewing and play-testing and about 34 minutes of Rhino crashes are not counted. About @@TOTAL@@ in total, over four days. Details: docs/dev-time-stats.md in the repository.</en></p>
+
+  <h3><zh>每个功能都按同一套流程做</zh><en>Every feature followed the same loop</en></h3>
+  <div class="steps">
+    <div class="step"><b><em>1</em><zh>方案</zh><en>Plan</en></b><zh>在 Rhino 里做原型截图，写一页图文方案给作者确认。</zh><en>Prototype screenshots in Rhino and a short illustrated plan for the author to approve.</en></div>
+    <div class="step"><b><em>2</em><zh>规则与测试</zh><en>Rules and tests</en></b><zh>求解器和游戏规则写成不依赖 Rhino 的核心库，配单元测试（现在 351 项）。</zh><en>Solvers and game rules live in a core library that needs no Rhino, with unit tests (351 checks now).</en></div>
+    <div class="step"><b><em>3</em><zh>Rhino 端</zh><en>Rhino side</en></b><zh>Grasshopper 组件、显示管线、键盘鼠标钩子、镜头。</zh><en>Grasshopper components, display conduit, keyboard and mouse hooks, cameras.</en></div>
+    <div class="step"><b><em>4</em><zh>实机试玩</zh><en>Play-test</en></b><zh>在真 Rhino 里用真实按键和鼠标测，截图看画面再改。</zh><en>Tested in real Rhino with real keys and mouse; screenshots checked and fixed.</en></div>
+    <div class="step"><b><em>5</em><zh>记录</zh><en>Record</en></b><zh>文档、用时统计、提交。发布前再做一次多代理代码审查。</zh><en>Docs, time log, commit. Before release, a multi-agent code review.</en></div>
+  </div>
+
+  <h3><zh>每个部分研究什么</zh><en>What each part studies</en></h3>
+  <div class="study">
+    <img src="icons/SolverComponent.png" alt=""><div><b><zh>拓扑优化（数值）</zh><en>Topology optimisation (numerics)</en></b> · <zh>代理能不能写对带测试的工程数值代码：有限元、SIMP + 最优准则法、密度过滤、2D 带状 Cholesky、3D 多重网格共轭梯度；以及怎样用 Timer 让优化在 Grasshopper 里实时迭代、边算边改。</zh><en>Can an agent get engineering numerics right, with tests: finite elements, SIMP with optimality criteria, a density filter, a banded Cholesky solver in 2D and multigrid conjugate gradients in 3D; and how a Timer makes the optimisation iterate live in Grasshopper while you edit it.</en></div>
+    <img src="icons/MassingStudyComponent.png" alt=""><div><b><zh>四个小游戏（交互与视口）</zh><en>Four small games (interaction and the viewport)</en></b> · <zh>从一个 Grasshopper 组件出发，Rhino 视口能做到什么：用显示管线稳定地画整个场景和 HUD；安全接管键盘鼠标，并在对话框、Grasshopper 和 Rhino 命令需要时让出去；控制镜头；一帧之内把同一份数据换成另一种图（老板键）。</zh><en>How far the Rhino viewport goes from one Grasshopper component: drawing a whole scene and a HUD with a display conduit at a steady frame rate; taking the keyboard and mouse safely and handing them back to dialogs, Grasshopper and Rhino commands; driving the camera; redrawing the same data as a different drawing in one frame (the boss key).</en></div>
+  </div>
+  <div class="g2 mt2" style="font-size:8pt">
+    <div><b style="color:var(--ink)">VoxStack</b> · <zh>视角在转时的三维移动与旋转；可拖动的 gumball。</zh><en>moving and turning in 3D while the view turns; a draggable gumball.</en></div>
+    <div><b style="color:var(--ink)">Serpentine</b> · <zh>任意曲面变成场地（UV 网格、闭合、修剪、坡度）；第一人称镜头。</zh><en>any surface as a playing field (UV grid, wrap, trims, slope); a first-person camera.</en></div>
+    <div><b style="color:var(--ink)">Rebound</b> · <zh>平面上的实时碰撞和鼠标控制；参数化砌法当关卡。</zh><en>real-time collision and mouse control on a plane; parametric brick bonds as levels.</en></div>
+    <div><b style="color:var(--ink)">Swift</b> · <zh>单键节奏、程序生成关卡，用自动驾驶验证每关能过。</zh><en>one-key timing and generated levels, checked by an autopilot.</en></div>
+  </div>
+  <h3><zh>方案原型和成品</zh><en>Prototype and result</en></h3>
+  <div class="g2">
+    <div class="proto"><figure><img src="img/vox_proto.jpg" alt=""></figure><div class="arrow">→</div><figure><img src="img/vox.jpg" alt=""></figure></div>
+    <div class="proto"><figure><img src="img/snake_proto.jpg" alt=""></figure><div class="arrow">→</div><figure><img src="img/snake.jpg" alt=""></figure></div>
+  </div>
+  <p class="small mt2"><zh>左：方案阶段 Claude Code 在 Rhino 里拼出来给作者确认的原型截图。右：作者试玩后要求统一改成极简风格，两个游戏的画面一起重做（约 19 分钟）。</zh><en>Left: prototype screenshots that Claude Code built in Rhino for the author to approve. Right: after play-testing, the author asked for one minimal style, and both games were redrawn together (about 19 minutes).</en></p>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>2</span></footer>
+</section>
+
+<!-- 3 · Install and panels -->
+<section class="page">
+  <div class="ph"><span class="num">02</span><span><zh>安装与面板</zh><en>Install and panels</en></span></div>
+  <h2><zh>安装</zh><en>Install</en></h2>
+  <p class="lead"><zh>需要 Windows 版 Rhino 8。两种运行时（默认的 .NET Core 和 .NET Framework）都能用；没有在 Mac 版上测试过。</zh><en>Needs Rhino 8 for Windows, in either runtime (.NET Core, the default, or .NET Framework). Not tested on Rhino for Mac.</en></p>
+  <div class="install">
+    <div><h4><zh>A · 包管理器（推荐）</zh><en>A · Package Manager (recommended)</en></h4><ol>
+      <li><zh>在 Rhino 里运行</zh><en>In Rhino run</en> <code>_PackageManager</code></li>
+      <li><zh>搜索</zh><en>Search for</en> <b>moyu</b> → Install</li>
+      <li><zh>重启 Rhino</zh><en>Restart Rhino</en></li></ol></div>
+    <div><h4><zh>B · .yak 文件</zh><en>B · The .yak file</en></h4><ol>
+      <li><zh>把 food4rhino 下载的</zh><en>Drag the</en> <code>moyu-@@VERSION@@-rh8_0-win.yak</code> <zh>拖进 Rhino 窗口</zh><en>from food4rhino into a Rhino window</en></li>
+      <li><zh>重启 Rhino</zh><en>Restart Rhino</en></li></ol></div>
+    <div><h4><zh>C · 手动复制</zh><en>C · By hand</en></h4><ol>
+      <li><zh>把</zh><en>Copy</en> <b><zh>一个</zh><en>one</en></b> <code>Moyu.gha</code> <zh>复制到</zh><en>to</en> <code>%APPDATA%\Grasshopper\Libraries\Moyu\</code></li>
+      <li><zh>.NET Core 用 net7.0，.NET Framework 用 net48（</zh><en>net7.0 for .NET Core, net48 for .NET Framework (</en><code>_SetDotNetRuntime</code><zh> 可查）</zh><en> tells which)</en></li>
+      <li><zh>被 Windows 阻止时：右键 › 属性 › 解除锁定，重启 Rhino</zh><en>If Windows blocks it: right-click › Properties › Unblock; restart Rhino</en></li></ol></div>
+  </div>
+
+  <h2 class="mt"><zh>Moyu 页签上的六个面板</zh><en>Six panels on the Moyu tab</en></h2>
+  <p class="lead"><zh>重启后，Grasshopper 工具栏上多出一个 Moyu 页签。四个游戏面板故意起了建筑研究的名字，图标也画成研究工具。</zh><en>After the restart Grasshopper shows a Moyu tab. The four game panels are named and drawn like architecture study tools on purpose.</en></p>
+  @@RIBBON@@
+  <div class="pcards mt">
+    <div><img class="fit" src="img/bridge.jpg" alt=""><b>2D</b><span><zh>平面像素拓扑优化：边界、荷载、支座、区域、材料 → 求解器 → 显示（第 5 页）。</zh><en>Pixel topology optimisation in a plane: boundary, loads, supports, areas, material → solver → display (page 5).</en></span></div>
+    <div><img class="fit" src="img/c3d_voxels.jpg" alt=""><b>3D</b><span><zh>封闭实体的体素拓扑优化，条件可以加在点、线、面上（第 6 页）。</zh><en>Voxel topology optimisation of a closed solid, with conditions on points, curves or faces (page 6).</en></span></div>
+    <div><img src="img/vox_boss.jpg" alt=""><b>Massing</b><span><zh>VoxStack 叠楼：三维落块。图是它的老板画面，一张体块研究（第 8 页）。</zh><en>VoxStack: 3D falling blocks. Shown: its boss screen, a massing study (page 8).</en></span></div>
+    <div><img src="img/snake_boss.jpg" alt=""><b>Landscape</b><span><zh>Serpentine 蜿蜒：曲面上的贪吃蛇。图是它的老板画面，一张景观平面（第 9 页）。</zh><en>Serpentine: a snake on any surface. Shown: its boss screen, a landscape plan (page 9).</en></span></div>
+    <div><img src="img/rebound_boss.jpg" alt=""><b>Facade</b><span><zh>Rebound 回弹：按真实砌法排的打砖块。图是它的老板画面，塔楼幕墙立面（第 10 页）。</zh><en>Rebound: brick breaker on real bonds. Shown: its boss screen, a curtain-wall elevation (page 10).</en></span></div>
+    <div><img src="img/swift_boss.jpg" alt=""><b>Section</b><span><zh>Swift 雨燕：剖面里单键飞行。图是它的老板画面，采光通风剖面（第 11 页）。</zh><en>Swift: one-key flight through a section. Shown: its boss screen, a daylight and ventilation section (page 11).</en></span></div>
+  </div>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>3</span></footer>
+</section>
+
+<!-- 4 · Examples -->
+<section class="page">
+  <div class="ph"><span class="num">03</span><span><zh>示例文件</zh><en>Example files</en></span></div>
+  <h2><zh>从示例开始</zh><en>Start from an example</en></h2>
+  <p class="lead"><zh>发布包的 examples 文件夹里有 6 个现成的 .gh 文件。在 Grasshopper 里 File › Open 打开，或者直接拖到画布上；画布顶部有两三行中英文说明。</zh><en>The examples folder of the download holds six ready-made .gh files. Open one in Grasshopper (File › Open, or drag it onto the canvas); the lines at the top of the canvas say what to do.</en></p>
+  <div class="note"><zh><b>文件在哪：</b>包管理器装的在 <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>；food4rhino 压缩包里的在 <code>examples\</code>。</zh><en><b>Where they are:</b> after a Package Manager install, in <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>; in the food4rhino archive, in <code>examples\</code>.</en></div>
+  <div class="g2 mt">
+    <div class="ex"><img class="fit" src="img/vis_pixels.jpg" alt=""><div><b>Topo2D.gh</b><span><zh>三组 2D：悬臂梁、立面上的桥、带螺栓孔的 L 形支架。每组有自己的 Run 开关和 Reset 按钮，Timer 已接好。</zh><en>Three 2D set-ups: a cantilever, a bridge elevation and an L-bracket with bolt holes. Each has its own Run toggle and Reset button; the Timer is wired.</en></span></div></div>
+    <div class="ex"><img class="fit" src="img/canopy.jpg" alt=""><div><b>Topo3D.gh</b><span><zh>三组 3D：悬臂梁、四角支撑的雨棚、带孔的 L 形支架。</zh><en>Three 3D set-ups: a cantilever, a canopy on four corners and an L-bracket with holes.</en></span></div></div>
+    <div class="ex"><img src="img/vox.jpg" alt=""><div><b>VoxStack.gh</b><span><zh>A 直接点 ▶ Run；B 用随手画的盒子和文本图案做自定义积木。</zh><en>A: just press ▶ Run. B: custom pieces from sketched boxes and a text pattern.</en></span></div></div>
+    <div class="ex"><img src="img/snake_torus.jpg" alt=""><div><b>Serpentine.gh</b><span><zh>A 内置起伏地形；B 用 Site Surface 换场地（环面、圆管、马鞍屋面、球面）；C 接你自己的曲面。</zh><en>A: the built-in terrain. B: other sites from Site Surface (torus, tube, saddle roof, sphere). C: your own surface.</en></span></div></div>
+    <div class="ex"><img src="img/rebound_game.jpg" alt=""><div><b>Rebound.gh</b><span><zh>A 六种砌法逐关轮换；B 指定砌法和模式；C 用一组闭合矩形做自定义墙。</zh><en>A: the six bonds in turn. B: pick a bond and a mode. C: a custom wall from closed rectangles.</en></span></div></div>
+    <div class="ex"><img src="img/swift.jpg" alt=""><div><b>Swift.gh</b><span><zh>A 普通风压、经典模式；B 调风压、开口高度、开间和种子。</zh><en>A: normal exposure, classic mode. B: tune exposure, opening height, bay width and seed.</en></span></div></div>
+  </div>
+  <h3 class="mt"><zh>真实画布：VoxStack.gh 的 B 组</zh><en>A real canvas: group B of VoxStack.gh</en></h3>
+  <figure><img src="img/vox_canvas.jpg" alt=""><figcaption><zh>两个 Voxel Unit（左：随手画的几何；下：文本图案）接进 Unit Library，再接到 Massing Study。滑块是井的尺寸和模式；组件下方的 ▶ Run 开始游戏。</zh><en>Two Voxel Units (left: sketched geometry; below: a text pattern) feed the Unit Library, which feeds Massing Study. The sliders set the well size and the mode; ▶ Run under the component starts the game.</en></figcaption></figure>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>4</span></footer>
+</section>
+
+<!-- 5 · 2D -->
+<section class="page">
+  <div class="ph"><span class="num">04</span><span><zh>2D 拓扑优化</zh><en>2D topology optimisation</en></span></div>
+  <h2><zh>2D 像素拓扑优化</zh><en>2D pixel topology optimisation</en></h2>
+  <p class="lead"><zh>在一个平面里画出设计域和条件，求解器一步步把材料挪到传力需要的地方（SIMP：体积受限下的最小柔度）。下面是典型连线。</zh><en>Draw a design domain and its conditions in a plane; the solver moves material, step by step, to where the load path needs it (SIMP: minimum compliance under a volume limit). The typical wiring:</en></p>
+  @@WIRING2D@@
+  <div class="comps mt">
+    <div class="comp"><img src="icons/BoundaryComponent.png" alt=""><div><b>Boundary 2D</b><span><zh>闭合平面曲线 → 方形像素网格；套在里面的曲线是孔。自动识别 XY / XZ / YZ 平面。</zh><en>Closed planar curves → a square pixel grid; nested curves are holes. Works in the XY, XZ or YZ plane.</en></span></div></div>
+    <div class="comp"><img src="icons/LoadComponent.png" alt=""><div><b>Load 2D</b><span><zh>点或曲线上的力（世界坐标向量），曲线上平均分到经过的节点。</zh><en>A force at points or along curves (a world vector), spread evenly along a curve.</en></span></div></div>
+    <div class="comp"><img src="icons/SupportComponent.png" alt=""><div><b>Support 2D</b><span><zh>点或曲线约束，分别锁 X / Y：两向 = 铰支，单向 = 滚动支座。</zh><en>Fixes points or curves in X and/or Y: both = pinned, one = roller.</en></span></div></div>
+    <div class="comp"><img src="icons/AreaComponent.png" alt=""><div><b>Area 2D</b><span><zh>始终实心（如楼板）或始终空心（如洞口）的区域。</zh><en>Regions that stay solid (a slab) or stay empty (an opening).</en></span></div></div>
+    <div class="comp"><img src="icons/MaterialComponent.png" alt=""><div><b>Material 2D</b><span><zh>杨氏模量 E、泊松比 ν（平面应力）。</zh><en>Young's modulus E and Poisson's ratio ν (plane stress).</en></span></div></div>
+    <div class="comp"><img src="icons/SolverComponent.png" alt=""><div><b>SIMP Solver 2D</b><span><zh>Run 为真时每跳推进 Steps 步，Timer 一直推到收敛；Reset 从均匀密度重来。V 体积分数、P 惩罚、R 过滤半径。</zh><en>While Run is true each tick advances Steps iterations, and the Timer keeps it going until it converges; Reset starts over. V volume fraction, P penalty, R filter radius.</en></span></div></div>
+    <div class="comp"><img src="icons/VisualizeComponent.png" alt=""><div><b>Visualize 2D</b><span><zh>三种显示（密度 / 实心 / 平滑）、阈值轮廓曲线（可以直接拿去建模）、荷载与支座符号。</zh><en>Three display modes (density, solid, smooth), a threshold outline curve you can model with, load and support symbols.</en></span></div></div>
+  </div>
+  <h3><zh>迭代过程</zh><en>How it converges</en></h3>
+  <div class="g3">
+    <figure><img src="img/iter000.jpg" alt=""><figcaption><b><zh>第 0 步</zh><en>Step 0</en></b> · <zh>均匀密度</zh><en>uniform density</en></figcaption></figure>
+    <figure><img src="img/iter005.jpg" alt=""><figcaption><b><zh>第 5 步</zh><en>Step 5</en></b> · <zh>传力路径开始出现</zh><en>the load path appears</en></figcaption></figure>
+    <figure><img src="img/iter020.jpg" alt=""><figcaption><b><zh>第 20 步</zh><en>Step 20</en></b> · <zh>杆件基本成形</zh><en>the members have formed</en></figcaption></figure>
+  </div>
+  <div class="g23 mt">
+    <div class="g2">
+      <figure><img src="img/vis_smooth.jpg" alt=""><figcaption><b><zh>平滑模式</zh><en>Smooth mode</en></b> · <zh>和轮廓曲线一起出图</zh><en>with the outline curve</en></figcaption></figure>
+      <figure><img src="img/bridge.jpg" alt=""><figcaption><b><zh>立面上的桥</zh><en>Bridge elevation</en></b> · <zh>线荷载 + 实心桥面</zh><en>line load + solid deck</en></figcaption></figure>
+    </div>
+    <div class="note"><zh><b>边算边改。</b>运行中拖动荷载、支座或改参数，求解器保留当前密度继续收敛，不用从头再来；想重新开始按 Reset。</zh><en><b>Edit while it runs.</b> Drag a load or a support, or change a parameter, and the solver carries on from the current density; press Reset to start from scratch.</en></div>
+  </div>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>5</span></footer>
+</section>
+
+<!-- 6 · 3D -->
+<section class="page">
+  <div class="ph"><span class="num">05</span><span><zh>3D 拓扑优化</zh><en>3D topology optimisation</en></span></div>
+  <h2><zh>3D 体素拓扑优化</zh><en>3D voxel topology optimisation</en></h2>
+  <p class="lead"><zh>连线和 2D 一样，组件名把 2D 换成 3D：设计域是封闭实体，条件可以加在点、曲线或面上，求解器用多重网格预条件共轭梯度。</zh><en>The same wiring with the 3D components: the domain is a closed solid, conditions sit on points, curves or faces, and the solver uses multigrid-preconditioned conjugate gradients.</en></p>
+  <div class="g3">
+    <figure><img src="img/c3d000.jpg" alt=""><figcaption><b><zh>第 0 步</zh><en>Step 0</en></b> · <zh>左端固定，右下边线荷载</zh><en>left end fixed, line load at the bottom right</en></figcaption></figure>
+    <figure><img src="img/c3d010.jpg" alt=""><figcaption><b><zh>第 10 步</zh><en>Step 10</en></b> · <zh>平滑等值面（Mode 1）</zh><en>smooth isosurface (Mode 1)</en></figcaption></figure>
+    <figure><img src="img/c3d_voxels.jpg" alt=""><figcaption><b><zh>体素块（Mode 0）</zh><en>Voxel blocks (Mode 0)</en></b> · <zh>同一个结果</zh><en>the same result</en></figcaption></figure>
+  </div>
+  <div class="comps mt">
+    <div class="comp"><img src="icons/Boundary3DComponent.png" alt=""><div><b>Boundary 3D</b><span><zh>封闭 Brep / 网格 → 立方体素。Resolution = 长边体素数（默认 32，最高 160）；套在里面的实体是孔。</zh><en>A closed Brep or mesh → cubic voxels. Resolution = voxels along the long side (default 32, at most 160); solids inside are holes.</en></span></div></div>
+    <div class="comp"><img src="icons/Load3DComponent.png" alt=""><div><b>Load 3D</b><span><zh>点、线、面上的力，默认 (0, 0, −1)，总力平均分到接触的节点。</zh><en>A force on points, curves or faces, default (0, 0, −1), shared by the nodes it touches.</en></span></div></div>
+    <div class="comp"><img src="icons/Support3DComponent.png" alt=""><div><b>Support 3D</b><span><zh>点、线、面上的约束，分别锁 X / Y / Z。</zh><en>Fixes points, curves or faces in X, Y and/or Z.</en></span></div></div>
+    <div class="comp"><img src="icons/Area3DComponent.png" alt=""><div><b>Area 3D</b><span><zh>封闭实体围出的始终实心 / 始终空心区域。</zh><en>Closed solids that stay solid or stay empty.</en></span></div></div>
+    <div class="comp"><img src="icons/Material3DComponent.png" alt=""><div><b>Material 3D</b><span><zh>E、ν（三维各向同性）。</zh><en>E and ν (isotropic 3D).</en></span></div></div>
+    <div class="comp"><img src="icons/Solver3DComponent.png" alt=""><div><b>SIMP Solver 3D</b><span><zh>默认体积分数 0.2、过滤半径 1.5、每跳 2 步。</zh><en>Defaults: volume fraction 0.2, filter radius 1.5, 2 steps per tick.</en></span></div></div>
+    <div class="comp"><img src="icons/Visualize3DComponent.png" alt=""><div><b>Visualize 3D</b><span><zh>Mode 0 体素块 / Mode 1 光滑等值面；另输出闭合网格和逐体素密度。</zh><en>Mode 0 voxel blocks, Mode 1 smooth isosurface; also outputs a closed mesh and per-voxel densities.</en></span></div></div>
+  </div>
+  <h3><zh>选 Resolution：体素数随它的三次方增长</zh><en>Choosing Resolution: the voxel count grows with its cube</en></h3>
+  @@VOXCHART@@
+  <div class="mt">
+    <div class="note warm"><b><zh>2D 和 3D 通用的上限</zh><en>Limits shared by 2D and 3D</en></b><ul>
+      <li><zh>Steps 最多 50；每跳算满约 1.5 秒就停在当前步，剩下的留给下一跳，Rhino 不会卡住。按 Esc 停得更早。</zh><en>Steps is at most 50; each tick stops after about 1.5 s and leaves the rest to the next one, so Rhino stays responsive. Esc stops it sooner.</en></li>
+      <li><zh>过滤半径：2D 1–12，3D 1–6。收到 NaN 或无穷大时按默认值算并警告。</zh><en>Filter radius: 1–12 in 2D, 1–6 in 3D. NaN or infinity falls back to the default, with a warning.</en></li>
+      <li><zh>状态：<b>Waiting</b> 缺输入；<b>Unstable</b> 结构是机构（加支座）；<b>Error</b> 原因在消息里。</zh><en>Status: <b>Waiting</b> = an input is missing; <b>Unstable</b> = a mechanism (add supports); <b>Error</b> = see the message.</en></li></ul></div>
+  </div>
+  <div class="g2 mt">
+    <figure><img src="img/canopy.jpg" alt=""><figcaption><b><zh>雨棚</zh><en>Canopy</en></b> · <zh>顶面面荷载、四角铰支、实心屋面板、空心通道。</zh><en>a face load on top, pinned corners, a solid roof slab and an empty passage.</en></figcaption></figure>
+    <figure><img src="img/bracket3d.jpg" alt=""><figcaption><b><zh>带孔的 L 形支架</zh><en>L-bracket with holes</en></b> · <zh>嵌套圆柱是孔，顶面固定，端部水平荷载。</zh><en>nested cylinders are holes; top fixed, a sideways load at the end.</en></figcaption></figure>
+  </div>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>6</span></footer>
+</section>
+
+<!-- 7 · Games: the basics -->
+<section class="page">
+  <div class="ph"><span class="num">06</span><span><zh>游戏的共同操作</zh><en>Playing the games</en></span></div>
+  <h2><zh>四个游戏，一套操作</zh><en>Four games, one set of controls</en></h2>
+  <p class="lead"><zh>游戏画在当前的 Rhino 视口里，Grasshopper 画布只用来开始和设置。每个游戏开局都很慢、很简单，逐渐变难；默认静音。</zh><en>The games draw in the active Rhino viewport; the Grasshopper canvas only starts and sets them up. Every game starts slow and easy and ramps up; all of them are silent.</en></p>
+  <div class="g23">
+    <div class="runstop">
+      <img src="img/run_button.jpg" alt="">
+      <img src="img/stop_button.jpg" alt="">
+      <div style="font-size:8.4pt"><b style="color:var(--ink)"><zh>开始和结束</zh><en>Start and stop</en></b><br><zh>点游戏组件下方的 <kbd>▶ Run</kbd> 开始，再点 <kbd>■ Stop</kbd> 结束。点 Run 会把焦点交给 Rhino 主窗口，一开局按键就有效。组件被禁用时 Run 不起作用。</zh><en>Press <kbd>▶ Run</kbd> under a game component to start and <kbd>■ Stop</kbd> to end. Run hands the focus to the Rhino window, so the keys work at once. A disabled component ignores Run.</en></div>
+    </div>
+    <div class="note"><zh><b>组件输出</b>（分数、体块、路线、指标……）只在暂停、老板模式和结束时刷新，游戏进行中 Grasshopper 不会重算。</zh><en><b>The outputs</b> (score, mass, route, metrics…) refresh only when you pause, switch to the boss screen or finish, so Grasshopper does not recompute while you play.</en></div>
+  </div>
+  <h3><zh>键盘</zh><en>Keyboard</en></h3>
+  @@KEYBOARD@@
+  <p class="small"><zh>珊瑚色：每个游戏都一样；浅蓝：部分游戏用（见各游戏页）。</zh><en>Coral: the same in every game. Light blue: used by some games (see each game's page).</en></p>
+  <div class="keys">
+    <span><kbd>Esc</kbd><kbd>P</kbd></span><span><zh>暂停。暂停时 <kbd>Esc</kbd> 继续，<kbd>Shift</kbd>+<kbd>Esc</kbd> 退出。</zh><en>Pause. While paused, <kbd>Esc</kbd> resumes and <kbd>Shift</kbd>+<kbd>Esc</kbd> quits.</en></span>
+    <span><kbd>Enter</kbd><kbd>Space</kbd></span><span><zh>结算画面上再来一局（Esc 退出）。</zh><en>Play again on the results screen (Esc quits).</en></span>
+    <span><kbd>Home</kbd></span><span><zh>镜头回到游戏的默认视角。</zh><en>Back to the game's default view.</en></span>
+    <span><kbd>`</kbd></span><span><zh>老板键：1 左边的那个键（美式键盘上是 `）。</zh><en>The boss key: the key left of 1 (` on a US keyboard).</en></span>
+    <span><zh>鼠标左键 / 右键拖动</zh><en>Left / right drag</en></span><span><zh>转视角；中键在游戏视口里不起作用。</zh><en>Orbit the view; the middle button does nothing in the game viewport.</en></span>
+  </div>
+  <h3><zh>老板键</zh><en>The boss key</en></h3>
+  <div class="boss">
+    <figure><img src="img/rebound_game.jpg" alt=""><figcaption><zh>游戏中</zh><en>Playing</en></figcaption></figure>
+    <div class="arrow"><kbd>`</kbd><span>⇄</span></div>
+    <figure><img src="img/rebound_boss.jpg" alt=""><figcaption><zh>老板模式：同一面墙画成塔楼幕墙立面</zh><en>Boss screen: the same wall drawn as a tower elevation</en></figcaption></figure>
+  </div>
+  <p class="mt2" style="font-size:8.3pt"><zh>一帧之内切成一张正经的设计图，指标按游戏里的数据实算；再按一次 3-2-1 回来。Rhino 失去焦点（Alt+Tab 到别的程序）时自动切过去。老板模式里键盘全部还给 Rhino。</zh><en>One frame turns the game into a serious drawing whose numbers come from the game state; press again for a 3-2-1 countdown back. It also switches by itself when Rhino loses focus (Alt+Tab). In the boss screen the keyboard belongs to Rhino.</en></p>
+  <div class="note warm"><zh><b>键盘让给谁。</b>只有焦点在 Rhino 主窗口（或游戏所在的浮动视口）时按键才归游戏；Ctrl / Alt 组合键任何时候都放行。对话框、Grasshopper 窗口或 Rhino 命令拿走键盘时，游戏自动暂停（倒计时也停住）；点回视口、按 Esc 继续。中文输入法开着也能玩。最高分存在 <code>%APPDATA%\Moyu\</code>。</zh><en><b>Who gets the keyboard.</b> Keys go to the game only while the Rhino window (or the game's floating viewport) has the focus; Ctrl and Alt shortcuts always pass. When a dialog, the Grasshopper window or a Rhino command takes the keyboard, the game pauses (countdowns too); click the viewport and press Esc to carry on. An East Asian input method can stay on. High scores are kept in <code>%APPDATA%\Moyu\</code>.</en></div>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>7</span></footer>
+</section>
+
+<!-- 8 · VoxStack -->
+<section class="page">
+  <div class="ph"><span class="num">07</span><span>Massing · VoxStack</span></div>
+  <h2>VoxStack<small><zh>叠楼 · 三维落块</zh><en>3D falling blocks</en></small></h2>
+  <p class="lead"><zh>积木落进一口 5 × 5 × 12 的井，某一层 25 格铺满就消掉。视角可以随便转，移动方向跟着视角走。</zh><en>Pieces fall into a 5 × 5 × 12 well; a layer of 25 cells clears when it is full. Turn the view as you like: the moves follow it.</en></p>
+  <figure><img src="img/vox.jpg" alt=""><figcaption><zh>右下角固定着一个和 Rhino 一样的 gumball：按住一个圆环顺着它拖约 30°，积木就绕这根轴转 90°。右上是接下来的积木。</zh><en>A Rhino-style gumball sits in the bottom right: drag along a ring for about 30° and the piece turns 90° about that axis. The next pieces are on the right.</en></figcaption></figure>
+  <div class="g2 mt">
+    <div class="keys">
+      <span><kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd></span><span><zh>水平移动（↑ 永远是屏幕上远离你的方向）</zh><en>Move (↑ is always away from you on screen)</en></span>
+      <span><zh>拖 gumball 圆环</zh><en>Drag a ring</en></span><span><zh>绕那根轴转 90°</zh><en>Turn 90° about that axis</en></span>
+      <span><kbd>Q</kbd><kbd>E</kbd> · <kbd>W</kbd><kbd>S</kbd> · <kbd>A</kbd><kbd>D</kbd></span><span><zh>绕竖轴转 · 前后翻 · 左右翻</zh><en>Turn about the vertical · tip forward/back · roll left/right</en></span>
+      <span><kbd>Space</kbd> · <kbd>Shift</kbd></span><span><zh>直接落下 · 按住加速</zh><en>Hard drop · hold to fall faster</en></span>
+      <span><kbd>C</kbd></span><span><zh>暂存当前积木</zh><en>Hold the current piece</en></span>
+      <span><kbd>Z</kbd><kbd>X</kbd> · <kbd>V</kbd></span><span><zh>视角转 90° · 俯视</zh><en>Turn the view 90° · top view</en></span>
+    </div>
+    <div class="comps one">
+      <div class="comp"><img src="icons/MassingStudyComponent.png" alt=""><div><b>Massing Study</b><span><zh>游戏本体。Width / Depth / Height 井尺寸（4–10 × 4–10 × 8–20），Size 体素边长（默认 7.2 m），Mode 0 马拉松 / 1 三分钟闪电 / 2 禅，Level 起始等级。</zh><en>The game. Width / Depth / Height of the well (4–10 × 4–10 × 8–20), Size of a voxel (default 7.2 m), Mode 0 marathon / 1 three-minute blitz / 2 zen, Level to start at.</en></span></div></div>
+      <div class="comp"><img src="icons/VoxelUnitComponent.png" alt=""><div><b>Voxel Unit</b><span><zh>自定义积木：随手画的封闭体、体素中心点，或文本图案 <code>###/#.#|#..</code>（/ 分行，| 分层）。最多 10 格，每边 ≤ 4，必须面连通。</zh><en>A custom piece from a sketched closed solid, voxel centre points, or a text pattern <code>###/#.#|#..</code> (/ between rows, | between layers). Up to 10 cells, ≤ 4 per side, face-connected.</en></span></div></div>
+      <div class="comp"><img src="icons/UnitLibraryComponent.png" alt=""><div><b>Unit Library</b><span><zh>内置积木集（−1 只用自定义 / 0 入门 / 1 标准 8 块 / 2 困难）加上自定义积木。</zh><en>A built-in set (−1 custom only / 0 beginner / 1 standard eight / 2 hard) plus your custom pieces.</en></span></div></div>
+    </div>
+  </div>
+  <div class="g2 mt">
+    <figure><img src="img/vox_gate.jpg" alt=""><figcaption><b><zh>自定义积木</zh><en>A custom piece</en></b> · <zh>"Gate 门楼"第 1 级就会发。开局 2.4 秒落一格，每级快 8 %；前两级只发扁平的内置积木。</zh><en>"Gate" is dealt from level 1. A cell takes 2.4 s to fall at first and 8 % less each level; the first two levels deal only flat built-in pieces.</en></figcaption></figure>
+    <figure><img src="img/vox_boss.jpg" alt=""><figcaption><b><zh>老板模式：体块研究</zh><en>Boss screen: a massing study</en></b> · <zh>一格 = 7.2 m 柱跨 × 3 层，带场地红线、周边体块、日照阴影和容积率等指标。</zh><en>One cell = a 7.2 m bay × 3 storeys, with the site line, neighbours, sun shadows and floor-area ratio.</en></figcaption></figure>
+  </div>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>8</span></footer>
+</section>
+
+<!-- 9 · Serpentine -->
+<section class="page">
+  <div class="ph"><span class="num">08</span><span>Landscape · Serpentine</span></div>
+  <h2>Serpentine<small><zh>蜿蜒 · 曲面上的贪吃蛇</zh><en>a snake on any surface</en></small></h2>
+  <p class="lead"><zh>蛇沿曲面的 UV 网格一格一格走。曲面在某个方向闭合（圆管、环面、球）就能绕过去，开放的边是墙，修剪的洞是障碍；下坡快、上坡慢，曲面的形状就是关卡。</zh><en>The snake moves cell by cell along the surface's UV grid. Closed directions (tube, torus, sphere) wrap around, open edges are walls and trimmed holes are obstacles; downhill is faster, uphill slower, so the surface is the level.</en></p>
+  <div class="g23">
+    <figure><img src="img/snake.jpg" alt=""><figcaption><b><zh>第一人称（默认）</zh><en>First person (default)</en></b> · <zh>镜头锁在蛇头后上方，前方永远在屏幕上方。</zh><en>The camera rides behind the head; ahead is always up the screen.</en></figcaption></figure>
+    <div>
+      <figure><img src="img/snake_free.jpg" alt=""><figcaption><b><zh>自由视角</zh><en>Free view</en></b> · <zh>按 C 切换，看整个场地</zh><en>press C to see the whole site</en></figcaption></figure>
+      <figure class="mt2"><img src="img/snake_torus.jpg" alt=""><figcaption><b><zh>环面</zh><en>Torus</en></b> · <zh>上下左右都能穿过去</zh><en>wraps both ways</en></figcaption></figure>
+    </div>
+  </div>
+  <div class="g2 mt">
+    <div>
+      <div class="keys">
+        <span><kbd>←</kbd><kbd>A</kbd> · <kbd>→</kbd><kbd>D</kbd></span><span><zh>以蛇头为准左转 / 右转（不管镜头朝哪）</zh><en>Turn left / right relative to the head, whatever the camera does</en></span>
+        <span><zh>按住</zh><en>Hold</en> <kbd>↑</kbd><kbd>W</kbd><kbd>Shift</kbd></span><span><zh>冲刺 ×1.8</zh><en>Sprint ×1.8</en></span>
+        <span><kbd>C</kbd></span><span><zh>第一人称 ⇄ 自由视角（只有自由视角能拖动转模型）</zh><en>First person ⇄ free view (dragging orbits only in free view)</en></span>
+      </div>
+      <h3><zh>道具</zh><en>Items</en></h3>
+      @@ITEMS@@
+      <p class="small mt2"><zh>4 秒内连吃有连击倍率（最高 ×5）。每吃 5 个水果升一级，五章配色：庭院、草坡、丘陵、峡谷、山脊。</zh><en>Eating again within 4 s builds a combo (up to ×5). Every five fruit is a level; five chapters: Courtyard, Meadow, Hills, Canyon, Ridge.</en></p>
+    </div>
+    <div class="comps one">
+      <div class="comp"><img src="icons/PathStudyComponent.png" alt=""><div><b>Path Study</b><span><zh>游戏本体。Surface（不接就用内置起伏地形，修剪面也行），Cells 长边格数（默认 28），Mode 0 经典 / 1 三分钟闪电 / 2 禅（撞墙停住），Level，Slope 坡度对速度的影响。</zh><en>The game. Surface (the built-in terrain if empty; trimmed surfaces work), Cells along the long side (default 28), Mode 0 classic / 1 three-minute blitz / 2 zen (walls just stop you), Level, Slope effect on speed.</en></span></div></div>
+      <div class="comp"><img src="icons/SiteSurfaceComponent.png" alt=""><div><b>Site Surface</b><span><zh>一键生成场地：0 起伏地形、1 环面、2 圆管、3 马鞍屋面、4 球面；Size 默认 40 m，Seed 改变地形。</zh><en>A site in one click: 0 rolling terrain, 1 torus, 2 tube, 3 saddle roof, 4 sphere; Size default 40 m, Seed varies the terrain.</en></span></div></div>
+    </div>
+  </div>
+  <figure class="mt"><img src="img/snake_boss.jpg" alt="" style="height:62mm;object-fit:cover"><figcaption><b><zh>老板模式：景观设计</zh><en>Boss screen: a landscape plan</en></b> · <zh>曲面画成坡度分析和等高线，蛇身变成铺装步道，配树、长椅、人和节点广场；路线长度、爬升、无障碍比例按蛇身实算。</zh><en>The surface becomes a slope analysis with contours and the snake a paved path, with trees, benches, people and small plazas; length, climb and the accessible share are measured from the snake.</en></figcaption></figure>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>9</span></footer>
+</section>
+
+<!-- 10 · Rebound -->
+<section class="page">
+  <div class="ph"><span class="num">09</span><span>Facade · Rebound</span></div>
+  <h2>Rebound<small><zh>回弹 · 立面打砖块</zh><en>brick breaker on a façade</en></small></h2>
+  <p class="lead"><zh>砖墙按真实砌法排，一关一种。不同材料要打的次数不同；打碎的砖有机会掉道具，增益按次数用完就失效。</zh><en>The wall is laid in a real brick bond, one per level. Materials take different numbers of hits; broken bricks may drop power-ups, which wear off after a number of uses.</en></p>
+  <div class="g23">
+    <figure><img src="img/rebound.jpg" alt=""><figcaption><zh>左边是正在生效的增益和剩余次数，挡板上方写着刚拿到的道具；两次碰挡板之间连续打砖有连击倍率（最高 ×8）。</zh><en>Active power-ups and their remaining uses are on the left; a new one is named above the paddle. Bricks hit in a row between paddle touches build a combo (up to ×8).</en></figcaption></figure>
+    <div>
+      <h3 style="margin-top:0"><zh>材料</zh><en>Materials</en></h3>
+      <span class="chip"><i style="--c:#BFE3F2"></i><zh>玻璃 1 下</zh><en>Glass: 1 hit</en></span>
+      <span class="chip"><i style="--c:#EFAA94"></i><zh>砖 2 下</zh><en>Brick: 2 hits</en></span>
+      <span class="chip"><i style="--c:#E4E2E0"></i><zh>混凝土 3 下</zh><en>Concrete: 3 hits</en></span>
+      <span class="chip"><i style="--c:#8E93A3"></i><zh>钢：打不坏</zh><en>Steel: unbreakable</en></span>
+      <h3><zh>道具（按次数失效）</zh><en>Power-ups (by uses, not time)</en></h3>
+      <span class="chip"><i style="--c:#8FD3A3"></i><zh>加宽 · 8 次接球</zh><en>Wide · 8 catches</en></span>
+      <span class="chip"><i style="--c:#F0D277"></i><zh>多球</zh><en>Multi-ball</en></span>
+      <span class="chip"><i style="--c:#96D3DE"></i><zh>慢速 · 6 次</zh><en>Slow · 6 catches</en></span>
+      <span class="chip"><i style="--c:#C6A9E6"></i><zh>粘板 · 3 次</zh><en>Sticky · 3 catches</en></span>
+      <span class="chip"><i style="--c:#F2938C"></i><zh>穿透 · 6 块砖</zh><en>Pierce · 6 bricks</en></span>
+      <span class="chip"><i style="--c:#F0AFCF"></i><zh>+1 命</zh><en>+1 life</en></span>
+      <span class="chip"><i style="--c:#6B7487"></i><zh>缩短（坏）· 5 次</zh><en>Shrink (bad) · 5 catches</en></span>
+      <p class="small"><zh>开局头六个道具正好是六种好道具各一个。</zh><en>The first six drops are one of each good power-up.</en></p>
+    </div>
+  </div>
+  <div class="g2 mt">
+    <div>
+      <div class="keys">
+        <span><kbd>←</kbd><kbd>→</kbd> · <kbd>A</kbd><kbd>D</kbd> · <zh>鼠标</zh><en>mouse</en></span><span><zh>移动挡板</zh><en>Move the paddle</en></span>
+        <span><kbd>Space</kbd></span><span><zh>发球、放开粘住的球</zh><en>Serve, release a stuck ball</en></span>
+      </div>
+      <div class="comps one mt2">
+        <div class="comp"><img src="icons/FacadeStudyComponent.png" alt=""><div><b>Facade Study</b><span><zh>游戏本体。Wall（不接就六种砌法逐关轮换），Mode 0 经典 3 条命 / 1 三分钟闪电 / 2 禅（不掉命），Level，Plane（默认 World XZ），Size 模数（默认 2.4 m）。</zh><en>The game. Wall (the six bonds in turn if empty), Mode 0 classic with 3 lives / 1 three-minute blitz / 2 zen (no lives lost), Level, Plane (World XZ by default), Size of a module (default 2.4 m).</en></span></div></div>
+        <div class="comp"><img src="icons/BrickBondComponent.png" alt=""><div><b>Brick Bond</b><span><zh>Type −1 轮换、0–5 指定砌法，Courses 皮数；或者 Curves 接闭合曲线当板块，按大小分成玻璃 / 砖 / 混凝土。</zh><en>Type −1 rotates, 0–5 picks a bond; Courses sets the rows. Or feed closed Curves as panels, sorted by size into glass, brick and concrete.</en></span></div></div>
+      </div>
+    </div>
+    <figure><img src="img/rebound_arch.jpg" alt=""><figcaption><b><zh>六种砌法</zh><en>Six bonds</en></b> · <zh>顺砌、通缝、英式、荷兰式、花墙、拱（图）。</zh><en>Stretcher, stack, English, Flemish, screen wall and arch (shown).</en></figcaption></figure>
+  </div>
+  <figure class="mt"><img src="img/rebound_boss.jpg" alt=""><figcaption><b><zh>老板模式：塔楼幕墙立面</zh><en>Boss screen: a curtain-wall elevation</en></b> · <zh>每块幕墙板取它背后的砖：打掉的是透明玻璃，剩下的是印釉玻璃、窗槛板或铝板；窗墙比、U 值等指标按当前墙实算。</zh><en>Each panel takes the brick behind it: cleared bricks are clear glass, the rest fritted glass, spandrels or aluminium; window-to-wall ratio and U-value are computed from the wall.</en></figcaption></figure>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>10</span></footer>
+</section>
+
+<!-- 11 · Swift -->
+<section class="page">
+  <div class="ph"><span class="num">10</span><span>Section · Swift</span></div>
+  <h2>Swift<small><zh>雨燕 · 剖面里的单键飞行</zh><en>one-key flight through a section</en></small></h2>
+  <p class="lead"><zh>一只雨燕在一条无尽的建筑剖面里飞：按一下扇一次翅膀往上蹿，不按就往下掉。穿过每堵横墙的开口得 1 分，碰墙或落地就结束。</zh><en>A swift flies through an endless building section: each press is one wing beat up, and it sinks when you let go. Each wall's opening you pass is a point; touching a wall or the floor ends the flight.</en></p>
+  <div class="g23">
+    <figure><img src="img/swift.jpg" alt=""><figcaption><zh>墙之间有羽毛可以捡。开头的开口很高、都在中间附近、速度慢；越往后开口越小、越快、高低差越大，第 26 堵墙起有上下滑动的窗扇。</zh><en>Feathers float between the walls. The first openings are tall, central and slow; later ones get smaller, faster and more uneven, and from the 26th wall some have sliding sashes.</en></figcaption></figure>
+    <div>
+      <div class="keys">
+        <span><kbd>Space</kbd><kbd>↑</kbd><kbd>W</kbd></span><span><zh>扇一下翅膀（鼠标左键也行）</zh><en>One wing beat (a left click too)</en></span>
+        <span><zh>右键拖动</zh><en>Right drag</en></span><span><zh>转视角</zh><en>Orbit the view</en></span>
+      </div>
+      <p class="small mt2"><zh>每 10 分升一层，每 3 层换一章配色：门厅、回廊、中庭、天井、黄昏。每个难度都用自动驾驶在五个种子上飞满 150 秒测过，关卡总能飞过去。</zh><en>Every 10 points is a level and every 3 levels a chapter: Foyer, Cloister, Atrium, Lightwell, Dusk. Each difficulty was flown by an autopilot for 150 s on five seeds, so every level can be passed.</en></p>
+      <figure class="mt2"><img src="img/swift_result.jpg" alt=""><figcaption><b><zh>结算画面</zh><en>Results</en></b> · <zh>Enter / 空格再来一局，Esc 退出。</zh><en>Enter or Space flies again, Esc quits.</en></figcaption></figure>
+    </div>
+  </div>
+  <div class="comps mt">
+    <div class="comp"><img src="icons/AirflowStudyComponent.png" alt=""><div><b>Airflow Study</b><span><zh>游戏本体。Grid（Storey Grid 的输出，不接就是普通风压、经典模式），Plane（默认 World XZ），Size 场地单位长度（默认 0.75 m）。输出飞行路径、剖面轮廓和指标。</zh><en>The game. Grid (from Storey Grid; normal exposure and classic mode if empty), Plane (World XZ by default), Size of a unit (default 0.75 m). Outputs the flight path, the section outline and metrics.</en></span></div></div>
+    <div class="comp"><img src="icons/StoreyGridComponent.png" alt=""><div><b>Storey Grid</b><span><zh>Exposure 0 避风 / 1 普通 / 2 迎风（越大越快越窄），Mode 0 经典 / 1 Zen（撞墙穿过、落地弹起），Opening 开口高度 0.8–1.4，Bay 开间 0.8–1.5，Seed 固定关卡（0 = 每次随机）。最高分按这些设置分开记。</zh><en>Exposure 0 sheltered / 1 normal / 2 exposed (faster and tighter), Mode 0 classic / 1 zen (bump through, bounce off the floor), Opening height 0.8–1.4, Bay width 0.8–1.5, Seed for a fixed layout (0 = new each run). Best scores are kept per setting.</en></span></div></div>
+  </div>
+  <figure class="mt"><img src="img/swift_boss.jpg" alt=""><figcaption><b><zh>老板模式：采光与通风剖面</zh><en>Boss screen: a daylight and ventilation section</en></b> · <zh>就是游戏里那个剖面：墙和开口在原来的位置，加上天窗、冬至 / 夏至的正午阳光、采光系数色带和气流线；主气流线就是雨燕刚才飞过的路线。</zh><en>It is the game's own section: walls and openings where they were, plus rooflights, noon sun at both solstices, a daylight-factor band and airflow lines; the main streamline is the swift's own flight.</en></figcaption></figure>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>11</span></footer>
+</section>
+
+<!-- 12 · Troubleshooting and uninstall -->
+<section class="page">
+  <div class="ph"><span class="num">11</span><span><zh>常见问题与卸载</zh><en>Troubleshooting and uninstall</en></span></div>
+  <h2><zh>常见问题</zh><en>Troubleshooting</en></h2>
+  <div class="qa mt">
+    <div><b><zh>游戏里按键没反应</zh><en>The game ignores my keys</en></b><zh>焦点不在 Rhino 主窗口。点一下游戏视口，再按 Esc 继续。</zh><en>The Rhino window does not have the focus. Click the game viewport, then press Esc.</en></div>
+    <div><b><zh>游戏突然暂停了</zh><en>The game paused by itself</en></b><zh>对话框、Grasshopper 窗口或 Rhino 命令拿走了键盘。处理完点回视口、按 Esc。</zh><en>A dialog, the Grasshopper window or a Rhino command took the keyboard. Finish there, click the viewport, press Esc.</en></div>
+    <div><b><zh>点 ▶ Run 没反应</zh><en>▶ Run does nothing</en></b><zh>组件被禁用（锁定）了，或者组件上有报错气泡，原因写在气泡里。</zh><en>The component is disabled (locked), or it shows a warning balloon that says why.</en></div>
+    <div><b><zh>求解器显示 Waiting</zh><en>The solver says Waiting</en></b><zh>缺输入，通常是荷载或支座没接上。</zh><en>An input is missing, usually the loads or the supports.</en></div>
+    <div><b><zh>求解器显示 Unstable</zh><en>The solver says Unstable</en></b><zh>结构是机构，能自由移动或转动。加支座，或者让支座锁住两个方向。</zh><en>The structure is a mechanism that can move or spin. Add supports, or fix them in both directions.</en></div>
+    <div><b><zh>3D 每步很慢</zh><en>3D steps are slow</en></b><zh>体素太多。降低 Resolution 或过滤半径；超过 15 万体素每步要几秒，超过 100 万会警告（第 6 页）。</zh><en>Too many voxels. Lower Resolution or the filter radius; above 150k voxels a step takes seconds, above 1M you get a warning (page 6).</en></div>
+    <div><b><zh>"Moyu data cannot be internalised"</zh><en>"Moyu data cannot be internalised"</en></b><zh>右键 Internalise 存下来的 Moyu 数据无法还原。把产生它的组件重新接上。</zh><en>Moyu values stored with right-click › Internalise cannot be restored. Reconnect the component that made them.</en></div>
+    <div><b><zh>"No Timer drives this solver"</zh><en>"No Timer drives this solver"</en></b><zh>文档里没有 Timer。接一个 Params › Util › Trigger 到求解器上，或者手动反复触发。</zh><en>There is no Timer in the document. Wire Params › Util › Trigger to the solver, or recompute by hand.</en></div>
+  </div>
+  <div class="g2 mt">
+    <figure><img src="img/snake_pause.jpg" alt=""><figcaption><b><zh>暂停画面</zh><en>The pause screen</en></b> · <zh>键盘被别的窗口拿走时也会停在这里；点回视口按 Esc 继续。</zh><en>Also shown when another window takes the keyboard; click the viewport and press Esc.</en></figcaption></figure>
+    <figure><img src="img/snake_count.jpg" alt=""><figcaption><b><zh>3-2-1 倒计时</zh><en>The 3-2-1 countdown</en></b> · <zh>从暂停或老板画面回来时先倒数，再继续。</zh><en>Coming back from a pause or the boss screen counts down first.</en></figcaption></figure>
+  </div>
+  <h2 class="mt"><zh>文件都在哪</zh><en>Where Moyu keeps its files</en></h2>
+  <div class="where mt2">
+    <div><h4><zh>包管理器安装</zh><en>Package Manager install</en></h4><code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\</code><zh>net48\、net7.0\（两份插件）、examples\、两份手册 PDF。</zh><en>net48\ and net7.0\ (the two builds), examples\, the two guide PDFs.</en></div>
+    <div><h4><zh>手动安装</zh><en>Copied by hand</en></h4><code>%APPDATA%\Grasshopper\Libraries\Moyu\</code><zh>你复制进去的那一份 Moyu.gha。</zh><en>The one Moyu.gha you copied.</en></div>
+    <div><h4><zh>最高分</zh><en>High scores</en></h4><code>%APPDATA%\Moyu\</code><zh>每个游戏一个纯文本文件，例如 swift-scores.txt。插件只写这里。</zh><en>One plain-text file per game, such as swift-scores.txt. The plugin writes nowhere else.</en></div>
+  </div>
+  <h2 class="mt"><zh>卸载</zh><en>Uninstall</en></h2>
+  <div class="install mt2">
+    <div><h4><zh>包管理器</zh><en>Package Manager</en></h4><code>_PackageManager</code> › Installed › moyu › Uninstall</div>
+    <div><h4><zh>手动复制的</zh><en>Copied by hand</en></h4><zh>删掉</zh><en>Delete</en> <code>%APPDATA%\Grasshopper\Libraries\Moyu\</code></div>
+    <div><h4><zh>最高分</zh><en>High scores</en></h4><zh>想清掉就删</zh><en>To clear them, delete</en> <code>%APPDATA%\Moyu\</code></div>
+  </div>
+  <div class="note mt">
+    <zh><b>关于。</b>Moyu @@VERSION@@ · 作者 Ming · MIT 许可。代码、测试和文档主要由 Claude Code 编写，图标由 OpenAI Codex 生成。完整的组件输入、按键、方案文档和开发用时统计在 https://github.com/ChenmingHe0126/moyu ；问题反馈请开 GitHub issue。拓扑优化结果只用于学习和概念设计，不提供任何担保。</zh>
+    <en><b>About.</b> Moyu @@VERSION@@ · by Ming · MIT licence. The code, tests and documentation were written mostly by Claude Code; the icons were drawn with OpenAI Codex. Every component input, every key, the design notes and the development time log are at https://github.com/ChenmingHe0126/moyu ; please report problems as GitHub issues. Optimisation results are for study and concept design and come with no warranty.</en>
+  </div>
+  <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>12</span></footer>
+</section>
+
+</body>
+</html>

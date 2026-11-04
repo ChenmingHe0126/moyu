@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <!-- The core is Rhino-free, so the plugin's Core sources are compiled straight into this runner. -->
+  <ItemGroup>
+    <Compile Include="..\..\src\Moyu\Core\**\*.cs" Link="Core\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Moyu\Games\Stack\Core\**\*.cs" Link="Games\Stack\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Moyu\Games\Snake\Core\**\*.cs" Link="Games\Snake\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Moyu\Games\Breakout\Core\**\*.cs" Link="Games\Breakout\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Moyu\Games\Swift\Core\**\*.cs" Link="Games\Swift\%(RecursiveDir)%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

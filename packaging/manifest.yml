@@ -1,0 +1,25 @@
+---
+name: moyu
+version: {version}
+authors:
+  - Ming
+description: >
+  A research and teaching project on developing a Rhino plugin quickly with an AI
+  coding agent (written mostly by Claude Code): live 2D/3D topology optimisation for
+  Grasshopper, plus four small viewport games that study interaction and display in
+  Rhino, each disguised as an architecture study with a boss key. Source, plans and
+  time logs are on GitHub. Windows only.
+url: https://github.com/ChenmingHe0126/moyu
+keywords:
+  - topology optimisation
+  - simp
+  - structural
+  - voxel
+  - grasshopper
+  - game
+  - research
+  - teaching
+  - claude code
+  # The plug-in's GH_AssemblyInfo.Id: lets Grasshopper's package restore find this package (yak adds it only for flat layouts).
+  - guid:b27a1bf2-7386-436b-846f-b4f9002b5395
+icon: icon.png
