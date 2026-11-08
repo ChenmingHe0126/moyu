@@ -22,6 +22,10 @@ Source and the full review: https://github.com/ChenmingHe0126/moyu
 - `dist/Moyu-1.0.1-food4rhino.zip`: examples, both guide PDFs and both `.gha` builds for installing by hand.
 - `dist/SHA256SUMS.txt`.
 
+## Status
+
+Published 2026-11-08: `yak push` of `moyu-1.0.1-rh8_0-win.yak` (built from commit 9567896; the server lists moyu 1.0.1 and 1.0.0), and on food4rhino (node 5994) a new "Moyu 1.0.1 - …(zip)" row above the old one, which is now titled "Moyu 1.0.0 - …" and marked "Previous version". The food4rhino description stays English only.
+
 ## Upload route (an update, not a new app)
 
 1. `"C:\Program Files\Rhino 8\System\Yak.exe" login` (or your Rhino's `Yak.exe`), then `yak push dist\moyu-1.0.1-rh8_0-win.yak`. A pushed version can never be replaced, only yanked. The food4rhino page is linked to the Yak package, so its Install row moves to 1.0.1 by itself.

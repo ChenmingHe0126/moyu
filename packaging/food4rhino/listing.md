@@ -1,6 +1,6 @@
-# food4rhino listing copy — Moyu 1.0.0
+# food4rhino listing copy — Moyu (1.0.0, updated for 1.0.1)
 
-Paste these into the food4rhino app form. The English block is the main description; the Chinese block goes after it (food4rhino has one description field, so both go in the same box). Screenshots to upload are listed at the end.
+Paste these into the food4rhino app form. The page is English only (food4rhino takes English); the Chinese block below is for reference and is not uploaded. Screenshots to upload are listed at the end.
 
 ## App name
 
@@ -36,10 +36,11 @@ Open source (MIT): https://github.com/ChenmingHe0126/moyu
 
 ## Downloads table
 
-The page shows two rows:
+As of 1.0.1 (2026-11-08) the page shows three rows, each with its version in the title:
 
-1. **moyu 1.0.0 · Install**: added by food4rhino from the linked Package Manager package. Install hands over to Rhino's Package Manager, which installs the plugin with the examples and the guide. Its description is `packaging/manifest.yml`'s and can only change with a new pushed version.
-2. **Examples, user guide and manual install (zip)**: the uploaded `dist/Moyu-<version>-food4rhino.zip`, platform Grasshopper › Windows › Version 8. Description: "Six example .gh files, the illustrated user guide (PDF, English and Chinese) and both Moyu.gha builds for installing by hand. The Install button above gives you the same plugin, examples and guide through Rhino's Package Manager."
+1. **moyu 1.0.1 · Install**: added by food4rhino from the linked Package Manager package. Install hands over to Rhino's Package Manager, which installs the plugin with the examples and the guide. Its description is `packaging/manifest.yml`'s and can only change with a new pushed version.
+2. **Moyu 1.0.1 - Examples, user guide and manual install (zip)**: `dist/Moyu-1.0.1-food4rhino.zip`, listed first (weight −1). Description: "Version 1.0.1 (2026-11-08). Six example .gh files, the illustrated user guide (PDF, English and Chinese) and both Moyu.gha builds for installing by hand. New in 1.0.1: an Examples component that opens any example in one click, a language menu on the game components, and fixes from a full code review. The Install button above gives you the same plugin, examples and guide through Rhino's Package Manager."
+3. **Moyu 1.0.0 - Examples, user guide and manual install (zip)**: the 1.0.0 zip, its description prefixed "Previous version 1.0.0 (2026-11-04).". The upload widget takes files from the user's own file chooser; Claude in Chrome's upload tool stops at 10 MB, and the 1.0.1 zip is 10.98 MB. Original 1.0.0 row text, for reference: Description: "Six example .gh files, the illustrated user guide (PDF, English and Chinese) and both Moyu.gha builds for installing by hand. The Install button above gives you the same plugin, examples and guide through Rhino's Package Manager."
 
 ## Form fields
 
