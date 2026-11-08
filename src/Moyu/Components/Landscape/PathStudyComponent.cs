@@ -5,6 +5,7 @@ using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
 using Moyu.Games.Common;
+using Moyu.Games.Common.Core;
 using Moyu.Games.Snake;
 using Moyu.Games.Snake.Core;
 using Rhino.Geometry;
@@ -22,6 +23,8 @@ namespace Moyu.Components.Landscape
 
     SurfaceField _field;
     SnakeSettings _pending;
+    /// <summary>The Language input's choice; null follows the system.</summary>
+    UiLanguage? _language;
     // What the field was built from (the input goo, or the built-in terrain), so a slider nudge elsewhere does not resample the surface.
     object _fieldSource;
     int _fieldCells;
@@ -59,6 +62,7 @@ namespace Moyu.Components.Landscape
       pManager.AddIntegerParameter("Mode", "M", "0 = Classic (endless), 1 = Blitz (3 minutes), 2 = Zen (no walls to die on, no bombs).", GH_ParamAccess.item, 0);
       pManager.AddIntegerParameter("Level", "Lv", "Starting level (1–15); higher is faster.", GH_ParamAccess.item, 1);
       pManager.AddBooleanParameter("Slope", "Sl", "Downhill is faster and uphill slower.", GH_ParamAccess.item, true);
+      AddLanguageInput(pManager);
       pManager[0].Optional = true;
     }
 
@@ -90,6 +94,8 @@ namespace Moyu.Components.Landscape
       DA.GetData(2, ref mode);
       DA.GetData(3, ref level);
       DA.GetData(4, ref slope);
+      _language = LanguageInput.Read(this, DA, 5);
+      if (IsRunning) LanguageInput.Apply(GameSession.Current, _language);
 
       _pending = null;
       var errors = new List<string>();
@@ -156,6 +162,7 @@ namespace Moyu.Components.Landscape
       };
       var session = SnakeSession.Start(_field, settings, this, OnSessionChanged, out string error);
       if (session == null) CannotRun(error);
+      else LanguageInput.Apply(session, _language);
     }
 
     /// <summary>Shows why the Run button did nothing on the component, where the user is looking.</summary>

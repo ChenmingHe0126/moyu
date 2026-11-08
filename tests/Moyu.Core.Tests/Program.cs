@@ -30,6 +30,7 @@ namespace Moyu.Core.Tests
       TestsBreakout.Run(Check);
       TestsSwift.Run(Check);
       TestsKeys.Run(Check);
+      TestsLanguage.Run(Check);
       if (args.Contains("--bench")) Benchmark();
       if (args.Contains("--bench")) Tests3D.Benchmark();
       if (args.Contains("--canopy")) Tests3D.CanopyTrace();

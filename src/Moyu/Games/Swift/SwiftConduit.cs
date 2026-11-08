@@ -33,9 +33,10 @@ namespace Moyu.Games.Swift
     static readonly Color Body = Palette.Hex(0x34365A), Belly = Palette.Hex(0xF4F1EA), Wing = Palette.Hex(0x474B78), Beak = Palette.Hex(0xF2A65A),
       FeatherPaint = Palette.Hex(0xF6B85A), Bump = Palette.Hex(0xFF7A66);
 
-    static readonly (string keys, string meaning)[] KeyRow =
+    (string keys, string meaning)[] KeyRow => new[]
     {
-      ("Space", "扇一下翅膀"), ("鼠标左键", "也能扇"), ("Esc", "暂停"), ("Home", "复位视角"), ("`", "老板键（1 左边的键）"),
+      ("Space", T("扇一下翅膀", "flap")), (T("鼠标左键", "Click"), T("也能扇", "flaps too")), ("Esc", T("暂停", "pause")),
+      ("Home", T("复位视角", "reset view")), BossHint,
     };
 
     readonly SwiftSession _s;
@@ -384,13 +385,13 @@ namespace Moyu.Games.Swift
       double y = 222 * k;
       var next = g.NextWall;
       if (g.State == SwiftState.Flying && next != null && next.Moving && next.X - g.BirdCourseX < 14)
-        Status(d, ref y, p.Accent, "滑动窗扇  · 看准再过", -1);
-      if (g.Zen) Status(d, ref y, Lighten(p.Accent, 0.3), "Zen  · 撞墙不结束", -1);
+        Status(d, ref y, p.Accent, T("滑动窗扇  · 看准再过", "Sliding sash  · time it"), -1);
+      if (g.Zen) Status(d, ref y, Lighten(p.Accent, 0.3), T("Zen  · 撞墙不结束", "Zen  · walls do not end the flight"), -1);
 
       if (g.State == SwiftState.Ready && _s.PlayTime > 0.2)
       {
         var at = e.Viewport.WorldToClient(_s.At(SwiftGame.BirdX, g.Y + 1.4));
-        Text(d, "空格 / 点一下  起飞", Fade(p.Muted, 0.6 + 0.4 * Math.Sin(_s.Time * 4)), at.X, at.Y, (int)Math.Round(15 * k), CjkLight, true);
+        Text(d, T("空格 / 点一下  起飞", "Space or click  to take off"), Fade(p.Muted, 0.6 + 0.4 * Math.Sin(_s.Time * 4)), at.X, at.Y, (int)Math.Round(15 * k), TextFace, true);
       }
       // Each wall passed pops a small +1 over its opening.
       foreach (var w in g.Walls.Where(w => w.Passed && !w.Hit))
@@ -404,7 +405,7 @@ namespace Moyu.Games.Swift
       {
         double t = (g.Clock - f.TakenAt) / 0.8;
         var at = e.Viewport.WorldToClient(_s.AtCourse(f.X, f.Y + 0.8));
-        Text(d, "羽毛 +1", Fade(p.Accent, 1.2 - t), at.X, at.Y - 26 * k * t, (int)Math.Round(16 * k), CjkLight, true);
+        Text(d, T("羽毛 +1", "Feather +1"), Fade(p.Accent, 1.2 - t), at.X, at.Y - 26 * k * t, (int)Math.Round(16 * k), TextFace, true);
       }
       if ((g.State == SwiftState.Crashed || g.IsOver) && g.Clock - g.CrashTime < 0.3)
         d.Draw2dRectangle(new Rectangle(0, 0, frame.Width, frame.Height), Color.Transparent, 0, Color.FromArgb((int)(55 * (1 - (g.Clock - g.CrashTime) / 0.3)), 255, 110, 90));
@@ -427,7 +428,7 @@ namespace Moyu.Games.Swift
         double a = Math.Min(1, Math.Min(since2 * 5, (2.4 - since2) * 2));
         double cx = frame.Width / 2.0, cy = frame.Height * 0.2;
         Text(d, Spaced($"Level {g.Level:00}"), Fade(p.Accent, a), cx, cy, (int)Math.Round(14 * k), UiStrong, true);
-        Text(d, Chapters[band].name, Fade(p.Ink, a), cx, cy + 34 * k, (int)Math.Round(32 * k), CjkLight, true);
+        Text(d, Named(Chapters[band].name), Fade(p.Ink, a), cx, cy + 34 * k, (int)Math.Round(32 * k), TextFace, true);
       }
     }
 
@@ -436,8 +437,10 @@ namespace Moyu.Games.Swift
       get
       {
         var g = _s.Game;
-        string title = g.HitWall ? "撞墙了" : "落地了";
-        string line = $"第 {g.Level} 层    ·    羽毛 {g.Feathers}    ·    飞了 {g.Distance * _s.Metres:F0} m" + (_s.NewBest ? "" : $"    ·    最高 {_s.Best:N0}");
+        string title = g.HitWall ? T("撞墙了", "Hit a wall") : T("落地了", "Landed");
+        string line = Zh
+          ? $"第 {g.Level} 层    ·    羽毛 {g.Feathers}    ·    飞了 {g.Distance * _s.Metres:F0} m" + (_s.NewBest ? "" : $"    ·    最高 {_s.Best:N0}")
+          : $"Level {g.Level}    ·    {g.Feathers} feathers    ·    flew {g.Distance * _s.Metres:F0} m" + (_s.NewBest ? "" : $"    ·    best {_s.Best:N0}");
         return (title, $"{g.Score:N0}", line, _s.NewBest ? "NEW BEST" : null);
       }
     }

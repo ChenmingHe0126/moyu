@@ -5,6 +5,7 @@ using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
 using Moyu.Games.Common;
+using Moyu.Games.Common.Core;
 using Moyu.Games.Stack;
 using Moyu.Games.Stack.Core;
 using Rhino;
@@ -23,6 +24,8 @@ namespace Moyu.Components.Massing
     StackSettings _pending;
     Plane _plane = Plane.WorldXY;
     double _size = 7.2;
+    /// <summary>The Language input's choice; null follows the system.</summary>
+    UiLanguage? _language;
 
     // Snapshot of the last session, shown on the outputs.
     string _state = "Ready";
@@ -57,6 +60,7 @@ namespace Moyu.Components.Massing
       pManager.AddNumberParameter("Size", "S", "Voxel edge in model units. Default: one 7.2 m structural bay.", GH_ParamAccess.item);
       pManager.AddIntegerParameter("Mode", "M", "0 = Marathon (endless), 1 = Blitz (3 minutes), 2 = Zen (no gravity, no game over).", GH_ParamAccess.item, 0);
       pManager.AddIntegerParameter("Level", "Lv", "Starting level (1–15); higher falls faster.", GH_ParamAccess.item, 1);
+      AddLanguageInput(pManager);
       pManager[0].Optional = true;
       pManager[4].Optional = true;
       pManager[5].Optional = true;
@@ -92,6 +96,8 @@ namespace Moyu.Components.Massing
       DA.GetData(5, ref size);
       DA.GetData(6, ref mode);
       DA.GetData(7, ref level);
+      _language = LanguageInput.Read(this, DA, 8);
+      if (IsRunning) LanguageInput.Apply(GameSession.Current, _language);
 
       _pending = null;
       var errors = new List<string>();
@@ -167,6 +173,7 @@ namespace Moyu.Components.Massing
       };
       var session = StackSession.Start(settings, _plane, _size, this, OnSessionChanged, out string error);
       if (session == null) CannotRun(error);
+      else LanguageInput.Apply(session, _language);
     }
 
     /// <summary>Shows why the Run button did nothing on the component, where the user is looking.</summary>

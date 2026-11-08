@@ -72,13 +72,12 @@ namespace Moyu.Games.Stack
 
     protected override Palette Theme => Current.palette;
 
-    static readonly (string keys, string meaning)[] StackKeys =
+    protected override (string keys, string meaning)[] KeyHints => new[]
     {
-      ("← ↑ ↓ →", "移动"), ("拖圆环", "旋转"), ("Q E", "水平转"), ("W S A D", "翻转"), ("Space", "落下"), ("Shift", "加速"), ("C", "暂存"),
-      ("Z X", "转视角"), ("Esc", "暂停"), ("Home", "复位视角"), ("`", "老板键（1 左边的键）"),
+      ("← ↑ ↓ →", T("移动", "move")), (T("拖圆环", "Gumball"), T("旋转", "drag a ring to turn")), ("Q E", T("水平转", "spin")),
+      ("W S A D", T("翻转", "tip")), ("Space", T("落下", "drop")), ("Shift", T("加速", "faster")), ("C", T("暂存", "hold")),
+      ("Z X", T("转视角", "turn view")), ("Esc", T("暂停", "pause")), ("Home", T("复位视角", "reset view")), BossHint,
     };
-
-    protected override (string keys, string meaning)[] KeyHints => StackKeys;
 
     protected override void IncludeBounds(CalculateBoundingBoxEventArgs e)
     {
@@ -441,8 +440,8 @@ namespace Moyu.Games.Stack
       LevelBlock(d, g.Level, ChapterNames[Palette.Band(g.Level)], (g.Layers % StackGame.LayersPerLevel) / (double)StackGame.LayersPerLevel);
       double k = Ui(d);
       double y = 222 * k;
-      if (g.Combo >= 2) Status(d, ref y, p.Accent, $"连消 ×{g.Combo}", -1);
-      if (g.SoftDrop && !g.IsOver) Status(d, ref y, p.Accent, "加速下落", -1);
+      if (g.Combo >= 2) Status(d, ref y, p.Accent, $"{T("连消", "Combo")} ×{g.Combo}", -1);
+      if (g.SoftDrop && !g.IsOver) Status(d, ref y, p.Accent, T("加速下落", "Fast drop"), -1);
 
       if (!g.IsOver)
         foreach (var (client, _, slot) in PreviewSlots(e.Viewport, frame, k))
@@ -485,8 +484,8 @@ namespace Moyu.Games.Stack
         var hint = Fade(p.Muted, Math.Min(1, (60 - _s.PlayTime) / 5));
         double right = cs.X - pixels * 1.45;
         int size = (int)Math.Round(13 * k);
-        TextRight(d, "拖动圆环", hint, right, cs.Y - size * 1.5, size, CjkLight);
-        TextRight(d, "绕这根轴转 90°", hint, right, cs.Y + size * 0.2, size, CjkLight);
+        TextRight(d, T("拖动圆环", "Drag a ring"), hint, right, cs.Y - size * 1.5, size, TextFace);
+        TextRight(d, T("绕这根轴转 90°", "to turn 90° about its axis"), hint, right, cs.Y + size * 0.2, size, TextFace);
       }
     }
 
@@ -495,12 +494,13 @@ namespace Moyu.Games.Stack
       get
       {
         var g = _s.Game;
-        string title = g.State == StackState.TimeUp ? "时间到" : "封顶了";
+        string title = g.State == StackState.TimeUp ? T("时间到", "Time's up") : T("封顶了", "Topped out");
         var played = TimeSpan.FromSeconds(g.Elapsed);
         // Past an hour the clock shows hours too, instead of wrapping.
         string time = played.TotalHours >= 1 ? $"{(int)played.TotalHours}:{played.Minutes:00}:{played.Seconds:00}" : $"{played.Minutes}:{played.Seconds:00}";
-        string line = $"{g.Layers} 层    ·    第 {g.Level} 级    ·    {g.PiecesPlaced} 块    ·    {time}" +
-          (_s.NewBest ? "" : $"    ·    最高 {_s.Best:N0}");
+        string line = Zh
+          ? $"{g.Layers} 层    ·    第 {g.Level} 级    ·    {g.PiecesPlaced} 块    ·    {time}" + (_s.NewBest ? "" : $"    ·    最高 {_s.Best:N0}")
+          : $"{g.Layers} layers    ·    level {g.Level}    ·    {g.PiecesPlaced} pieces    ·    {time}" + (_s.NewBest ? "" : $"    ·    best {_s.Best:N0}");
         return (title, $"{g.Score:N0}", line, _s.NewBest ? "NEW BEST" : null);
       }
     }
@@ -521,7 +521,7 @@ namespace Moyu.Games.Stack
         string title = clear.Perfect ? "SITE CLEARED" : clear.Layers == 1 ? "FLOOR CLEARED" : clear.Layers == 2 ? "DOUBLE FLOOR" : clear.Layers == 3 ? "TRIPLE FLOOR" : "MEGA FLOOR";
         Text(d, Spaced(title), Fade(p.Accent, 1.4 - t), x, y, (int)Math.Round(14 * k), UiStrong);
         Text(d, $"+{clear.Points:N0}", Fade(p.Ink, 1.4 - t), x - 2 * k, y + 22 * k, (int)Math.Round(44 * k), Display);
-        if (clear.Combo > 1) Text(d, $"连消 ×{clear.Combo}", Fade(p.Muted, 1.3 - t), x, y + 76 * k, (int)Math.Round(15 * k), CjkLight);
+        if (clear.Combo > 1) Text(d, $"{T("连消", "Combo")} ×{clear.Combo}", Fade(p.Muted, 1.3 - t), x, y + 76 * k, (int)Math.Round(15 * k), TextFace);
       }
       if (g.Elapsed - g.LevelUpTime < 2.6 && g.Level > 1)
       {
@@ -529,12 +529,12 @@ namespace Moyu.Games.Stack
         double a = Math.Min(1, Math.Min(t * 5, (1 - t) * 3));
         double cx = frame.Width / 2.0;
         Text(d, Spaced($"LEVEL {g.Level:00}"), Fade(p.Accent, a), cx, frame.Height * 0.16, (int)Math.Round(14 * k), UiStrong, true);
-        Text(d, ChapterNames[Palette.Band(g.Level)], Fade(p.Ink, a), cx, frame.Height * 0.16 + 36 * k, (int)Math.Round(34 * k), CjkLight, true);
+        Text(d, Named(ChapterNames[Palette.Band(g.Level)]), Fade(p.Ink, a), cx, frame.Height * 0.16 + 36 * k, (int)Math.Round(34 * k), TextFace, true);
       }
       if (g.Elapsed - g.SiteResetTime < 2.2)
       {
         double t = (g.Elapsed - g.SiteResetTime) / 2.2;
-        Text(d, "场地重置", Fade(p.Ink, 1.3 - t), frame.Width / 2.0, frame.Height * 0.16 + 90 * k, (int)Math.Round(20 * k), CjkLight, true);
+        Text(d, T("场地重置", "Site reset"), Fade(p.Ink, 1.3 - t), frame.Width / 2.0, frame.Height * 0.16 + 90 * k, (int)Math.Round(20 * k), TextFace, true);
       }
     }
 

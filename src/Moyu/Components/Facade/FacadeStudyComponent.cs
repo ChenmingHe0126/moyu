@@ -7,6 +7,7 @@ using Grasshopper.Kernel.Types;
 using Moyu.Games.Breakout;
 using Moyu.Games.Breakout.Core;
 using Moyu.Games.Common;
+using Moyu.Games.Common.Core;
 using Rhino;
 using Rhino.Geometry;
 
@@ -23,6 +24,8 @@ namespace Moyu.Components.Facade
     BreakoutSettings _pending;
     Plane _plane;
     double _size;
+    /// <summary>The Language input's choice; null follows the system.</summary>
+    UiLanguage? _language;
 
     // Snapshot of the last session, shown on the outputs.
     string _state = "Ready";
@@ -57,6 +60,7 @@ namespace Moyu.Components.Facade
       pManager.AddIntegerParameter("Level", "Lv", "Starting level (1–15); higher is faster and harder.", GH_ParamAccess.item, 1);
       pManager.AddPlaneParameter("Plane", "P", "The facade plane (X along the wall, Y up). Default: World XZ at the origin.", GH_ParamAccess.item);
       pManager.AddNumberParameter("Size", "S", "Model units per facade module. Default: 2.4 m.", GH_ParamAccess.item);
+      AddLanguageInput(pManager);
       pManager[0].Optional = true;
       pManager[3].Optional = true;
       pManager[4].Optional = true;
@@ -89,6 +93,8 @@ namespace Moyu.Components.Facade
       DA.GetData(2, ref level);
       DA.GetData(3, ref plane);
       DA.GetData(4, ref size);
+      _language = LanguageInput.Read(this, DA, 5);
+      if (IsRunning) LanguageInput.Apply(GameSession.Current, _language);
 
       _pending = null;
       var errors = new List<string>();
@@ -124,7 +130,15 @@ namespace Moyu.Components.Facade
       DA.SetDataList(5, _windows);
       DA.SetDataList(6, _metrics);
       if (errors.Count > 0) Message = "Error";
-      else if (!IsRunning && _state == "Ready") Message = wall?.Custom != null ? "Custom wall" : wall?.Bond != null ? Bonds.Names[(int)wall.Bond].Split(' ')[0] : "Ready";
+      else if (!IsRunning && _state == "Ready") Message = wall?.Custom != null ? "Custom wall" : wall?.Bond != null ? BondName(wall.Bond.Value) : "Ready";
+    }
+
+    /// <summary>The bond's name in the Language input's language ("顺砌 Stretcher bond" → 顺砌 or Stretcher bond).</summary>
+    string BondName(BondType bond)
+    {
+      string both = Bonds.Names[(int)bond];
+      int space = both.IndexOf(' ');
+      return GameSession.Resolve(_language) == UiLanguage.Chinese ? both.Substring(0, space) : both.Substring(space + 1);
     }
 
     public static double DefaultSize()
@@ -153,6 +167,7 @@ namespace Moyu.Components.Facade
       };
       var session = BreakoutSession.Start(settings, _plane, _size, this, OnSessionChanged, out string error);
       if (session == null) CannotRun(error);
+      else LanguageInput.Apply(session, _language);
     }
 
     /// <summary>Shows why the Run button did nothing on the component, where the user is looking.</summary>

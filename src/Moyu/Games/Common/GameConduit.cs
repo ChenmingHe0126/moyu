@@ -6,6 +6,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.Linq;
+using Moyu.Games.Common.Core;
 using Rhino.Display;
 using Rhino.Geometry;
 
@@ -75,6 +76,21 @@ namespace Moyu.Games.Common
     }
 
     protected bool Mine(DrawEventArgs e) => !_session.Stopped && e.Viewport.Id == _session.ViewportId;
+
+    /// <summary>The HUD speaks Chinese (else English), as the component's Language input says.</summary>
+    protected bool Zh => _session.Language == UiLanguage.Chinese;
+
+    /// <summary>The Chinese or the English wording, in the session's language.</summary>
+    protected string T(string zh, string en) => Zh ? zh : en;
+
+    /// <summary>A bilingual name such as "庭院 Courtyard": whole in Chinese (the English is part of the look), only its English part otherwise.</summary>
+    protected string Named(string both) => Zh ? both : both.Substring(both.IndexOf(' ') + 1);
+
+    /// <summary>The face for running text: YaHei for Chinese, Bahnschrift for English.</summary>
+    protected string TextFace => Zh ? CjkLight : UiLight;
+
+    /// <summary>The boss-key hint every game ends its key row with.</summary>
+    protected (string keys, string meaning) BossHint => ("`", T("老板键（1 左边的键）", "boss key (left of 1)"));
 
     /// <summary>The palette right now (games blend between chapter palettes as the level rises).</summary>
     protected abstract Palette Theme { get; }
@@ -308,7 +324,7 @@ namespace Moyu.Games.Common
         Ring(d, cx, cy, 120 * k, 1, Fade(p.Ink, 0.12), (float)(2 * k));
         Ring(d, cx, cy, 120 * k, _session.Countdown / 3.0, p.Accent, (float)(3 * k));
         Text(d, n.ToString(), Fade(p.Ink, 1 - t * 0.5), cx, cy - 6 * k, Px((140 - 24 * t) * k), Display, true);
-        Text(d, _session.CountdownIsStart ? "准备开始" : "回到游戏", Fade(p.Muted, 0.9), cx, cy + 160 * k, Px(18 * k), CjkLight, true);
+        Text(d, _session.CountdownIsStart ? T("准备开始", "Get ready") : T("回到游戏", "Back to the game"), Fade(p.Muted, 0.9), cx, cy + 160 * k, Px(18 * k), TextFace, true);
         Hints(d, KeyHints, 1);
         return;
       }
@@ -316,9 +332,9 @@ namespace Moyu.Games.Common
       {
         Wash(d, frame, p, 0.72);
         Text(d, Spaced("PAUSED"), p.Accent, cx, cy - 70 * k, Px(16 * k), UiStrong, true);
-        Text(d, "已暂停", p.Ink, cx, cy - 22 * k, Px(44 * k), CjkLight, true);
-        Text(d, "暂停时键盘交给 Rhino，可以正常敲命令", p.Muted, cx, cy + 36 * k, Px(14 * k), CjkLight, true);
-        Hints(d, new[] { ("Esc", "继续"), ("Shift+Esc", "退出"), ("`", "老板键（1 左边的键）") }, 1, cy + 96 * k);
+        Text(d, T("已暂停", "Paused"), p.Ink, cx, cy - 22 * k, Px(44 * k), TextFace, true);
+        Text(d, T("暂停时键盘交给 Rhino，可以正常敲命令", "While paused, the keyboard is Rhino's: type commands as usual"), p.Muted, cx, cy + 36 * k, Px(14 * k), TextFace, true);
+        Hints(d, new[] { ("Esc", T("继续", "resume")), ("Shift+Esc", T("退出", "quit")), BossHint }, 1, cy + 96 * k);
         Hints(d, KeyHints, 0.85);
         return;
       }
@@ -327,11 +343,11 @@ namespace Moyu.Games.Common
         var (title, big, line, badge) = ResultText;
         Wash(d, frame, p, Math.Min(0.78, _session.OverTime * 1.6));
         double a = Math.Min(1, _session.OverTime * 2.5);
-        Text(d, title, Fade(p.Accent, a), cx, cy - 128 * k, Px(20 * k), CjkLight, true);
+        Text(d, title, Fade(p.Accent, a), cx, cy - 128 * k, Px(20 * k), TextFace, true);
         Text(d, big, Fade(p.Ink, a), cx, cy - 40 * k, Px(112 * k), Display, true);
         if (badge != null) Text(d, Spaced(badge), Fade(p.Accent, a), cx, cy + 40 * k, Px(15 * k), UiStrong, true);
-        Text(d, line, Fade(p.Muted, a), cx, cy + 76 * k, Px(15 * k), CjkLight, true);
-        if (_session.OverTime > 0.8) Hints(d, new[] { ("Enter", "再来一局"), ("Esc", "退出") }, Math.Min(1, (_session.OverTime - 0.8) * 3), cy + 132 * k);
+        Text(d, line, Fade(p.Muted, a), cx, cy + 76 * k, Px(15 * k), TextFace, true);
+        if (_session.OverTime > 0.8) Hints(d, new[] { ("Enter", T("再来一局", "play again")), ("Esc", T("退出", "quit")) }, Math.Min(1, (_session.OverTime - 0.8) * 3), cy + 132 * k);
         return;
       }
       // While playing, the hints stay for the first few seconds and then get out of the way.
@@ -394,7 +410,7 @@ namespace Moyu.Games.Common
       double k = Ui(d);
       double right = d.FrameSize.Width - 52 * k;
       TextRight(d, Spaced($"LEVEL {level:00}"), p.Muted, right, 44 * k, Px(12 * k), UiStrong);
-      TextRight(d, chapter, p.Ink, right, 64 * k, Px(22 * k), CjkLight);
+      TextRight(d, Named(chapter), p.Ink, right, 64 * k, Px(22 * k), TextFace);
       double w = 150 * k;
       float y = (float)(104 * k), thick = (float)(2 * k);
       d.Draw2dLine(new PointF((float)(right - w), y), new PointF((float)right, y), Fade(p.Ink, 0.15), thick);
@@ -407,7 +423,7 @@ namespace Moyu.Games.Common
       var p = Theme;
       double k = Ui(d);
       Dot(d, 58 * k, y + 9 * k, 5, colour);
-      Text(d, text, p.Ink, 72 * k, y, Px(15 * k), CjkLight);
+      Text(d, text, p.Ink, 72 * k, y, Px(15 * k), TextFace);
       if (fraction >= 0)
       {
         float x0 = (float)(72 * k), x1 = (float)(222 * k), ly = (float)(y + 26 * k), thick = (float)(2 * k);
@@ -448,20 +464,21 @@ namespace Moyu.Games.Common
       int step = (int)Math.Round(Math.Min(1, alpha) * 8);
       // The width is rounded down to 16-px steps so a live resize does not lay the row out again every frame.
       int maxW = Math.Max(64, (int)(frame.Width - 48 * k) / 16 * 16);
-      string key = "hints:" + string.Join("|", hints.Select(h => h.keys + "=" + h.meaning)) + $":{Q(p.Ink)}:{step}:{Math.Round(k, 2)}:{maxW}";
-      var (bmp, size) = Sprite(key, () => KeycapRow(hints, p, step / 8.0, k, maxW));
+      string font = TextFace;
+      string key = "hints:" + string.Join("|", hints.Select(h => h.keys + "=" + h.meaning)) + $":{font}:{Q(p.Ink)}:{step}:{Math.Round(k, 2)}:{maxW}";
+      var (bmp, size) = Sprite(key, () => KeycapRow(hints, p, step / 8.0, k, maxW, font));
       double cy = double.IsNaN(y) ? frame.Height - 40 * k : y;
       int rowH = Px(30 * k);
       d.DrawBitmap(bmp, (int)(frame.Width / 2.0 - size.Width / 2.0), (int)(cy + rowH / 2.0 - size.Height));
     }
 
-    static Bitmap KeycapRow((string keys, string meaning)[] hints, Palette p, double alpha, double k, int maxW)
+    static Bitmap KeycapRow((string keys, string meaning)[] hints, Palette p, double alpha, double k, int maxW, string meaningFont)
     {
       Color A(Color c, double f = 1) => Color.FromArgb((int)(c.A * alpha * f), c);
       int capH = Px(24 * k), rowH = Px(30 * k);
       float pad = (float)(8 * k), gap = (float)(30 * k), inner = (float)(8 * k), plus = (float)(4 * k), radius = (float)(6 * k);
       using (var capFont = new Font(UiStrong, (float)(13 * k), GraphicsUnit.Pixel))
-      using (var textFont = new Font(CjkLight, (float)(14 * k), GraphicsUnit.Pixel))
+      using (var textFont = new Font(meaningFont, (float)(14 * k), GraphicsUnit.Pixel))
       using (var measure = new Bitmap(1, 1))
       using (var mg = Graphics.FromImage(measure))
       {

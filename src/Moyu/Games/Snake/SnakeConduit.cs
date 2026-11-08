@@ -93,16 +93,13 @@ namespace Moyu.Games.Snake
 
     protected override Palette Theme => Current.Palette;
 
-    static readonly (string keys, string meaning)[] FollowHints =
+    // C switches the camera, so its hint names the view it switches to.
+    protected override (string keys, string meaning)[] KeyHints => new[]
     {
-      ("← →", "左转 / 右转（以蛇头为准）"), ("↑ / Shift", "冲刺"), ("C", "自由视角"), ("Esc", "暂停"), ("Home", "复位视角"), ("`", "老板键（1 左边的键）"),
+      ("← →", T("左转 / 右转（以蛇头为准）", "turn left / right (as the head sees it)")), ("↑ / Shift", T("冲刺", "sprint")),
+      ("C", _s.Follow ? T("自由视角", "free view") : T("第一人称", "first person")), ("Esc", T("暂停", "pause")),
+      ("Home", T("复位视角", "reset view")), BossHint,
     };
-    static readonly (string keys, string meaning)[] FreeHints =
-    {
-      ("← →", "左转 / 右转（以蛇头为准）"), ("↑ / Shift", "冲刺"), ("C", "第一人称"), ("Esc", "暂停"), ("Home", "复位视角"), ("`", "老板键（1 左边的键）"),
-    };
-
-    protected override (string keys, string meaning)[] KeyHints => _s.Follow ? FollowHints : FreeHints;
 
     protected override void IncludeBounds(CalculateBoundingBoxEventArgs e)
     {
@@ -515,13 +512,13 @@ namespace Moyu.Games.Snake
 
       double y = 222 * Ui(d);
       double comboLeft = SnakeGame.ComboWindow - (g.Elapsed - g.LastEatTime);
-      if (g.Combo >= 2 && comboLeft > 0) Status(d, ref y, p.Accent, $"连击 ×{g.Combo}", comboLeft / SnakeGame.ComboWindow);
-      if (g.IceActive) Status(d, ref y, Frost, $"冰冻 · 减速  {g.IceUntil - g.Elapsed:F1}s", (g.IceUntil - g.Elapsed) / SnakeGame.PowerSeconds);
-      if (g.GhostActive) Status(d, ref y, Lerp(Spirit, p.Muted, 0.4), $"幽灵 · 可以穿过自己  {g.GhostUntil - g.Elapsed:F1}s", (g.GhostUntil - g.Elapsed) / SnakeGame.PowerSeconds);
-      if (g.Boost && !g.IsOver) Status(d, ref y, p.Accent, "冲刺 ×1.8", -1);
-      if (g.SlopeFactor > 1.03) Status(d, ref y, Palette.Hex(0xF2B544), $"下坡  +{(g.SlopeFactor - 1) * 100:F0}%", -1);
-      else if (g.SlopeFactor < 0.97) Status(d, ref y, Palette.Hex(0x7FA7D9), $"上坡  −{(1 - g.SlopeFactor) * 100:F0}%", -1);
-      Status(d, ref y, p.Muted, _s.Follow ? "第一人称 · 视角跟着蛇头" : "自由视角 · 拖动鼠标转模型", -1);
+      if (g.Combo >= 2 && comboLeft > 0) Status(d, ref y, p.Accent, $"{T("连击", "Combo")} ×{g.Combo}", comboLeft / SnakeGame.ComboWindow);
+      if (g.IceActive) Status(d, ref y, Frost, $"{T("冰冻 · 减速", "Ice · slower")}  {g.IceUntil - g.Elapsed:F1}s", (g.IceUntil - g.Elapsed) / SnakeGame.PowerSeconds);
+      if (g.GhostActive) Status(d, ref y, Lerp(Spirit, p.Muted, 0.4), $"{T("幽灵 · 可以穿过自己", "Ghost · pass through yourself")}  {g.GhostUntil - g.Elapsed:F1}s", (g.GhostUntil - g.Elapsed) / SnakeGame.PowerSeconds);
+      if (g.Boost && !g.IsOver) Status(d, ref y, p.Accent, T("冲刺 ×1.8", "Sprint ×1.8"), -1);
+      if (g.SlopeFactor > 1.03) Status(d, ref y, Palette.Hex(0xF2B544), $"{T("下坡", "Downhill")}  +{(g.SlopeFactor - 1) * 100:F0}%", -1);
+      else if (g.SlopeFactor < 0.97) Status(d, ref y, Palette.Hex(0x7FA7D9), $"{T("上坡", "Uphill")}  −{(1 - g.SlopeFactor) * 100:F0}%", -1);
+      Status(d, ref y, p.Muted, _s.Follow ? T("第一人称 · 视角跟着蛇头", "First person · the view follows the head") : T("自由视角 · 拖动鼠标转模型", "Free view · drag to turn the model"), -1);
       Popups(e, g, p);
     }
 
@@ -545,8 +542,8 @@ namespace Moyu.Games.Snake
             if (t < 0.25)
               d.Draw2dRectangle(new Rectangle(0, 0, frame.Width, frame.Height), Color.Transparent, 0, Color.FromArgb((int)(70 * (1 - t / 0.25)), 255, 120, 100));
             break;
-          case ItemKind.Ice: Text(d, "冰冻", Fade(p.Ink, 1.4 - t), at.X, y, Px(22), CjkLight, true); break;
-          case ItemKind.Ghost: Text(d, "幽灵", Fade(p.Ink, 1.4 - t), at.X, y, Px(22), CjkLight, true); break;
+          case ItemKind.Ice: Text(d, T("冰冻", "Ice"), Fade(p.Ink, 1.4 - t), at.X, y, Px(22), TextFace, true); break;
+          case ItemKind.Ghost: Text(d, T("幽灵", "Ghost"), Fade(p.Ink, 1.4 - t), at.X, y, Px(22), TextFace, true); break;
           default:
             Text(d, $"+{ev.Points}", Fade(ev.Combo > 1 ? p.Accent : p.Ink, 1.4 - t), at.X, y, Px(ev.Kind == ItemKind.Melon ? 40 : 30), Display, true);
             if (ev.Combo > 1) Text(d, $"×{ev.Combo}", Fade(p.Accent, 1.3 - t), at.X, y + 38 * k, Px(18), UiStrong, true);
@@ -560,8 +557,8 @@ namespace Moyu.Games.Snake
         double a = Math.Min(1, Math.Min(t * 5, (1 - t) * 3));
         double cx = frame.Width / 2.0, top = frame.Height * 0.2;
         Text(d, Spaced($"LEVEL {g.Level:00}"), Fade(p.Accent, a), cx, top, Px(14), UiStrong, true);
-        Text(d, ChapterNames[Palette.Band(g.Level)], Fade(p.Ink, a), cx, top + 36 * k, Px(34), CjkLight, true);
-        Text(d, "更快了", Fade(p.Muted, a), cx, top + 84 * k, Px(15), CjkLight, true);
+        Text(d, Named(ChapterNames[Palette.Band(g.Level)]), Fade(p.Ink, a), cx, top + 36 * k, Px(34), TextFace, true);
+        Text(d, T("更快了", "Faster now"), Fade(p.Muted, a), cx, top + 84 * k, Px(15), TextFace, true);
       }
     }
 
@@ -573,13 +570,15 @@ namespace Moyu.Games.Snake
         string title;
         switch (g.Cause)
         {
-          case DeathCause.Wall: title = "撞到了边缘"; break;
-          case DeathCause.Self: title = "咬到了自己"; break;
-          case DeathCause.Bomb: title = "被炸没了"; break;
-          default: title = "时间到"; break;
+          case DeathCause.Wall: title = T("撞到了边缘", "Ran into the edge"); break;
+          case DeathCause.Self: title = T("咬到了自己", "Bit yourself"); break;
+          case DeathCause.Bomb: title = T("被炸没了", "Blown up"); break;
+          default: title = T("时间到", "Time's up"); break;
         }
-        string line = $"长度 {g.Length}    ·    第 {g.Level} 级    ·    {g.FruitsEaten} 个水果    ·    {TimeSpan.FromSeconds(g.Elapsed):m\\:ss}" +
-          (_s.NewBest ? "" : $"    ·    最高 {_s.Best:N0}");
+        string time = $"{TimeSpan.FromSeconds(g.Elapsed):m\\:ss}";
+        string line = Zh
+          ? $"长度 {g.Length}    ·    第 {g.Level} 级    ·    {g.FruitsEaten} 个水果    ·    {time}" + (_s.NewBest ? "" : $"    ·    最高 {_s.Best:N0}")
+          : $"length {g.Length}    ·    level {g.Level}    ·    {g.FruitsEaten} fruit    ·    {time}" + (_s.NewBest ? "" : $"    ·    best {_s.Best:N0}");
         return (title, $"{g.Score:N0}", line, _s.NewBest ? "NEW BEST" : null);
       }
     }

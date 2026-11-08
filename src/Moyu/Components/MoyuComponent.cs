@@ -66,6 +66,10 @@ namespace Moyu.Components
       if (NativePreview) base.DrawViewportMeshes(args);
     }
 
+    /// <summary>The game components' Language input (see <see cref="LanguageInput"/>); always registered last.</summary>
+    protected static void AddLanguageInput(GH_InputParamManager pManager) =>
+      pManager.AddTextParameter(LanguageInput.Name, LanguageInput.Nickname, LanguageInput.Description, GH_ParamAccess.item, Games.Common.Core.UiLanguages.Auto);
+
     /// <summary>Point → point anchor; anything curve-like → curve anchor.</summary>
     protected static Anchor2D ToAnchor(IGH_GeometricGoo goo)
     {

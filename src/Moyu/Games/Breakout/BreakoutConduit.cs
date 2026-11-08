@@ -35,6 +35,12 @@ namespace Moyu.Games.Breakout
       [PowerKind.Narrow] = (Palette.Hex(0x6B7487), "缩短"),
     };
 
+    static readonly Dictionary<PowerKind, string> PowerEnglish = new Dictionary<PowerKind, string>
+    {
+      [PowerKind.Wide] = "Wide", [PowerKind.Multi] = "Multiball", [PowerKind.Slow] = "Slow", [PowerKind.Sticky] = "Sticky",
+      [PowerKind.Pierce] = "Pierce", [PowerKind.Life] = "+1 life", [PowerKind.Narrow] = "Narrow",
+    };
+
     /// <summary>One line on what a power-up does, shown as it is caught.</summary>
     static readonly Dictionary<PowerKind, string> PowerHelp = new Dictionary<PowerKind, string>
     {
@@ -43,15 +49,26 @@ namespace Moyu.Games.Breakout
       [PowerKind.Life] = "多一条命", [PowerKind.Narrow] = $"坏道具：挡板变短 · {BreakoutGame.NarrowHits} 次接球",
     };
 
+    static readonly Dictionary<PowerKind, string> PowerHelpEnglish = new Dictionary<PowerKind, string>
+    {
+      [PowerKind.Wide] = $"Wider paddle · {BreakoutGame.WideHits} catches", [PowerKind.Multi] = "Every ball splits in three",
+      [PowerKind.Slow] = $"Slower balls · {BreakoutGame.SlowHits} catches", [PowerKind.Sticky] = $"Balls stick to the paddle, Space lets go · {BreakoutGame.StickyCatches} times",
+      [PowerKind.Pierce] = $"Straight through {BreakoutGame.PierceBricks} bricks", [PowerKind.Life] = "One more life",
+      [PowerKind.Narrow] = $"Bad luck: a shorter paddle · {BreakoutGame.NarrowHits} catches",
+    };
+
+    string PowerLabel(PowerKind kind) => T(PowerLooks[kind].label, PowerEnglish[kind]);
+
     sealed class Fragment
     {
       public double X, Y, Z, Vx, Vy, Vz, Born, Size;
       public Color Colour;
     }
 
-    static readonly (string keys, string meaning)[] KeyRow =
+    (string keys, string meaning)[] KeyRow => new[]
     {
-      ("← →", "移动挡板"), ("鼠标", "挡板跟着走"), ("Space", "发球"), ("Esc", "暂停"), ("Home", "复位视角"), ("`", "老板键（1 左边的键）"),
+      ("← →", T("移动挡板", "move the paddle")), (T("鼠标", "Mouse"), T("挡板跟着走", "the paddle follows")), ("Space", T("发球", "serve")),
+      ("Esc", T("暂停", "pause")), ("Home", T("复位视角", "reset view")), BossHint,
     };
 
     readonly BreakoutSession _s;
@@ -338,27 +355,28 @@ namespace Moyu.Games.Breakout
       // Power-ups wear off by use: the line shows the goes left and shortens with each one.
       void Uses(PowerKind kind, int left, int of, string unit)
       {
-        if (left > 0) Status(d, ref y, PowerLooks[kind].colour, $"{PowerLooks[kind].label}  还剩 {left} {unit}", left / (double)of);
+        if (left > 0)
+          Status(d, ref y, PowerLooks[kind].colour, Zh ? $"{PowerLabel(kind)}  还剩 {left} {unit}" : $"{PowerLabel(kind)}  {left} {unit} left", left / (double)of);
       }
-      Uses(PowerKind.Wide, g.WideLeft, BreakoutGame.WideHits, "次接球");
-      Uses(PowerKind.Narrow, g.NarrowLeft, BreakoutGame.NarrowHits, "次接球");
-      Uses(PowerKind.Slow, g.SlowLeft, BreakoutGame.SlowHits, "次接球");
-      Uses(PowerKind.Sticky, g.StickyLeft, BreakoutGame.StickyCatches, "次粘球");
-      Uses(PowerKind.Pierce, g.PierceLeft, BreakoutGame.PierceBricks, "块砖");
-      if (g.Balls.Count > 1) Status(d, ref y, PowerLooks[PowerKind.Multi].colour, $"{g.Balls.Count} 个球", -1);
+      Uses(PowerKind.Wide, g.WideLeft, BreakoutGame.WideHits, T("次接球", "catches"));
+      Uses(PowerKind.Narrow, g.NarrowLeft, BreakoutGame.NarrowHits, T("次接球", "catches"));
+      Uses(PowerKind.Slow, g.SlowLeft, BreakoutGame.SlowHits, T("次接球", "catches"));
+      Uses(PowerKind.Sticky, g.StickyLeft, BreakoutGame.StickyCatches, T("次粘球", "sticky catches"));
+      Uses(PowerKind.Pierce, g.PierceLeft, BreakoutGame.PierceBricks, T("块砖", "bricks"));
+      if (g.Balls.Count > 1) Status(d, ref y, PowerLooks[PowerKind.Multi].colour, $"{g.Balls.Count} {T("个球", "balls")}", -1);
       // The launch prompt whenever a ball waits on the paddle: the serve, and a sticky catch mid-rally.
       bool held = false;
       foreach (var b in g.Balls) held |= b.Held;
       if (held && _s.PlayTime > 0.3)
       {
         var at = e.Viewport.WorldToClient(_s.At(g.PaddleX, BreakoutGame.PaddleY - 1.1));
-        Text(d, "空格 发球", Fade(p.Muted, 0.6 + 0.4 * Math.Sin(_s.Time * 4)), at.X, at.Y, Px(15, k), CjkLight, true);
+        Text(d, T("空格 发球", "Space  to serve"), Fade(p.Muted, 0.6 + 0.4 * Math.Sin(_s.Time * 4)), at.X, at.Y, Px(15, k), TextFace, true);
       }
 
       foreach (var pw in g.Powers)
       {
         var at = e.Viewport.WorldToClient(_s.At(pw.X, pw.Y + 0.7));
-        Text(d, PowerLooks[pw.Kind].label, p.Ink, at.X, at.Y, Px(13, k), CjkLight, true);
+        Text(d, PowerLabel(pw.Kind), p.Ink, at.X, at.Y, Px(13, k), TextFace, true);
       }
       Popups(e, g, p, frame, k);
     }
@@ -381,8 +399,8 @@ namespace Moyu.Games.Breakout
         double t = (g.Elapsed - lp.Value.time) / 2.4;
         var at = e.Viewport.WorldToClient(_s.At(g.PaddleX, BreakoutGame.PaddleY + 2.6));
         double rise = 26 * k * Math.Min(1, t * 2);
-        Text(d, PowerLooks[lp.Value.kind].label, Fade(p.Ink, 1.6 - t * 1.4), at.X, at.Y - rise, Px(22, k), CjkLight, true);
-        Text(d, PowerHelp[lp.Value.kind], Fade(p.Muted, 1.6 - t * 1.4), at.X, at.Y - rise + 26 * k, Px(14, k), CjkLight, true);
+        Text(d, PowerLabel(lp.Value.kind), Fade(p.Ink, 1.6 - t * 1.4), at.X, at.Y - rise, Px(22, k), TextFace, true);
+        Text(d, T(PowerHelp[lp.Value.kind], PowerHelpEnglish[lp.Value.kind]), Fade(p.Muted, 1.6 - t * 1.4), at.X, at.Y - rise + 26 * k, Px(14, k), TextFace, true);
       }
       if (g.Elapsed - g.LifeLostTime < 0.3)
         d.Draw2dRectangle(new Rectangle(0, 0, frame.Width, frame.Height), Color.Transparent, 0, Color.FromArgb((int)(60 * (1 - (g.Elapsed - g.LifeLostTime) / 0.3)), 255, 110, 90));
@@ -401,7 +419,7 @@ namespace Moyu.Games.Breakout
         else
         {
           Text(d, Spaced($"Level {g.Level:00}"), Fade(p.Accent, a), cx, cy, Px(14, k), UiStrong, true);
-          Text(d, g.WallName, Fade(p.Ink, a), cx, cy + 34 * k, Px(32, k), CjkLight, true);
+          Text(d, Named(g.WallName), Fade(p.Ink, a), cx, cy + 34 * k, Px(32, k), TextFace, true);
         }
       }
     }
@@ -411,10 +429,12 @@ namespace Moyu.Games.Breakout
       get
       {
         var g = _s.Game;
-        string title = g.State == BreakoutState.TimeUp ? "时间到" : "球用完了";
+        string title = g.State == BreakoutState.TimeUp ? T("时间到", "Time's up") : T("球用完了", "Out of balls");
         var played = TimeSpan.FromSeconds(g.Elapsed);
         string time = played.TotalHours >= 1 ? $"{(int)played.TotalHours}:{played.Minutes:00}:{played.Seconds:00}" : $"{played.Minutes}:{played.Seconds:00}";
-        string line = $"第 {g.Level} 关    ·    打掉 {g.BricksBroken} 块    ·    {time}" + (_s.NewBest ? "" : $"    ·    最高 {_s.Best:N0}");
+        string line = Zh
+          ? $"第 {g.Level} 关    ·    打掉 {g.BricksBroken} 块    ·    {time}" + (_s.NewBest ? "" : $"    ·    最高 {_s.Best:N0}")
+          : $"level {g.Level}    ·    {g.BricksBroken} bricks    ·    {time}" + (_s.NewBest ? "" : $"    ·    best {_s.Best:N0}");
         return (title, $"{g.Score:N0}", line, _s.NewBest ? "NEW BEST" : null);
       }
     }

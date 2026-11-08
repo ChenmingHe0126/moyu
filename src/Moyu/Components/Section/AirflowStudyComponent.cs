@@ -5,6 +5,7 @@ using Grasshopper;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Types;
 using Moyu.Games.Common;
+using Moyu.Games.Common.Core;
 using Moyu.Games.Swift;
 using Moyu.Games.Swift.Core;
 using Rhino;
@@ -21,6 +22,8 @@ namespace Moyu.Components.Section
     FlightSpec _spec;
     Plane _plane;
     double _size;
+    /// <summary>The Language input's choice; null follows the system.</summary>
+    UiLanguage? _language;
     /// <summary>Set while the document closes or the component leaves it: the session's last change must not touch the canvas or schedule a solution.</summary>
     bool _closing;
 
@@ -60,6 +63,7 @@ namespace Moyu.Components.Section
       pManager.AddGenericParameter("Grid", "G", "Course settings from Storey Grid. Default: normal exposure, classic.", GH_ParamAccess.item);
       pManager.AddPlaneParameter("Plane", "P", "The section plane (X across, Y up). Default: World XZ at the origin.", GH_ParamAccess.item);
       pManager.AddNumberParameter("Size", "Sz", "Model units per course unit. Default: 0.75 m.", GH_ParamAccess.item);
+      AddLanguageInput(pManager);
       pManager[0].Optional = true;
       pManager[1].Optional = true;
       pManager[2].Optional = true;
@@ -88,6 +92,8 @@ namespace Moyu.Components.Section
       DA.GetData(0, ref specGoo);
       DA.GetData(1, ref plane);
       DA.GetData(2, ref size);
+      _language = LanguageInput.Read(this, DA, 3);
+      if (IsRunning) LanguageInput.Apply(GameSession.Current, _language);
 
       var errors = new List<string>();
       var spec = FlightSpec.Default;
@@ -125,6 +131,7 @@ namespace Moyu.Components.Section
       }
       var session = SwiftSession.Start(_spec.Settings.Copy(), _spec.Seed, _plane, _size, this, OnSessionChanged, out string error);
       if (session == null) RhinoApp.WriteLine($"Airflow Study: {error}");
+      else LanguageInput.Apply(session, _language);
     }
 
     void OnSessionChanged(GameSession session)

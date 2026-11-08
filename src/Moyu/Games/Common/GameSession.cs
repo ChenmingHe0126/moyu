@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Moyu.Games.Common.Core;
 using Rhino;
 using Rhino.Display;
 using Rhino.DocObjects;
@@ -43,6 +46,40 @@ namespace Moyu.Games.Common
     public double PlayTime { get; private set; }
     public bool AutoBoss { get; set; } = true;
     public bool Stopped { get; private set; }
+
+    /// <summary>
+    /// Language of the text the game draws (the boss-mode disguises stay English). The component sets it from its
+    /// Language input, also while the game runs; until then it follows the system.
+    /// </summary>
+    public UiLanguage Language
+    {
+      get => _language;
+      set
+      {
+        if (_language == value) return;
+        _language = value;
+        if (!Stopped) Redraw();
+      }
+    }
+
+    UiLanguage _language = SystemLanguage();
+
+    [DllImport("kernel32.dll")]
+    static extern ushort GetUserDefaultUILanguage();
+
+    /// <summary>The Windows display language (Settings › Time &amp; language), else the UI culture: Chinese for any Chinese, English otherwise.</summary>
+    public static UiLanguage SystemLanguage()
+    {
+      if (System.Environment.OSVersion.Platform == PlatformID.Win32NT)
+      {
+        try { return UiLanguages.FromCulture(new CultureInfo(GetUserDefaultUILanguage()).Name); }
+        catch (Exception) { /* an unknown language id: fall back to the UI culture */ }
+      }
+      return UiLanguages.FromCulture(CultureInfo.CurrentUICulture.Name);
+    }
+
+    /// <summary>A Language input's choice, with auto (null) resolved to the system language.</summary>
+    public static UiLanguage Resolve(UiLanguage? choice) => choice ?? SystemLanguage();
 
     protected readonly RhinoDoc Doc;
     protected readonly RhinoView View;
