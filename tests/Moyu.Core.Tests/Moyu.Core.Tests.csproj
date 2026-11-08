@@ -15,6 +15,7 @@
     <Compile Include="..\..\src\Moyu\Games\Snake\Core\**\*.cs" Link="Games\Snake\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\..\src\Moyu\Games\Breakout\Core\**\*.cs" Link="Games\Breakout\%(RecursiveDir)%(Filename)%(Extension)" />
     <Compile Include="..\..\src\Moyu\Games\Swift\Core\**\*.cs" Link="Games\Swift\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Moyu\Games\Common\Core\**\*.cs" Link="Games\Common\%(RecursiveDir)%(Filename)%(Extension)" />
   </ItemGroup>
 
 </Project>

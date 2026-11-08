@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Moyu.Games.Common.Core;
 
 namespace Moyu.Games.Common
 {
@@ -68,8 +69,8 @@ namespace Moyu.Games.Common
 
     readonly Handler _handler;
     readonly List<IntPtr> _imeClosed = new List<IntPtr>();
-    // Keys seen going down and when, so a press or release is acted on once however many times it is reported.
-    readonly Dictionary<Keys, long> _down = new Dictionary<Keys, long>();
+    // Which keys are down, so a press or release is acted on once however many times it is reported.
+    readonly KeyTransitions _keys = new KeyTransitions();
     readonly Stopwatch _clock = Stopwatch.StartNew();
     // Held in a field so the garbage collector cannot free the delegate while Windows still calls it.
     readonly HookProc _proc;
@@ -126,17 +127,10 @@ namespace Moyu.Games.Common
         // by position; a layout that gives VK_OEM_3 to another key (UK ' @, German Ö) does not get a second boss key.
         if (scanCode == BossScanCode && !extended) key = GameSession.BossKey;
         else if (key == GameSession.BossKey) key = Keys.None;
-        // Windows may report one message twice (peeked, then removed) or only as peeked, so both codes count and
-        // transitions are de-duplicated here. A key still marked down from a lost release counts again after 250 ms.
-        bool fresh;
-        long now = _clock.ElapsedMilliseconds;
-        if (!up)
-        {
-          bool known = _down.TryGetValue(key, out long since);
-          fresh = !wasDown && (!known || now - since > 250);
-          if (fresh) _down[key] = now;
-        }
-        else fresh = _down.Remove(key);
+        // Both hook codes count (a message may be reported only as peeked); KeyTransitions acts on each press and
+        // release once, and does not trust wasDown for a key whose release it saw (Microsoft Pinyin can set it on a
+        // brand-new press).
+        bool fresh = _keys.Fresh((int)key, up, wasDown, _clock.ElapsedMilliseconds);
         bool swallow = false;
         try { swallow = _handler(key, !up, !up && !fresh, fresh); }
         catch (Exception ex) { Rhino.RhinoApp.WriteLine($"Moyu keyboard: {ex.Message}"); }
@@ -147,7 +141,7 @@ namespace Moyu.Games.Common
     }
 
     /// <summary>Forgets which keys are down, e.g. after the app lost focus and missed their release.</summary>
-    public void Reset() => _down.Clear();
+    public void Reset() => _keys.Reset();
 
     /// <summary>Drops any half-typed IME text and switches the focused window's IME to direct (English) input.</summary>
     void CloseIme()
