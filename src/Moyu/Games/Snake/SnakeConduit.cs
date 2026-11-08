@@ -58,6 +58,16 @@ namespace Moyu.Games.Snake
 
     public SnakeConduit(SnakeSession session) : base(session) => _s = session;
 
+    public override void Release()
+    {
+      _unit.Dispose();
+      _ground?.Dispose();
+      _plinth?.Dispose();
+      _crystal?.Dispose();
+      _ground = _plinth = _crystal = null;
+      base.Release();
+    }
+
     // ---------------------------------------------------------------- palette
 
     double Blend => Math.Min(1, (_s.Time - _blendStart) / BlendSeconds);
@@ -174,6 +184,12 @@ namespace Moyu.Games.Snake
     /// <summary>An open site stands on a block, like a cut-out site model: walls from its edge down to a flat base.</summary>
     void PaintPlinth(Chapter ch)
     {
+      // Built once, like the ground: a chapter blend repaints several times a second and only the colours change.
+      if (_plinth != null)
+      {
+        for (int i = 0; i < _plinth.Vertices.Count; i++) _plinth.VertexColors.SetColor(i, Toon.Shade(ch.Plinth, ch.Palette.Shadow, _plinth.Normals[i]));
+        return;
+      }
       var f = _s.Field;
       var grid = f.Grid;
       double baseZ = f.Bounds.Min.Z - f.Step * 1.6;
@@ -573,7 +589,8 @@ namespace Moyu.Games.Snake
           case DeathCause.Wall: title = T("撞到了边缘", "Ran into the edge"); break;
           case DeathCause.Self: title = T("咬到了自己", "Bit yourself"); break;
           case DeathCause.Bomb: title = T("被炸没了", "Blown up"); break;
-          default: title = T("时间到", "Time's up"); break;
+          // No death: the clock ran out, or the snake filled every cell of the site.
+          default: title = g.State == SnakeState.Won ? T("铺满了整片场地", "Site complete: every cell filled") : T("时间到", "Time's up"); break;
         }
         string time = $"{TimeSpan.FromSeconds(g.Elapsed):m\\:ss}";
         string line = Zh

@@ -3,7 +3,7 @@ using Moyu.Games.Common.Core;
 
 namespace Moyu.Core.Tests
 {
-  /// <summary>The game components' Language input (no Rhino needed).</summary>
+  /// <summary>The game components' language choice, as saved in a definition (no Rhino needed).</summary>
   static class TestsLanguage
   {
     public static void Run(Action<bool, string> check)
@@ -16,6 +16,9 @@ namespace Moyu.Core.Tests
       check(Is("中文", UiLanguage.Chinese) && Is("Chinese", UiLanguage.Chinese) && Is(" zh-TW ", UiLanguage.Chinese), "中文, Chinese and culture names are Chinese");
       check(Is("en", UiLanguage.English) && Is("English", UiLanguage.English) && Is("英文", UiLanguage.English) && Is("en-GB", UiLanguage.English), "en / English / 英文 / en-GB is English");
       check(!UiLanguages.TryParse("fr", out _) && !UiLanguages.TryParse("chn", out _) && !UiLanguages.TryParse("english please", out _), "unknown text is refused");
+
+      foreach (var choice in new UiLanguage?[] { null, UiLanguage.Chinese, UiLanguage.English })
+        check(Is(UiLanguages.Code(choice), choice), $"the saved choice {UiLanguages.Code(choice)} reads back as itself");
 
       check(UiLanguages.FromCulture("zh-CN") == UiLanguage.Chinese && UiLanguages.FromCulture("zh-Hant-TW") == UiLanguage.Chinese, "a Chinese Windows shows Chinese");
       check(UiLanguages.FromCulture("en-US") == UiLanguage.English && UiLanguages.FromCulture("de-DE") == UiLanguage.English, "English, and any other language, shows English");

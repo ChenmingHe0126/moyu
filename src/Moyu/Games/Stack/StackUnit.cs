@@ -35,14 +35,15 @@ namespace Moyu.Games.Stack
     }
 
     Mesh _preview;
+    // Kept like the mesh: a new material per redraw is a native object only the finalizer frees.
+    DisplayMaterial _material;
 
     public BoundingBox Bounds => (_preview ?? (_preview = ToMesh())).GetBoundingBox(false);
 
     public void Draw(DisplayPipeline display, RhinoViewport viewport, Color? highlight)
     {
       var mesh = _preview ?? (_preview = ToMesh());
-      var colour = Color.FromArgb(Piece.Colour);
-      display.DrawMeshShaded(mesh, new DisplayMaterial(colour, 0.35));
+      display.DrawMeshShaded(mesh, _material ?? (_material = new DisplayMaterial(Color.FromArgb(Piece.Colour), 0.35)));
       display.DrawMeshWires(mesh, highlight ?? Color.FromArgb(120, 50, 20));
     }
 
@@ -59,8 +60,11 @@ namespace Moyu.Games.Stack
       frame = new Plane(box.Min, Vector3d.XAxis, Vector3d.YAxis);
       var cells = new List<Int3>();
       if (!box.IsValid || size <= 0) return cells;
-      int nx = Math.Max(1, (int)Math.Round(box.Diagonal.X / size)), ny = Math.Max(1, (int)Math.Round(box.Diagonal.Y / size)), nz = Math.Max(1, (int)Math.Round(box.Diagonal.Z / size));
-      if ((long)nx * ny * nz > 4096) return null;
+      // Counted in double before any cast: for a tiny Size the long product wrapped past 2^63 and let a near-endless
+      // loop through, and a ratio past int.MaxValue cast to one voxel. The !(<=) also refuses NaN and infinity.
+      double fx = Math.Max(1, Math.Round(box.Diagonal.X / size)), fy = Math.Max(1, Math.Round(box.Diagonal.Y / size)), fz = Math.Max(1, Math.Round(box.Diagonal.Z / size));
+      if (!(fx * fy * fz <= 4096)) return null;
+      int nx = (int)fx, ny = (int)fy, nz = (int)fz;
       double tol = size * 1e-4;
       for (int z = 0; z < nz; z++)
         for (int y = 0; y < ny; y++)

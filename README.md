@@ -87,11 +87,11 @@ Material 2D ─┘        └── Timer (Params › Util › Trigger) + Toggle
 
 | 组件 | 缩写 | 作用 |
 |---|---|---|
-| Massing Study | Mass | 游戏本体。点组件下方的 **▶ Run** 就在当前视口开始，再点一次（**■ Stop**）结束。输入：Library、Width / Depth / Height（井尺寸，4–10 × 4–10 × 8–20）、Plane、Size（体素边长，默认 7.2 m）、Mode（0 马拉松 / 1 三分钟闪电 / 2 禅）、Level（**起始等级**，默认 1；设成 15 就是一开局 0.75 秒落一格）、Language（视口文字的语言，见下）。输出只在暂停、老板模式、结束时刷新：State、Score、Layers、Level、Best、Mass（当前体块网格）、Metrics（容积率等） |
-| Voxel Unit | Unit | 自定义积木：随手画的封闭体（体素中心在里面就算）、体素中心点、或文本图案（`###/#.#\|#..`，层用 `\|` 分、行用 `/` 分）。最多 10 格、每边不超过 4 格、必须面连通；给点时超过 64 个点报错。自定义积木从第 1 块起就会发（开局的"先发简单积木"只管内置积木） |
+| Massing Study | Mass | 游戏本体。点组件下方的 **▶ Run** 就在当前视口开始，再点一次（**■ Stop**）结束。输入：Library、Width / Depth / Height（井尺寸，4–10 × 4–10 × 8–20）、Plane、Size（体素边长，默认 7.2 m）、Mode（0 马拉松 / 1 三分钟闪电 / 2 禅）、Level（**起始等级**，默认 1；设成 15 就是一开局 0.75 秒落一格）。输出只在暂停、老板模式、结束时刷新：State、Score、Layers、Level、Best、Mass（当前体块网格）、Metrics（容积率等） |
+| Voxel Unit | Unit | 自定义积木：随手画的封闭体（体素中心在里面就算）、体素中心点、或文本图案（`###/#.#\|#..`，层用 `\|` 分、行用 `/` 分，空格和 `.` 都是空格子，开头的空格和空行也算数）。最多 10 格、每边不超过 4 格、必须面连通；给点时超过 64 个点报错。自定义积木从第 1 块起就会发（开局的"先发简单积木"只管内置积木） |
 | Unit Library | Lib | 内置积木集（-1 只用自定义 / 0 入门 / 1 标准 8 块 / 2 困难）＋ 自定义积木 |
 
-**语言**：四个游戏组件（Massing / Path / Facade / Airflow Study）的最后一个输入都是 Language，管视口里画的文字（按键提示、倒数、暂停、结果画面、道具提示）。`auto`（默认）跟随 Windows 显示语言：中文 Windows 显示中文，其他语言显示英文；`ch`（也认 `zh`、`cn`、`中文`）固定中文，`en`（也认 `English`、`英文`）固定英文；不认识的写法给一条警告并按 `auto` 处理。游戏运行中改这个输入，下一帧就换。老板键的伪装画面始终是英文。
+**语言**：四个游戏组件（Massing / Path / Facade / Airflow Study）的**右键菜单**里有 **Language · 语言**，管视口里画的文字（按键提示、倒数、暂停、结果画面、道具提示）：**Auto · 自动**（默认）跟随 Windows 显示语言，中文 Windows 显示中文、其他语言显示英文；**中文**、**English** 固定一种。选择跟着 .gh 文件保存；游戏运行中切换，下一帧就换。老板键的伪装画面始终是英文。
 
 **操作**：
 
@@ -132,7 +132,7 @@ Material 2D ─┘        └── Timer (Params › Util › Trigger) + Toggle
 
 | 组件 | 缩写 | 作用 |
 |---|---|---|
-| Path Study | Path | 游戏本体，组件下方 **▶ Run / ■ Stop**。输入：Surface（不接就用内置起伏地形；修剪面可以）、Cells（长边格数，默认 28）、Mode（0 经典 / 1 三分钟闪电 / 2 禅：撞墙停住、不会咬死、没有炸弹）、Level、Slope（坡度影响速度）、Language。输出只在暂停、老板模式、结束时刷新：State、Score、Length、Best、Route（蛇身平滑曲线）、Metrics（路线长度、爬升、坡度等） |
+| Path Study | Path | 游戏本体，组件下方 **▶ Run / ■ Stop**。输入：Surface（不接就用内置起伏地形；修剪面可以）、Cells（长边格数，默认 28）、Mode（0 经典：铺满整片场地就算赢 / 1 三分钟闪电 / 2 禅：撞墙停住、不会咬死、没有炸弹）、Level、Slope（坡度影响速度）。输出只在暂停、老板模式、结束时刷新：State、Score、Length、Best、Route（蛇身平滑曲线）、Metrics（路线长度、爬升、坡度等） |
 | Site Surface | Site | 一键生成场地曲面：0 起伏地形、1 环面、2 圆管（S 形，绕一圈）、3 马鞍屋面、4 球面；Size（默认 40 m）、Seed |
 
 | 道具 | 效果 |
@@ -174,10 +174,10 @@ Material 2D ─┘        └── Timer (Params › Util › Trigger) + Toggle
 
 | 组件 | 缩写 | 作用 |
 |---|---|---|
-| Facade Study | Facade | 游戏本体，组件下方 **▶ Run / ■ Stop**。输入：Wall（Brick Bond 的输出，不接就六种砌法逐关轮换）、Mode（0 经典 3 条命 / 1 三分钟闪电 / 2 禅：不掉命）、Level、Plane（立面所在平面，默认 World XZ）、Size（一个模数的长度，默认 2.4 m）、Language。输出：State、Score、Level、Best、Panels / Windows（板块和窗洞轮廓）、Metrics |
+| Facade Study | Facade | 游戏本体，组件下方 **▶ Run / ■ Stop**。输入：Wall（Brick Bond 的输出，不接就六种砌法逐关轮换）、Mode（0 经典 3 条命 / 1 三分钟闪电 / 2 禅：不掉命）、Level、Plane（立面所在平面，默认 World XZ）、Size（一个模数的长度，默认 2.4 m）。输出：State、Score、Level、Best、Panels / Windows（板块和窗洞轮廓）、Metrics |
 | Brick Bond | Bond | 砌法：Type（−1 轮换，0–5 六种砌法）、Courses（皮数）；或者 Curves 接闭合曲线当板块（按大小分成玻璃 / 砖 / 混凝土）。太小没法打的板块会被跳过：缩放后窄于约 0.3 个场地单位的板块被忽略，并警告 “N panel(s) too small to play”；自定义墙一块能打的都没有时，Facade Study 改为铺砌法序列。平面图在 Y 方向比 X 方向高时现在也读对了（u 取 X，v 取 Y）。从第 4 关起，会把一块能打的砖围死的钢砖改铺成混凝土，每面墙都能打光。Bricks 输出第一关的预览 |
 
-**操作**：← → / A D 或直接移动鼠标（挡板跟着走）；空格发球、松开粘住的球；鼠标拖动转视角；Esc / P 暂停（暂停时 Esc 继续、Shift + Esc 退出）；结束后 Enter / 空格再来一局；`` ` ``（1 左边的键）老板键。道具：加宽、多球、慢速、粘板、穿透、+1 命，以及坏的"缩短"。第一面墙碎砖有 36 % 的机会掉道具（第二面 24 %，之后 15 %），而且开局头六个道具正好是六种好道具各一个，一上来就能都试到；拿到时挡板上方会写一行它的作用。增益按次数用完就失效（不按时间）：加宽 8 次接球、慢速 6 次、缩短 5 次、粘板粘 3 次、穿透 6 块砖；左侧状态行显示还剩几次。粘板最少见（掉落里约 7 %）。两次碰挡板之间连续打砖有连击倍率（最高 ×8）。
+**操作**：← → / A D 或直接移动鼠标（挡板跟着走）；空格发球、松开粘住的球；鼠标拖动转视角；Esc / P 暂停（暂停时 Esc 继续、Shift + Esc 退出）；结束后 Enter / 空格再来一局；`` ` ``（1 左边的键）老板键。道具：加宽、多球（最多 9 个球）、慢速、粘板、穿透、+1 命，以及坏的"缩短"。第一面墙碎砖有 36 % 的机会掉道具（第二面 24 %，之后 15 %），而且开局头六个道具正好是六种好道具各一个，一上来就能都试到；拿到时挡板上方会写一行它的作用。增益按次数用完就失效（不按时间）：加宽 8 次接球、慢速 6 次、缩短 5 次、粘板粘 3 次、穿透 6 块砖；左侧状态行显示还剩几次。粘板最少见（掉落里约 7 %）。两次碰挡板之间连续打砖有连击倍率（最高 ×8）。
 
 ![老板模式：塔楼玻璃幕墙立面](docs/images/rebound_boss.jpg)
 
@@ -193,7 +193,7 @@ Material 2D ─┘        └── Timer (Params › Util › Trigger) + Toggle
 
 | 组件 | 缩写 | 作用 |
 |---|---|---|
-| Airflow Study | Airflow | 游戏本体，组件下方 **▶ Run / ■ Stop**。输入：Grid（Storey Grid 的输出，不接就是普通风压、经典模式）、Plane（默认 World XZ）、Size（一个场地单位的长度，默认 0.75 m，场地 9 m 高）、Language。输出：State、Score、Best、Path（最近一段飞行路径）、Section（剖面切线轮廓）、Metrics |
+| Airflow Study | Airflow | 游戏本体，组件下方 **▶ Run / ■ Stop**。输入：Grid（Storey Grid 的输出，不接就是普通风压、经典模式）、Plane（默认 World XZ）、Size（一个场地单位的长度，默认 0.75 m，场地 9 m 高）。输出：State、Score、Best、Path（最近一段飞行路径）、Section（剖面切线轮廓）、Metrics |
 | Storey Grid | Grid | 设置：Exposure（0 避风 / 1 普通 / 2 迎风，越大越快越窄）、Mode（0 经典 / 1 Zen：撞墙穿过、落地弹起，不结束）、Opening（开口高度系数 0.8–1.4）、Bay（开间系数 0.8–1.5）、Seed（固定关卡，0 = 每次随机）。Section 输出前几堵墙的预览 |
 
 **操作**：空格 / ↑ / W / 鼠标左键 扇一下翅膀；右键拖动转视角；Esc / P 暂停（暂停时 Esc 继续、Shift + Esc 退出）；`` ` ``（1 左边的键）老板键。结束后 Enter / 空格再来一局，Esc 退出。
@@ -214,7 +214,7 @@ Material 2D ─┘        └── Timer (Params › Util › Trigger) + Toggle
 2. **.yak 文件**：从 GitHub Releases 或 food4rhino 下载 `moyu-<版本>-rh8_0-win.yak`，拖进打开的 Rhino 窗口（或 `_PackageManager` → *Install from file*），重启 Rhino。
 3. **手动复制 .gha**：新建 `%APPDATA%\Grasshopper\Libraries\Moyu\`，把发布包里对应运行时的那一个 `Moyu.gha` 复制进去（Rhino 跑在 .NET Core 上用 `net7.0\Moyu.gha`，跑在 .NET Framework 上用 `net48\Moyu.gha`；`_SetDotNetRuntime` 能看到当前是哪种）。文件被 Windows 标成"已阻止"的话先右键 → 属性 → 解除锁定，再重启 Rhino。
 
-装好后组件在 Grasshopper 工具栏的 **Moyu** 页签下（2D、3D、Massing、Landscape、Facade、Section 六个面板）。卸载：`_PackageManager` → Installed → moyu → Uninstall，或删掉 `Libraries\Moyu` 文件夹；最高分在 `%APPDATA%\Moyu\`，可以一起删。发布包里也带一份 [packaging/INSTALL.md](packaging/INSTALL.md)（中英双语）。
+装好后组件在 Grasshopper 工具栏的 **Moyu** 页签下（2D、3D、Massing、Landscape、Facade、Section、Examples 七个面板）。**打开示例最快的办法**：把 Examples 面板里的 **Examples** 组件拖到画布上（或者在画布上双击搜 `example` / `示例`），点上面的按钮（2D 拓扑优化、3D 拓扑优化、叠楼、蜿蜒、回弹、雨燕），示例就在新标签页里打开；打开的是未命名的副本，保存时会问存到哪里，示例本身不会被改。示例文件编进了插件里，不管用哪种方式安装都能打开。卸载：`_PackageManager` → Installed → moyu → Uninstall，或删掉 `Libraries\Moyu` 文件夹；最高分在 `%APPDATA%\Moyu\`，可以一起删。发布包里也带一份 [packaging/INSTALL.md](packaging/INSTALL.md)（中英双语）。
 
 ## 构建与加载
 
@@ -307,7 +307,7 @@ dotnet run -c Release --project tests/Moyu.RhinoTests -- --write-gh
 
 ## 发布
 
-版本号只写在 `src/Moyu/Moyu.csproj` 的 `<Version>` 里（当前 1.0.0），程序集、`manifest.yml` 和包名都从它来；Grasshopper 库对话框里显示的版本就是 `<Version>` 原样（预发布后缀如 `1.0.1-beta` 也保留）。发布包由一个脚本生成：
+版本号只写在 `src/Moyu/Moyu.csproj` 的 `<Version>` 里（当前 1.0.1），程序集、`manifest.yml` 和包名都从它来；Grasshopper 库对话框里显示的版本就是 `<Version>` 原样（预发布后缀如 `1.0.1-beta` 也保留）。发布包由一个脚本生成：
 
 ```bash
 python tools/package.py            # 关掉 Rhino 后：Release 构建（要求 0 警告）→ 打包
@@ -324,7 +324,7 @@ python tools/package.py --no-build # 只用已有的 Release 产物打包
 | `Moyu-<版本>-food4rhino.zip` | 上面的 .yak、两个裸 `.gha`、`examples/`、两份手册 PDF、`QUICKSTART.md`、`INSTALL.md`、`LICENSE.txt` | food4rhino 的下载包 |
 | `SHA256SUMS.txt` | 两个包的校验和 | 发布说明里贴 |
 
-示例 .gh 由 `dotnet run -c Release --project tests/Moyu.RhinoTests -- --examples packaging/examples` 生成（不碰 `tests/gh`）。图文手册的源文件是 `packaging/guide/guide.html`（中英文写在一起），`python tools/make_guide.py` 用 Edge / Chrome 无界面打印出两份 PDF（加 `--preview` 另存每页 PNG 检查排版），图片取自 `docs/images`。打包前脚本会检查每个文件里有没有本机路径或用户名，有就拒绝；插件用 `PathMap` 编译，`.gha` 里只留 `/_/Moyu/...`。
+示例 .gh 由 `dotnet run -c Release --project tests/Moyu.RhinoTests -- --examples packaging/examples` 生成（不碰 `tests/gh`）；它们同时作为资源编进 `Moyu.gha`（Examples 组件从这里打开），所以重新生成示例后要再编译一次插件，Rhino 场景测试会检查编进去的和 `packaging/examples` 是否一致。图文手册的源文件是 `packaging/guide/guide.html`（中英文写在一起），`python tools/make_guide.py` 用 Edge / Chrome 无界面打印出两份 PDF（加 `--preview` 另存每页 PNG 检查排版），图片取自 `docs/images`。打包前脚本会检查每个文件里有没有本机路径或用户名，有就拒绝；插件用 `PathMap` 编译，`.gha` 里只留 `/_/Moyu/...`。
 
 脚本用 Rhino 自带的 `Yak.exe` 打包，依次找 `C:\Program Files\Rhino 8\System\Yak.exe`、`E:\Rhino 8\System\Yak.exe`，装在别处用环境变量 `YAK_EXE` 指定。打包的源文件都在 `packaging/`：`manifest.yml`（包管理器的清单，`{version}` 由脚本填）、`icon.png` / `icon-512.png`（包图标）、`INSTALL.md`（随包发的安装说明）、`food4rhino/listing.md`（food4rhino 页面的文案）。许可证是 MIT（仓库根目录的 [LICENSE](LICENSE)），作者 Ming，主页 https://github.com/ChenmingHe0126/moyu。
 
@@ -335,26 +335,26 @@ src/Moyu/
   Core/            不依赖 Rhino 的算法：像素 / 体素网格、Q4 / H8 单元、带状 Cholesky、多重网格 CG、过滤、
                    SIMP 优化器（2D、3D 共用基类）、Marching Squares、Surface Nets
   TwoD/ ThreeD/    Rhino 几何 ↔ 网格：设计域、条件数据、问题构建、结果网格化、视口符号
-  Components/      GH 组件基类、求解器基类、Goo、图标、Run 按钮；TwoD/ 和 ThreeD/ 下各 7 个组件，Massing/ 下 3 个，Landscape/、Facade/、Section/ 下各 2 个
+  Components/      GH 组件基类、求解器基类、Goo、图标、Run 按钮；TwoD/ 和 ThreeD/ 下各 7 个组件，Massing/ 下 3 个，Landscape/、Facade/、Section/ 下各 2 个，Examples/ 下 1 个（示例启动器，示例 .gh 编进程序集）
   Games/Common/    游戏共用：会话基类（老板键、失焦、倒计时、暂停、镜头、鼠标转视角）、绘制基类（极简风格：背景、
                    平涂着色、软投影、字体、键帽提示、暂停 / 结算画面、HUD 缩放）、配色、本地最高分、线程级键盘钩子、60 Hz 帧时钟
   Games/Stack/     VoxStack：Core/（不依赖 Rhino 的规则、积木、体块指标）、会话、视口绘制、老板模式体块
   Games/Snake/     Serpentine：Core/（不依赖 Rhino 的网格、规则、道具、路线指标）、曲面 → 网格、会话、视口绘制、老板模式流线研究
   Games/Breakout/  Rebound：Core/（不依赖 Rhino 的砌法、球与砖的碰撞、道具、塔楼幕墙映射与指标）、会话、视口绘制、老板模式塔楼立面
   Games/Swift/     Swift：Core/（不依赖 Rhino 的飞行物理、关卡生成、住宅剖面的日照 / 采光 / 通风模型）、会话、视口绘制、老板模式剖面分析
-  Icons/           24 个 24×24 透明 PNG：7 个 2D + 7 个 3D + 3 个 Massing + Landscape / Facade / Section 各 2 个组件图标 + Moyu 插件 / 页签图标
+  Icons/           25 个 24×24 透明 PNG：7 个 2D + 7 个 3D + 3 个 Massing + Landscape / Facade / Section 各 2 个 + 1 个 Examples 组件图标 + Moyu 插件 / 页签图标
 tests/             Moyu.Core.Tests（纯算法）、Moyu.RhinoTests（Rhino.Inside 集成测试）
 docs/              工作流说明、游戏方案、图标提示词、开发记录与用时统计、结果图；contributing.md（开发流程）、testing.md（测试排查）
 packaging/         发布包的源文件：manifest.yml、icon.png、INSTALL.md、QUICKSTART.md、examples/（示例 .gh）、guide/（图文手册源文件和 PDF）、food4rhino/listing.md
 tools/package.py     构建并打包 .yak 和 food4rhino zip（见"发布"）
-tools/make_icons.py  把图标表切成 24×24 图标（--set 2d / 3d / massing / landscape / facade / section；--source-out 存原分辨率切图，--preview 出实际尺寸预览）
+tools/make_icons.py  把图标表切成 24×24 图标（--set 2d / 3d / massing / landscape / facade / section / examples；--source-out 存原分辨率切图，--preview 出实际尺寸预览）
 tools/codex_image.py 用本机 Codex 命令行生图（图标用，见 docs/contributing.md）
 tools/dev_time.py    导出开发用时时间线（见 docs/contributing.md）
 ```
 
 ## 图标
 
-图标是 `src/Moyu/Icons/` 里的 **24×24 透明 PNG**，按组件类名命名（`BoundaryComponent.png` ……），`Moyu.png` 同时用作插件和 Ribbon 页签图标，现在是一条圆角体素块拼成的鱼（摸鱼），放大版 `packaging/icon.png` / `icon-512.png` 是包管理器和 food4rhino 的图标，设计和导出见 [docs/icon-prompts-plugin.md](docs/icon-prompts-plugin.md)；csproj 把整个文件夹嵌进程序集，重新编译即可生效。原图在 `docs/images/moyu-icons-*-source.png`，从原图重新切：`python tools/make_icons.py <图标表> --set <面板>`（2d / 3d / massing / landscape / facade / section）。编译后可以在无界面 Rhino 里检查 23 个组件和 Moyu 页签都拿到了图标：
+图标是 `src/Moyu/Icons/` 里的 **24×24 透明 PNG**，按组件类名命名（`BoundaryComponent.png` ……），`Moyu.png` 同时用作插件和 Ribbon 页签图标，现在是一条圆角体素块拼成的鱼（摸鱼），放大版 `packaging/icon.png` / `icon-512.png` 是包管理器和 food4rhino 的图标，设计和导出见 [docs/icon-prompts-plugin.md](docs/icon-prompts-plugin.md)；csproj 把整个文件夹嵌进程序集，重新编译即可生效。原图在 `docs/images/moyu-icons-*-source.png`，从原图重新切：`python tools/make_icons.py <图标表> --set <面板>`（2d / 3d / massing / landscape / facade / section / examples）。编译后可以在无界面 Rhino 里检查 24 个组件和 Moyu 页签都拿到了图标：
 
 ```bash
 dotnet run -c Release --project tests/Moyu.RhinoTests -- --icons

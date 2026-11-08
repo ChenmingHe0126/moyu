@@ -37,7 +37,8 @@ namespace Moyu.RhinoTests
         "点 Airflow Study 下面的 ▶ Run · Click ▶ Run under Airflow Study.\n" +
         "空格 / ↑ / W / 鼠标左键 扇翅，穿过墙上的开口 · Space, ↑, W or left click flaps through the openings\n" +
         "Esc 暂停 / 继续，Shift+Esc 退出 · Home 复位视角 · Esc pause / resume, Shift+Esc quit, Home reset view\n" +
-        "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key");
+        "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key\n" +
+        "右键游戏组件 › Language · 语言：Auto 跟随 Windows / 中文 / English · Right-click the study › Language: Auto (follows Windows), 中文 or English");
       QuickStart(b, 0, 0);
       Settings(b, 0, 300);
 
@@ -69,7 +70,8 @@ namespace Moyu.RhinoTests
       var m = new List<IGH_DocumentObject>();
       var study = b.Moyu(Study, x + 230, y + 20, m);
       Metrics(b, study, x + 490, y + 20, m);
-      b.Group("A · 快速开始：直接点 ▶ Run（普通风压，经典模式）", Color.FromArgb(70, 229, 107, 93), m);
+      b.Group("A · 快速开始：直接点 ▶ Run（普通风压，经典模式）",
+        "A · Quick start: just click ▶ Run (normal exposure, Classic mode)", Color.FromArgb(70, 229, 107, 93), m);
     }
 
     /// <summary>B: Storey Grid with sliders for exposure, mode, opening, bay and seed.</summary>
@@ -91,7 +93,8 @@ namespace Moyu.RhinoTests
       var study = b.Moyu(Study, x + 490, y + 60, m);
       b.Wire(grid, 0, study, 0);
       Metrics(b, study, x + 750, y + 60, m);
-      b.Group("B · 调参数：Exposure 0 避风 / 1 普通 / 2 迎风（越大越快越窄），Mode 1 = Zen，Opening 开口高度系数，Bay 开间系数，Seed 固定关卡（0 = 每次随机）", Color.FromArgb(70, 140, 132, 200), m);
+      b.Group("B · 调参数：Exposure 0 避风 / 1 普通 / 2 迎风（越大越快越窄），Mode 1 = Zen，Opening 开口高度系数，Bay 开间系数，Seed 固定关卡（0 = 每次随机）",
+        "B · Settings: Exposure 0 sheltered / 1 normal / 2 exposed (higher is faster and tighter), Mode 1 = Zen, Opening = opening height factor, Bay = bay width factor, Seed fixes the course (0 = new each time)", Color.FromArgb(70, 140, 132, 200), m);
     }
 
     static void Inspect(GH_Document doc, string when)

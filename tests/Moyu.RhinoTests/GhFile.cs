@@ -94,7 +94,8 @@ namespace Moyu.RhinoTests
       b.Wire(load, 0, solver, 1);
       b.Wire(sup, 0, solver, 2);
       var vis = b.Visualize(x + 1060, y + 30, solver, mode, members);
-      b.Group("A · 悬臂梁（World XY）· 左边固定，右端荷载 · 拖 Load Y 可在运行中移动荷载", Color.FromArgb(70, 120, 170, 220), members);
+      b.Group("A · 悬臂梁（World XY）· 左边固定，右端荷载 · 拖 Load Y 可在运行中移动荷载",
+        "A · Cantilever (World XY) · fixed on the left, load at the right end · drag Load Y to move the load while it runs", Color.FromArgb(70, 120, 170, 220), members);
     }
 
     /// <summary>Bridge elevation in World XZ: line load on the deck, pin + roller, solid deck, void opening, steel E.</summary>
@@ -185,7 +186,8 @@ namespace Moyu.RhinoTests
       b.Wire(steel, 0, solver, 4);
       b.Set(solver, 7, new GH_Number(2.5));
       var vis = b.Visualize(x + 1200, y + 90, solver, mode, members);
-      b.Group("B · 立面桥（World XZ，y = -60）· 顶边线荷载 + 实心桥面 + 空心洞口 + 钢材 E", Color.FromArgb(70, 220, 170, 120), members);
+      b.Group("B · 立面桥（World XZ，y = -60）· 顶边线荷载 + 实心桥面 + 空心洞口 + 钢材 E",
+        "B · Bridge elevation (World XZ, y = -60) · line load on the top edge + solid deck + void opening + steel E", Color.FromArgb(70, 220, 170, 120), members);
     }
 
     /// <summary>L-shaped bracket with a bolt hole (nested boundary curve), smooth display.</summary>
@@ -222,7 +224,8 @@ namespace Moyu.RhinoTests
       b.Wire(load, 0, solver, 1);
       b.Wire(sup, 0, solver, 2);
       var vis = b.Visualize(x + 960, y + 30, solver, mode, members);
-      b.Group("C · L 形支架 + 螺栓孔（World XY，x = 120…220）· 嵌套曲线 = 孔，平滑显示", Color.FromArgb(70, 200, 140, 200), members);
+      b.Group("C · L 形支架 + 螺栓孔（World XY，x = 120…220）· 嵌套曲线 = 孔，平滑显示",
+        "C · L-shaped bracket with a bolt hole (World XY, x = 120…220) · a nested curve is a hole, smooth display", Color.FromArgb(70, 200, 140, 200), members);
     }
   }
 }

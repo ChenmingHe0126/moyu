@@ -48,7 +48,14 @@ namespace Moyu.Games.Stack.Core
         if (_rng.NextDouble() < d.Weight - copies) copies++;
         for (int i = 0; i < copies; i++) bag.Add(d);
       }
-      if (bag.Count == 0) bag.AddRange(_defs);
+      if (bag.Count == 0)
+      {
+        // Every roll came up empty (all weights under 1): deal the live kinds once each. A weight-0 unit is never
+        // dealt, unless no kind has any weight at all.
+        foreach (var d in _defs)
+          if (d.Weight > 0) bag.Add(d);
+        if (bag.Count == 0) bag.AddRange(_defs);
+      }
       for (int i = bag.Count - 1; i > 0; i--)
       {
         int j = _rng.Next(i + 1);

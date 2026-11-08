@@ -38,7 +38,9 @@ namespace Moyu.ThreeD
       var result = new Output();
       var p = new Problem3D(grid)
       {
-        YoungsModulus = material.YoungsModulus,
+        // The solver's H8 stiffness is a unit cube's and a cube of edge h is h times as stiff: scaling E by the voxel
+        // size keeps the compliance in world units at every resolution. The layout does not depend on it.
+        YoungsModulus = material.YoungsModulus * domain.VoxelSize,
         PoissonRatio = material.PoissonRatio,
       };
       result.Problem = p;
@@ -69,6 +71,11 @@ namespace Moyu.ThreeD
         double fx = load.Force * plane.XAxis, fy = load.Force * plane.YAxis, fz = load.Force * plane.ZAxis;
         if (fx == 0.0 && fy == 0.0 && fz == 0.0) continue;
         var nodes = Snap(domain, active, load.Anchor);
+        if (nodes.Count == 0)
+        {
+          result.Warnings.Add("A load lies at NaN, infinite or overflowing coordinates and was ignored.");
+          continue;
+        }
         foreach (int n in nodes)
         {
           p.Force[3 * n] += fx / nodes.Count;
@@ -82,6 +89,11 @@ namespace Moyu.ThreeD
       {
         if (!support.FixX && !support.FixY && !support.FixZ) continue;
         var nodes = Snap(domain, active, support.Anchor);
+        if (nodes.Count == 0)
+        {
+          result.Warnings.Add("A support lies at NaN, infinite or overflowing coordinates and was ignored.");
+          continue;
+        }
         foreach (int n in nodes)
         {
           if (support.FixX) p.Fixed[3 * n] = true;
@@ -152,10 +164,12 @@ namespace Moyu.ThreeD
             set.Add(Nearest(domain, active, domain.ToGrid(mesh.Vertices[v])));
         }
       }
+      // Nearest finds nothing (-1) for NaN, infinite or overflowing coordinates; such positions land nowhere.
+      set.Remove(-1);
       return set.ToList();
     }
 
-    /// <summary>Nearest active node to grid coordinates, growing a cubic shell until no closer node can exist.</summary>
+    /// <summary>Nearest active node to grid coordinates, growing a cubic shell until no closer node can exist; -1 if none.</summary>
     static int Nearest(VoxelDomain3D domain, bool[] active, Point3d g)
     {
       var grid = domain.Grid;

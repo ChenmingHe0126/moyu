@@ -17,10 +17,12 @@ namespace Moyu.Core.Tests
       SelfAndTail(check);
       Fruit(check);
       Bombs(check);
+      BoardFull(check);
       PowerUps(check);
       Slope(check);
       LevelsAndBlitz(check);
       Spawning(check);
+      Islands(check);
       Replay(check);
       Metrics(check);
       Landscape(check);
@@ -216,6 +218,63 @@ namespace Moyu.Core.Tests
       check(owed.Length == 6, $"a bomb right after a melon cuts to 6 (length {owed.Length})");
       for (int i = 0; i < 5; i++) StepOnce(owed);
       check(owed.Length == 6, $"and the growth the melon still owed is lost with the tail (length {owed.Length})");
+
+      // The new last segment glides in from the cut cell right behind it, not from the far end of the cut tail.
+      var glide = new SnakeGame(SurfaceGrid.Flat(12, 9), new SnakeSettings { Seed = 7, StartLength = 6, SpawnItems = false });
+      glide.PlaceItem(ItemKind.Bomb, Ahead(glide, 1));
+      StepOnce(glide);
+      var last = glide.Body.Last();
+      check(glide.Length == 3 && glide.RemovedTail == glide.LastEvent.Lost.Last() && glide.RemovedTail != null && glide.Grid.GridDistance(glide.RemovedTail.Value, last) == 1,
+        $"after a bomb the last segment comes from the cell next to it (from {glide.RemovedTail} to {last})");
+      var grown = Game(SurfaceGrid.Flat(30, 9, true, true), length: 8);
+      grown.PlaceItem(ItemKind.Melon, Ahead(grown, 1));
+      grown.PlaceItem(ItemKind.Bomb, Ahead(grown, 2));
+      StepOnce(grown);
+      StepOnce(grown);
+      var end = grown.Body.Last();
+      check(grown.RemovedTail != null && grown.Grid.GridDistance(grown.RemovedTail.Value, end) == 1, $"and also while growing (from {grown.RemovedTail} to {end})");
+    }
+
+    static void BoardFull(Action<bool, string> check)
+    {
+      Console.WriteLine("Serpentine: filling the whole site");
+      // A ring of eight free cells (one open row round a cylinder), a 4-long snake and fruit on the four cells ahead.
+      SnakeGame Ring(SnakeMode mode)
+      {
+        var row = new bool[8 * 3];
+        for (int i = 8; i < row.Length; i++) row[i] = true;
+        var g = Game(SurfaceGrid.Flat(8, 3, wrapU: true, blocked: row), mode: mode);
+        for (int i = 1; i <= 4; i++) g.PlaceItem(ItemKind.Apple, new Cell((g.Head.U + i) % 8, 0));
+        return g;
+      }
+      var chase = Ring(SnakeMode.Classic);
+      for (int i = 0; i < 4; i++) StepOnce(chase);
+      check(chase.State == SnakeState.Playing && chase.Length == 7, $"seven of eight cells filled: still playing (length {chase.Length})");
+      chase.Boost = true;
+      StepOnce(chase);
+      check(chase.State == SnakeState.Won && chase.IsOver && chase.Cause == DeathCause.None && chase.Length == 8,
+        $"the last free cell fills the site: a win, not an endless chase of the tail ({chase.State}, length {chase.Length})");
+      check(!chase.Boost, "the sprint stops with the win");
+      var head = chase.Head;
+      chase.Tick(5);
+      check(chase.State == SnakeState.Won && chase.Head == head, "and the game stays over");
+
+      var bite = Ring(SnakeMode.Classic);
+      for (int i = 0; i < 4; i++) StepOnce(bite);
+      bite.PlaceItem(ItemKind.Grape, Ahead(bite, 1));
+      StepOnce(bite);
+      check(bite.State == SnakeState.Won && bite.Cause == DeathCause.None, $"growth still owed from the last fruit does not turn the win into a bite ({bite.State}, {bite.Cause})");
+
+      var zen = Ring(SnakeMode.Zen);
+      for (int i = 0; i < 8; i++) StepOnce(zen);
+      check(zen.State == SnakeState.Playing, "zen has no end: a full site keeps going");
+
+      // Left to itself round a ring of twelve, a classic snake eats its way to a full site and wins.
+      var ring = new bool[12 * 4];
+      for (int i = 12; i < ring.Length; i++) ring[i] = true;
+      var auto = new SnakeGame(SurfaceGrid.Flat(12, 4, true, true, blocked: ring), new SnakeSettings { Seed = 5, StartLength = 8 });
+      while (!auto.IsOver && auto.Elapsed < 60) auto.Tick(0.02);
+      check(auto.State == SnakeState.Won && auto.Length >= 12, $"a classic run that fills the site ends as a win ({auto.State}, {auto.Cause}, length {auto.Length})");
     }
 
     static void PowerUps(Action<bool, string> check)
@@ -351,6 +410,79 @@ namespace Moyu.Core.Tests
       check(tidy && crowded.Length >= 12 && crowded.Items.Count == 0, $"it eats its way to a full field, where nothing more can spawn (length {crowded.Length}, {crowded.Items.Count} items)");
     }
 
+    static void Islands(Action<bool, string> check)
+    {
+      Console.WriteLine("Serpentine: a site cut into islands");
+      // A trimmed neck narrower than a cell leaves a wall right across: the six columns left of it, five right.
+      var wall = new bool[12 * 6];
+      for (int v = 0; v < 6; v++) wall[v * 12 + 6] = true;
+      var split = SurfaceGrid.Flat(12, 6, blocked: wall);
+      bool near = true;
+      for (int seed = 0; seed < 200; seed++)
+      {
+        var g = new SnakeGame(split, new SnakeSettings { Mode = SnakeMode.Zen, Seed = seed });
+        near &= g.Head.U < 6 && g.Items.Count == SnakeGame.Apples && g.Items.All(i => i.Cell.U < 6);
+      }
+      check(near, "the snake starts on the larger side and both apples are put on its side");
+
+      // Chased by a simple autopilot, apples keep coming on the snake's side instead of sitting out of reach for good.
+      var chase = new SnakeGame(split, new SnakeSettings { Mode = SnakeMode.Zen, Seed = 6 });
+      bool reachable = true;
+      int apples = 0;
+      SnakeEvent seen = null;
+      while (chase.Elapsed < 60)
+      {
+        var apple = chase.Items.Where(i => i.Kind == ItemKind.Apple).OrderBy(i => split.GridDistance(i.Cell, chase.Head)).FirstOrDefault();
+        if (apple != null)
+        {
+          var h = chase.PlannedHeading;
+          int du = Math.Sign(apple.Cell.U - chase.Head.U), dv = Math.Sign(apple.Cell.V - chase.Head.V);
+          if (du != 0 && du != -h.du) chase.Turn(du, 0);
+          else if (dv != 0 && dv != -h.dv) chase.Turn(0, dv);
+          else if (du != 0) chase.Turn(0, chase.Head.V < 3 ? 1 : -1);
+          else if (dv != 0) chase.Turn(chase.Head.U < 3 ? 1 : -1, 0);
+        }
+        chase.Tick(0.02);
+        reachable &= chase.Items.All(i => i.Cell.U < 6);
+        if (chase.LastEvent != seen)
+        {
+          seen = chase.LastEvent;
+          if (seen.Kind == ItemKind.Apple) apples++;
+        }
+      }
+      check(reachable && apples >= 10, $"every item lands where the snake can get to, and the apples keep being eaten ({apples} in a minute)");
+
+      // A small pocket round the middle of the site: the snake starts on the large part, not shut in the pocket.
+      var pocket = new bool[16 * 5];
+      for (int u = 0; u < 16; u++)
+      {
+        pocket[1 * 16 + u] = pocket[3 * 16 + u] = true;
+        pocket[2 * 16 + u] = u < 5 || u > 10;
+      }
+      var shut = Game(SurfaceGrid.Flat(16, 5, blocked: pocket));
+      check(shut.Head.V != 2, $"a small pocket at the middle is not where the snake starts (head {shut.Head})");
+
+      // A ring of eight cells and a cut-off scrap of three: filling the ring is filling the site.
+      var scrap = new bool[8 * 3];
+      for (int u = 0; u < 8; u++)
+      {
+        scrap[1 * 8 + u] = true;
+        scrap[2 * 8 + u] = u > 2;
+      }
+      var ringed = SurfaceGrid.Flat(8, 3, wrapU: true, blocked: scrap);
+      bool onRing = true;
+      for (int seed = 0; seed < 50; seed++)
+      {
+        var g = new SnakeGame(ringed, new SnakeSettings { Mode = SnakeMode.Zen, Seed = seed });
+        onRing &= g.Head.V == 0 && g.Items.Count == SnakeGame.Apples && g.Items.All(i => i.Cell.V == 0 && !g.Occupies(i.Cell));
+      }
+      check(onRing, "on a crowded island too, apples go only on its free cells, never on the scrap");
+      var fill = Game(ringed);
+      for (int i = 1; i <= 4; i++) fill.PlaceItem(ItemKind.Apple, new Cell((fill.Head.U + i) % 8, 0));
+      for (int i = 0; i < 5; i++) StepOnce(fill);
+      check(fill.State == SnakeState.Won && fill.Length == 8, $"the full ring is a win, though the scrap is still empty ({fill.State}, length {fill.Length})");
+    }
+
     static void Replay(Action<bool, string> check)
     {
       Console.WriteLine("Serpentine: same seed, same game");
@@ -399,6 +531,54 @@ namespace Moyu.Core.Tests
       bool continuous = decoy.Zip(decoy.Skip(1), (a, b) => grid.GridDistance(a, b)).All(d => d == 1);
       check(decoy.Count > 20 && continuous && decoy.All(c => !grid.IsBlocked(c)), $"decoy route is long, continuous and on free cells ({decoy.Count} cells)");
       check(decoy.Distinct().Count() == decoy.Count, "decoy route never doubles back on itself");
+
+      // Trimmed sites: the decoy keeps to free cells instead of stopping at the first trimmed one.
+      bool Sound(SurfaceGrid field, List<Cell> path) =>
+        path.Zip(path.Skip(1), (a, b) => field.GridDistance(a, b)).All(d => d == 1) && path.All(c => !field.IsBlocked(c)) && path.Distinct().Count() == path.Count;
+      foreach (var (nu, nv) in new[] { (16, 12), (28, 19), (28, 28), (40, 22) })
+      {
+        var oval = SurfaceGrid.Flat(nu, nv, blocked: Ellipse(nu, nv));
+        int shortest = int.MaxValue;
+        bool sound = true;
+        for (int seed = 0; seed < 200; seed++)
+        {
+          var meander = RouteMetrics.Decoy(oval, seed);
+          shortest = Math.Min(shortest, meander.Count);
+          sound &= Sound(oval, meander);
+        }
+        check(sound && shortest >= nu * 3 / 4, $"on an elliptical {nu} × {nv} site every decoy crosses most of it ({shortest} cells at the shortest, continuous and on free cells)");
+      }
+      var gap = new bool[28 * 18];
+      for (int v = 0; v < 18; v++) gap[v * 28 + 14] = v != 3;
+      var slotted = SurfaceGrid.Flat(28, 18, blocked: gap);
+      var through = RouteMetrics.Decoy(slotted, 5);
+      check(Sound(slotted, through) && through.Any(c => c.U < 14) && through.Any(c => c.U > 14), $"a slot with one gap: the route goes through the gap ({through.Count} cells)");
+      var wall = new bool[28 * 18];
+      for (int v = 0; v < 18; v++) wall[v * 28 + 14] = true;
+      var split = SurfaceGrid.Flat(28, 18, blocked: wall);
+      var half = RouteMetrics.Decoy(split, 5);
+      check(Sound(split, half) && half.Count >= 13, $"a slot right across: the longer side is kept ({half.Count} cells)");
+      var strip = new bool[20 * 12];
+      for (int i = 0; i < strip.Length; i++) strip[i] = i % 20 != 0;
+      var edge = SurfaceGrid.Flat(20, 12, blocked: strip);
+      var walk = RouteMetrics.Decoy(edge, 5);
+      check(Sound(edge, walk) && walk.Count == 12, $"no room to meander: a straight walk along the free strip ({walk.Count} cells)");
+    }
+
+    /// <summary>Cells trimmed away by an inscribed ellipse, as SurfaceField marks them: centre outside, or two corners outside.</summary>
+    static bool[] Ellipse(int nu, int nv)
+    {
+      bool Outside(double u, double v) => (2 * u - 1) * (2 * u - 1) + (2 * v - 1) * (2 * v - 1) > 1;
+      var blocked = new bool[nu * nv];
+      for (int j = 0; j < nv; j++)
+        for (int i = 0; i < nu; i++)
+        {
+          int corners = 0;
+          foreach (var (a, b) in new[] { (0, 0), (1, 0), (0, 1), (1, 1) })
+            if (Outside((i + a) / (double)nu, (j + b) / (double)nv)) corners++;
+          blocked[j * nu + i] = Outside((i + 0.5) / nu, (j + 0.5) / nv) || corners >= 2;
+        }
+      return blocked;
     }
 
     static void Landscape(Action<bool, string> check)

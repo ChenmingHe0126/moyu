@@ -26,7 +26,7 @@
          without the "+commit" metadata, pre-release suffix kept) back from the assembly, and tools/package.py reads Version
          and refuses Release outputs built from a different one, so the Grasshopper library dialog, manifest.yml and the
          packages all agree. -->
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Title>Moyu</Title>
     <Authors>Ming</Authors>
     <Company>Ming</Company>
@@ -46,6 +46,9 @@
   <!-- 24x24 icons named after the component class (BoundaryComponent.png …) plus Moyu.png for the tab. -->
   <ItemGroup>
     <EmbeddedResource Include="Icons\*.png" LogicalName="Moyu.Icons.%(Filename).png" />
+    <!-- The example definitions, so the Examples component can open them however Moyu was installed. Regenerate
+         packaging/examples with the Rhino test runner's examples option (see README), then build again. -->
+    <EmbeddedResource Include="..\..\packaging\examples\*.gh" LogicalName="Moyu.Examples.%(Filename).gh" />
   </ItemGroup>
 
   <!-- For Windows only builds -->

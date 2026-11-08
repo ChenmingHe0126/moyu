@@ -23,7 +23,7 @@ Drag `{yak}` into an open Rhino window (or run `_PackageManager` and use *Instal
 
 ## First steps
 
-Open one of the `examples/*.gh` files in Grasshopper. `Moyu-Guide-EN.pdf` is the illustrated guide to every component and game; `QUICKSTART.md` is the one-page version.
+Drop the **Examples** component (Moyu › Examples) on the canvas and click a button to open an example, or open one of the `examples/*.gh` files in Grasshopper. `Moyu-Guide-EN.pdf` is the illustrated guide to every component and game; `QUICKSTART.md` is the one-page version.
 
 ## Uninstall
 
@@ -60,7 +60,7 @@ Moyu 是 **Windows 版 Rhino 8** 的 Grasshopper 插件，Rhino 8 的两种运�
 
 ## 上手
 
-在 Grasshopper 里打开 `examples/*.gh` 里的任意一个示例。`Moyu-Guide-ZH.pdf` 是图文手册，每个组件和游戏都有介绍；`QUICKSTART.md` 是一页的简版。
+把 **Examples** 组件（Moyu › Examples）拖到画布上，点按钮打开示例；或者在 Grasshopper 里打开 `examples/*.gh` 里的任意一个。`Moyu-Guide-ZH.pdf` 是图文手册，每个组件和游戏都有介绍；`QUICKSTART.md` 是一页的简版。
 
 ## 卸载
 

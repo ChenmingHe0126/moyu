@@ -111,9 +111,10 @@ namespace Moyu.RhinoTests
       Place(s, x, y, null);
     }
 
-    public void Group(string name, Color colour, List<IGH_DocumentObject> members)
+    /// <summary>A coloured group around <paramref name="members"/>, labelled in Chinese and English (one line each).</summary>
+    public void Group(string chinese, string english, Color colour, List<IGH_DocumentObject> members)
     {
-      var g = new GH_Group { NickName = name, Colour = colour };
+      var g = new GH_Group { NickName = chinese + "\n" + english, Colour = colour };
       g.CreateAttributes();
       foreach (var m in members) g.AddObject(m.InstanceGuid);
       _doc.AddObject(g, false, 0);

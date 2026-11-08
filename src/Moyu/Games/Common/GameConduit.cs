@@ -484,6 +484,8 @@ namespace Moyu.Games.Common
       {
         mg.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
         var fmt = StringFormat.GenericTypographic;
+        // Text is measured from a point, like DrawString draws it: a width would wrap a long hint at a large UI scale
+        // and give a two-line size for text drawn on one line. Rows break only between whole hints.
         // Each hint (its caps and meaning) is laid out as one unit, then the units are packed into rows.
         var units = new List<(List<(string text, bool cap, float x, float w)> items, float width)>();
         foreach (var (keys, meaning) in hints)
@@ -497,17 +499,17 @@ namespace Moyu.Games.Common
             {
               if (i > 0)
               {
-                float pw = mg.MeasureString("+", capFont, 100, fmt).Width;
+                float pw = mg.MeasureString("+", capFont, PointF.Empty, fmt).Width;
                 items.Add(("+", false, x, pw));
                 x += pw + plus;
               }
-              float w = Math.Max(capH, mg.MeasureString(parts[i], capFont, 400, fmt).Width + pad * 2);
+              float w = Math.Max(capH, mg.MeasureString(parts[i], capFont, PointF.Empty, fmt).Width + pad * 2);
               items.Add((parts[i], true, x, w));
               x += w + plus;
             }
           }
           x += inner - plus;
-          float tw = mg.MeasureString(meaning, textFont, 600, fmt).Width;
+          float tw = mg.MeasureString(meaning, textFont, PointF.Empty, fmt).Width;
           items.Add((meaning, false, x, tw));
           units.Add((items, x + tw));
         }
@@ -557,7 +559,7 @@ namespace Moyu.Games.Common
                   }
                   using (var ink = new SolidBrush(capInk))
                   {
-                    var tsz = g.MeasureString(text, capFont, 400, fmt);
+                    var tsz = g.MeasureString(text, capFont, PointF.Empty, fmt);
                     g.DrawString(text, capFont, ink, lx + (w - tsz.Width) / 2, oy + (capH - tsz.Height) / 2, fmt);
                   }
                 }
@@ -565,7 +567,7 @@ namespace Moyu.Games.Common
                   using (var ink = new SolidBrush(text == "+" ? capInk : textInk))
                   {
                     var font = text == "+" ? capFont : textFont;
-                    var tsz = g.MeasureString(text, font, 600, fmt);
+                    var tsz = g.MeasureString(text, font, PointF.Empty, fmt);
                     g.DrawString(text, font, ink, lx, oy + (capH - tsz.Height) / 2, fmt);
                   }
               }

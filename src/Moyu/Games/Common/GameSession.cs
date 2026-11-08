@@ -48,8 +48,8 @@ namespace Moyu.Games.Common
     public bool Stopped { get; private set; }
 
     /// <summary>
-    /// Language of the text the game draws (the boss-mode disguises stay English). The component sets it from its
-    /// Language input, also while the game runs; until then it follows the system.
+    /// Language of the text the game draws (the boss-mode disguises stay English). It starts as the owner's choice
+    /// (<see cref="ILanguageOwner"/>), else the system's; the component switches it while the game runs.
     /// </summary>
     public UiLanguage Language
     {
@@ -62,7 +62,7 @@ namespace Moyu.Games.Common
       }
     }
 
-    UiLanguage _language = SystemLanguage();
+    UiLanguage _language;
 
     [DllImport("kernel32.dll")]
     static extern ushort GetUserDefaultUILanguage();
@@ -97,10 +97,13 @@ namespace Moyu.Games.Common
     OrbitMouse _mouse;
     ViewportInfo _gameCamera;
     bool _pausedByBoss;
+    // The round's game-over step has run (it can end in a frame or in a key handler).
+    bool _overNoted;
 
     protected GameSession(object owner, Action<GameSession> changed, RhinoDoc doc, RhinoView view)
     {
       Owner = owner;
+      _language = owner is ILanguageOwner lo ? lo.Language : SystemLanguage();
       _changed = changed;
       Doc = doc;
       View = view;
@@ -270,20 +273,15 @@ namespace Moyu.Games.Common
           {
             Countdown = 0;
             ResumeGame();
+            // The owner last heard "paused" as the countdown began.
+            Changed();
           }
           Redraw();
           return;
         }
-        bool wasOver = IsOver;
         if (!IsGamePaused) PlayTime += dt;
         TickGame(dt);
-        if (IsOver && !wasOver)
-        {
-          OverTime = 0;
-          ClearInput();
-          OnGameOver();
-          Changed();
-        }
+        NoteGameOver();
         if (IsOver) OverTime += dt;
         if (NeedsRedraw) Redraw();
       }
@@ -318,7 +316,8 @@ namespace Moyu.Games.Common
         if (down) Held.Add(key);
         else Held.Remove(key);
       }
-      if (key == Keys.LWin || key == Keys.RWin || IsCtrlOrAlt(key) || KeyboardHook.CtrlOrAltDown) return false;
+      // Shortcuts go to Rhino, but a key let go under Ctrl or Alt still ends its steer, sprint or soft drop.
+      if (key == Keys.LWin || key == Keys.RWin || IsCtrlOrAlt(key) || KeyboardHook.CtrlOrAltDown) return PassOn(key, down, act);
       if (!OwnsFocus()) return PassOn(key, down, act);
       bool press = act && down && !repeat;
       if (key == BossKey)
@@ -370,7 +369,12 @@ namespace Moyu.Games.Common
         if (press) ResetCamera();
         return true;
       }
-      if (act) GameKey(key, down, repeat);
+      if (act)
+      {
+        GameKey(key, down, repeat);
+        // A VoxStack hard drop or Hold can top out right here, before the next frame.
+        NoteGameOver();
+      }
       return true;
     }
 
@@ -390,10 +394,24 @@ namespace Moyu.Games.Common
 
     // ---------------------------------------------------------------- states
 
+    /// <summary>Scores the round and tells the owner, once per round, whether it ended in a frame or on a key.</summary>
+    void NoteGameOver()
+    {
+      if (!IsOver || _overNoted) return;
+      _overNoted = true;
+      OverTime = 0;
+      ClearInput();
+      OnGameOver();
+      Changed();
+    }
+
     void Pause()
     {
       PauseGame();
       ClearInput();
+      // A Shift held from play (VoxStack soft drop, Serpentine sprint) must not turn the Esc that resumes into the
+      // Shift+Esc that quits: only a Shift pressed while paused counts.
+      Held.Remove(Keys.ShiftKey);
       Changed();
       Redraw();
     }
@@ -408,6 +426,7 @@ namespace Moyu.Games.Common
     public void Restart()
     {
       NewGame();
+      _overNoted = false;
       // After NewGame, so a camera that follows the game (Serpentine's first person) starts from the new round.
       ResetCamera();
       StartCountdown(true);
@@ -418,14 +437,18 @@ namespace Moyu.Games.Common
       Redraw();
     }
 
+    /// <summary>The boss key.</summary>
     public void ToggleBoss()
     {
       if (Boss) ExitBoss();
-      else EnterBoss();
+      else EnterBoss(false);
     }
 
     /// <summary>Everything the boss could see changes in this one call; the next frame is the disguise.</summary>
-    public void EnterBoss()
+    public void EnterBoss() => EnterBoss(true);
+
+    /// <param name="keysLost">Rhino lost the focus, so key releases may have gone to another program.</param>
+    void EnterBoss(bool keysLost)
     {
       if (Boss || Stopped) return;
       _pausedByBoss = Countdown > 0 || IsGameActive;
@@ -433,7 +456,9 @@ namespace Moyu.Games.Common
       Countdown = 0;
       ClearInput();
       Held.Clear();
-      _hook.Reset();
+      // Only a focus loss hides releases from the hook. From the boss key it has seen them all, and forgetting the
+      // boss key would make its own auto-repeat count as a new press that switches boss mode straight back off.
+      if (keysLost) _hook.Reset();
       var vp = Viewport;
       _gameCamera = new ViewportInfo(vp);
       string line = EnterDisguise(vp);
@@ -540,8 +565,13 @@ namespace Moyu.Games.Common
     /// </summary>
     protected virtual bool GameMouse(MouseAction action, System.Drawing.Point client, MouseButton button) => false;
 
-    internal bool HandleMouse(RhinoView view, MouseAction action, System.Drawing.Point client, MouseButton button) =>
-      CanOrbit(view) && GameMouse(action, client, button);
+    internal bool HandleMouse(RhinoView view, MouseAction action, System.Drawing.Point client, MouseButton button)
+    {
+      if (!CanOrbit(view)) return false;
+      bool taken = GameMouse(action, client, button);
+      NoteGameOver();
+      return taken;
+    }
 
     /// <summary>Where a viewport pixel lands on <paramref name="plane"/>; false when the view runs parallel to it.</summary>
     protected bool ClientToPlane(System.Drawing.Point client, Plane plane, out Point3d point)
@@ -630,6 +660,10 @@ namespace Moyu.Games.Common
         }
         Take(e);
       }
+
+      // A quick second press comes as a double click, which Rhino sends here and never to OnMouseDown: without this
+      // every other fast click (a Swift flap) is lost and Rhino runs its own double-click action under the game.
+      protected override void OnMouseDoubleClick(MouseCallbackEventArgs e) => OnMouseDown(e);
 
       protected override void OnMouseMove(MouseCallbackEventArgs e)
       {

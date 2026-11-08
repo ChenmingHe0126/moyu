@@ -1,0 +1,30 @@
+Moyu Examples icon sheet — generation record
+Mode: built-in image_gen
+Style reference: docs/images/moyu-icons-section-source.png
+Final output: docs/images/moyu-icons-examples-source.png
+Actual size: 1254 x 1254 px, RGBA PNG
+Layout: 1 column x 1 row; the Examples launcher alone
+
+GENERATION PROMPT
+
+Create ONE original transparent PNG sprite sheet with exactly ONE Grasshopper toolbar component icon for Moyu's EXAMPLES panel.
+
+REFERENCE IMAGE ROLE: the attached Moyu Section sheet is ONLY a visual-family reference: consistent dark-indigo outlines, blue/violet and icy-white palette, compact architectural glyphs with flat colour faces. Do not copy its house section, airflow arrow or storey grid, and DO NOT copy its 2-by-1 layout. The new output must have ONE icon on a SQUARE canvas.
+
+LAYOUT:
+Canvas aspect ratio exactly 1:1, one square cell.
+Center the complete icon in the canvas. Keep every shape inside the central 68–70% of the canvas, with at least 15% transparent clearance on every side. Actual transparent alpha background everywhere outside the glyph. No visible borders, backing tile, labels, text, letters, numbers, watermark or UI screenshot.
+
+FUNCTIONAL CONTEXT:
+Moyu is a Grasshopper plugin for topology optimisation that also hosts four small viewport games disguised as architecture studies. It ships six example definitions (Grasshopper .gh files). The Examples component is a launcher: it shows one button per example, and clicking one opens that example definition as a new, unsaved copy in a new Grasshopper tab, so nobody has to dig through the install folder. The icon must read as "open a ready-made example definition"; it should look like a professional, neutral tool icon. The games are context only; no game imagery.
+
+THE ICON — EXAMPLES:
+Make a small STACK OF THREE DRAWING SHEETS the unmistakable dominant idea: three slightly fanned, offset sheets (ice-white faces, indigo outlines, the back sheets edged in cornflower blue), the front sheet clearly the largest. On the front sheet draw ONE very simple node diagram that suggests a Grasshopper definition: two or three small rounded rectangles joined by one or two smooth wires (indigo lines, one node in cornflower blue). In the upper-right corner of the front sheet, a bold soft-violet arrow points up and out to the right, meaning "open / launch". Keep the arrow chunky and short so it survives at 24×24; it overlaps the sheet corner slightly. Few broad shapes, generous negative space. No folder, no magnifier, no book, no play triangle.
+
+COHERENT DESIGN:
+Same authored icon family as the reference.
+Palette direction: dark indigo #263867 contours, cornflower blue #477DDA main faces, soft iris violet #8067C7 functional accents, ice-white #EFF4FF light regions.
+Crisp flat color planes with consistent sturdy outlines. Volume indicated by shape and discrete face colors, not smooth gradients. Clean, architectural, understated, technically legible. Designed to remain recognizable as a 24×24 Grasshopper toolbar icon; avoid fine lines and small repeated details.
+No gloss, photorealism, cast shadow, glow, texture, drop shadows or backdrop.
+No text, letters, numbers, file-name labels, logos, game objects, gamepad, play button or score.
+Output only ONE square transparent image containing exactly this ONE icon.

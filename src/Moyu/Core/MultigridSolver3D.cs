@@ -7,7 +7,8 @@ namespace Moyu.Core
   /// Conjugate gradients preconditioned by one geometric multigrid V-cycle on a voxel grid
   /// (after Amir, Aage & Lazarov 2014). Coarse operators are Galerkin products built element by element
   /// from trilinear interpolation; the coarsest level is solved directly with a banded Cholesky.
-  /// Fixed DOFs are eliminated on the fine level (identity rows); coarse levels see Pᵀ(ZKZ)P.
+  /// Fixed DOFs are eliminated on the fine level (identity rows); coarse levels see Pᵀ(ZKZ)P,
+  /// plus the fixed DOFs' diagonal when that alone is singular (see <see cref="SetElementScale"/>).
   /// </summary>
   public sealed class MultigridSolver3D
   {
@@ -30,6 +31,8 @@ namespace Moyu.Core
     readonly double[][] _childW;      // trilinear weights W[n, m] (8×8) for each of the 8 child positions
     readonly double[][] _childKe0;    // Tᵀ k₀ T per child position, for children without fixed DOFs
     double[] _scale;
+    bool _keepFixedDiagonal;
+    readonly bool _restrained;        // the fixed DOFs stop all six rigid motions
     BandedCholesky _coarse;
     readonly double[] _r, _z, _p, _q;
 
@@ -79,6 +82,7 @@ namespace Moyu.Core
         Galerkin(_childKe0[c], 0, ke0, 0, _childW[c], 1.0, new double[576]);
       }
 
+      _restrained = RigidModesRestrained(grid, fixedDofs);
       int n = grid.DofCount;
       _r = new double[n];
       _z = new double[n];
@@ -88,7 +92,8 @@ namespace Moyu.Core
 
     /// <summary>
     /// Sets the fine-level element stiffness factors E(xₑ) and rebuilds every coarse operator.
-    /// Returns false when the coarsest operator is singular (the structure is a mechanism).
+    /// Returns false when the structure is a mechanism (the fixed DOFs leave a rigid motion free),
+    /// or when the coarsest operator cannot be factorised.
     /// </summary>
     public bool SetElementScale(double[] scale)
     {
@@ -107,6 +112,71 @@ namespace Moyu.Core
       for (int d = 0; d < diag.Length; d++)
         fine.InvDiag[d] = _fixed[d] ? 1.0 : (diag[d] > 0.0 ? 1.0 / diag[d] : 0.0);
 
+      // Decided exactly up front: a near-singular factorisation of a mechanism can pass a pivot floor and PCG then
+      // returns garbage.
+      if (!_restrained) return false;
+      BuildCoarseLevels();
+      if (FactorCoarsest()) return true;
+      // The structure is stable here, but masking can leave coarse directions that move only fixed fine DOFs
+      // (Z P v = 0), e.g. a free node layer between fixed ones, and Pᵀ(ZKZ)P is then singular. Keeping the fixed DOFs'
+      // diagonal stiffens exactly those directions. It depends only on which DOFs are fixed, so once needed it stays
+      // on; solvers that never need it keep their numbers.
+      if (_levels.Length == 1 || _keepFixedDiagonal) return false;
+      _keepFixedDiagonal = true;
+      BuildCoarseLevels();
+      return FactorCoarsest();
+    }
+
+    /// <summary>
+    /// Every element is at least Emin stiff, so the only motions without strain energy are the grid's six rigid ones,
+    /// and the structure is stable exactly when the fixed DOFs stop all six. Their 6×6 Gram matrix over the fixed DOFs
+    /// is summed in doubled, centred integer coordinates, so it is exact; its Cholesky pivots are measured against each
+    /// mode's own diagonal, so one support DOF holding a mode still counts among millions holding the others.
+    /// </summary>
+    static bool RigidModesRestrained(Grid3D g, bool[] fixedDofs)
+    {
+      var gram = new double[36];
+      var row = new double[6];
+      for (int k = 0; k <= g.Nz; k++)
+        for (int j = 0; j <= g.Ny; j++)
+          for (int i = 0; i <= g.Nx; i++)
+          {
+            int node = g.Node(i, j, k);
+            double x = 2 * i - g.Nx, y = 2 * j - g.Ny, z = 2 * k - g.Nz;
+            for (int c = 0; c < 3; c++)
+            {
+              if (!fixedDofs[3 * node + c]) continue;
+              // Value of each rigid mode (translations X, Y, Z, rotations about X, Y, Z) at this DOF.
+              Array.Clear(row, 0, 6);
+              row[c] = 1.0;
+              if (c == 0) { row[4] = z; row[5] = -y; }
+              else if (c == 1) { row[3] = -z; row[5] = x; }
+              else { row[3] = y; row[4] = -x; }
+              for (int a = 0; a < 6; a++)
+                for (int b = 0; b < 6; b++) gram[a * 6 + b] += row[a] * row[b];
+            }
+          }
+      for (int a = 0; a < 6; a++)
+      {
+        double own = gram[a * 7];
+        double d = own;
+        for (int t = 0; t < a; t++) d -= gram[a * 6 + t] * gram[a * 6 + t];
+        // A free mode leaves only rounding (about 1e-16 of its diagonal); a mode nothing touches has a zero diagonal.
+        if (!(d > 1e-10 * own)) return false;
+        d = Math.Sqrt(d);
+        gram[a * 7] = d;
+        for (int b = a + 1; b < 6; b++)
+        {
+          double v = gram[b * 6 + a];
+          for (int t = 0; t < a; t++) v -= gram[b * 6 + t] * gram[a * 6 + t];
+          gram[b * 6 + a] = v / d;
+        }
+      }
+      return true;
+    }
+
+    void BuildCoarseLevels()
+    {
       for (int l = 1; l < _levels.Length; l++)
       {
         BuildCoarse(l);
@@ -119,7 +189,6 @@ namespace Moyu.Core
         }
         for (int d = 0; d < lv.T.Length; d++) lv.InvDiag[d] = lv.T[d] > 0.0 ? 1.0 / lv.T[d] : 0.0;
       }
-      return FactorCoarsest();
     }
 
     /// <summary>Solves K u = f by PCG starting from the given u. Returns the number of iterations used.</summary>
@@ -280,12 +349,13 @@ namespace Moyu.Core
                 for (int t = 0; t < 576; t++) lv.Ke[eo + t] += s * gk[t];
                 continue;
               }
-              // Zero rows and columns of fixed DOFs: the coarse levels see Pᵀ(ZKZ)P.
+              // Zero rows and columns of fixed DOFs: the coarse levels see Pᵀ(ZKZ)P (plus their diagonal if kept).
               for (int a = 0; a < 24; a++)
               {
                 bool fa = _fixed[prev.Edof[co + a]];
                 for (int b = 0; b < 24; b++)
                   masked[a * 24 + b] = fa || _fixed[prev.Edof[co + b]] ? 0.0 : _ke0[a * 24 + b];
+                if (fa && _keepFixedDiagonal) masked[a * 25] = _ke0[a * 25];
               }
               Galerkin(lv.Ke, eo, masked, 0, _childW[c], s, tmp);
             }

@@ -44,6 +44,16 @@ namespace Moyu.Core.Tests
       k.Reset();
       check(k.Fresh(Enter, false, true, 6100), "after Reset a held key's next report counts as a press");
       check(!k.Fresh(Space, true, true, 6150), "after Reset a release of a forgotten press does not count");
+
+      // A key an input method took is rebuilt from its scan code, which names the left or right Shift / Ctrl / Alt.
+      check(KeyTransitions.Generic(0xA0) == 0x10 && KeyTransitions.Generic(0xA1) == 0x10, "left and right Shift fold to Shift");
+      check(KeyTransitions.Generic(0xA2) == 0x11 && KeyTransitions.Generic(0xA3) == 0x11, "left and right Ctrl fold to Ctrl");
+      check(KeyTransitions.Generic(0xA4) == 0x12 && KeyTransitions.Generic(0xA5) == 0x12, "left and right Alt fold to Alt");
+      check(KeyTransitions.Generic(Space) == Space && KeyTransitions.Generic(Left) == Left && KeyTransitions.Generic(0x10) == 0x10,
+        "other keys are unchanged");
+      var shift = new KeyTransitions();
+      check(shift.Fresh(KeyTransitions.Generic(0x10), false, false, 7000) && shift.Fresh(KeyTransitions.Generic(0xA0), true, true, 7080),
+        "a plain Shift press pairs with a release the input method took");
     }
   }
 }

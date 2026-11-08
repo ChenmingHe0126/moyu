@@ -16,6 +16,8 @@ namespace Moyu.Games.Breakout.Core
     /// <summary>Held on the paddle (serve or sticky catch), at this offset from its centre.</summary>
     public bool Held;
     public double HeldOffset;
+    /// <summary>Bounces off walls and steel since the ball last met the paddle or a breakable brick.</summary>
+    public int Idle;
   }
 
   public sealed class Power
@@ -62,6 +64,14 @@ namespace Moyu.Games.Breakout.Core
     public const double BallRadius = 0.24, PaddleY = 1.0, PaddleHeight = 0.35, PaddleWidth = 2.4, PaddleSpeed = 16,
       MaxAngle = 60 * Math.PI / 180, MinVertical = 0.28, PowerFall = 4.2, PowerSize = 0.5, MaxSpeed = 16, ClearPause = 1.6;
     public const int MaxCombo = 8, MaxLives = 5;
+    /// <summary>Multi stops splitting here: more balls only crowd the field and slow the viewport down.</summary>
+    public const int MaxBalls = 9;
+    /// <summary>
+    /// From the <see cref="IdleBounces"/>-th bounce in a row off walls and steel alone, each one turns the ball by
+    /// <see cref="IdleTurn"/> with a chance of one in <see cref="IdleBounces"/> (see Wander).
+    /// </summary>
+    public const int IdleBounces = 8;
+    public const double IdleTurn = 4 * Math.PI / 180;
     /// <summary>
     /// Power-ups wear off by use, not by time: wide, narrow and slow count paddle returns, sticky counts catches,
     /// pierce counts the bricks it goes through.
@@ -247,7 +257,8 @@ namespace Moyu.Games.Breakout.Core
 
     void MoveBalls(double dt)
     {
-      for (int i = _balls.Count - 1; i >= 0; i--)
+      // Breaking the last brick clears the wall and empties the list mid-loop: stop there.
+      for (int i = _balls.Count - 1; i >= 0 && State == BreakoutState.Playing; i--)
       {
         var ball = _balls[i];
         if (ball.Held) continue;
@@ -268,9 +279,9 @@ namespace Moyu.Games.Breakout.Core
     void Collide(Ball ball)
     {
       double r = BallRadius, w = Settings.Width, h = Settings.Height;
-      if (ball.X < r) { ball.X = r; ball.Vx = Math.Abs(ball.Vx); KeepSteep(ball); }
-      if (ball.X > w - r) { ball.X = w - r; ball.Vx = -Math.Abs(ball.Vx); KeepSteep(ball); }
-      if (ball.Y > h - r) { ball.Y = h - r; ball.Vy = -Math.Abs(ball.Vy); }
+      if (ball.X < r) { ball.X = r; ball.Vx = Math.Abs(ball.Vx); KeepSteep(ball); Wander(ball); }
+      if (ball.X > w - r) { ball.X = w - r; ball.Vx = -Math.Abs(ball.Vx); KeepSteep(ball); Wander(ball); }
+      if (ball.Y > h - r) { ball.Y = h - r; ball.Vy = -Math.Abs(ball.Vy); Wander(ball); }
       if (ball.Y < -2 * r)
       {
         _balls.Remove(ball);
@@ -282,6 +293,7 @@ namespace Moyu.Games.Breakout.Core
       {
         double f = Math.Max(-1, Math.Min(1, (ball.X - PaddleX) / (half + r)));
         ball.Y = top + r;
+        ball.Idle = 0;
         Combo = 0;
         _speedUp = Math.Min(1.25, _speedUp * 1.015);
         // Each return uses up one go of the paddle power-ups.
@@ -348,6 +360,9 @@ namespace Moyu.Games.Breakout.Core
         }
         KeepSteep(ball);
       }
+      // A breakable brick is progress; steel is one more bounce of a ball that may be going round in circles.
+      if (hit.Breakable) ball.Idle = 0;
+      else Wander(ball);
       Damage(hit, pierce);
     }
 
@@ -363,12 +378,17 @@ namespace Moyu.Games.Breakout.Core
       if (b.Alive) return;
       BricksBroken++;
       Broken.Add(b);
+      // The last brick drops nothing: Clear() sweeps the field, and a power-up from the tour would be gone for good.
+      if (Remaining == 0)
+      {
+        Clear();
+        return;
+      }
       if (_rng.NextDouble() < PowerChanceNow)
       {
         var kind = Settings.PowerTour && _tour.Count > 0 ? _tour.Dequeue() : RandomPower();
         _powers.Add(new Power { X = (b.X0 + b.X1) / 2, Y = (b.Y0 + b.Y1) / 2, Kind = kind });
       }
-      if (Remaining == 0) Clear();
     }
 
     PowerKind RandomPower()
@@ -438,6 +458,7 @@ namespace Moyu.Games.Breakout.Core
           foreach (var b in _balls.Where(b => !b.Held).ToList())
             foreach (double turn in new[] { -0.3, 0.3 })
             {
+              if (_balls.Count >= MaxBalls) break;
               double c = Math.Cos(turn), s = Math.Sin(turn);
               _balls.Add(new Ball { X = b.X, Y = b.Y, Vx = b.Vx * c - b.Vy * s, Vy = b.Vx * s + b.Vy * c });
             }
@@ -465,6 +486,27 @@ namespace Moyu.Games.Breakout.Core
         b.Vy = (b.Vy >= 0 ? 1 : -1) * MinVertical * speed;
         b.Vx = Math.Sign(b.Vx) * Math.Sqrt(Math.Max(0, speed * speed - b.Vy * b.Vy));
       }
+    }
+
+    /// <summary>
+    /// Called on each bounce off a wall or steel. Steel never breaks and bounces off it are exact, so a ball can settle
+    /// into a loop that never comes back to the paddle or a brick: after a few such bounces in a row it now and then
+    /// turns a few degrees, too little to notice, until it finds its way out.
+    /// </summary>
+    void Wander(Ball b)
+    {
+      // At random bounces, not every n-th: a loop n bounces long would otherwise take the turn at the same point
+      // every time round and stay a loop. The game's own generator keeps a replay exact.
+      if (++b.Idle < IdleBounces || _rng.Next(IdleBounces) != 0) return;
+      double speed = Math.Sqrt(b.Vx * b.Vx + b.Vy * b.Vy);
+      // Turn steeper, so a ball skimming between steel drops through a gap and comes back down to the paddle; one
+      // already within about 15° of vertical turns away from it instead, so it drifts out of a shaft. A fixed turn
+      // would cancel itself out over a loop's mirror bounces.
+      double turn = (b.Vx >= 0) == (b.Vy >= 0) ? IdleTurn : -IdleTurn;
+      if (Math.Abs(b.Vx) < 0.26 * speed) turn = -turn;
+      double c = Math.Cos(turn), s = Math.Sin(turn), vx = b.Vx * c - b.Vy * s;
+      b.Vy = b.Vx * s + b.Vy * c;
+      b.Vx = vx;
     }
 
     static void Normalise(Ball b, double speed)

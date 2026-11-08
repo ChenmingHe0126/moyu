@@ -17,15 +17,13 @@ namespace Moyu.Components.Massing
   /// The VoxStack game, presented as a massing study generator. Run (the button on the component) starts a game in
   /// the active Rhino viewport; the outputs refresh when the game pauses, switches to boss mode or ends.
   /// </summary>
-  public class MassingStudyComponent : MoyuComponent, IRunnable
+  public class MassingStudyComponent : GameComponent
   {
     const string ScoreFile = "voxstack";
 
     StackSettings _pending;
     Plane _plane = Plane.WorldXY;
     double _size = 7.2;
-    /// <summary>The Language input's choice; null follows the system.</summary>
-    UiLanguage? _language;
 
     // Snapshot of the last session, shown on the outputs.
     string _state = "Ready";
@@ -36,6 +34,9 @@ namespace Moyu.Components.Massing
     List<string> _metrics = new List<string>();
     // The document is going away: a session stopped now must not schedule a solution on it.
     bool _closing;
+    // Why the last Run could not start. A failed start stops itself, and the solution that schedules clears runtime
+    // messages, so SolveInstance shows it again until the next Run.
+    string _runError;
 
     public MassingStudyComponent()
       : base("Massing Study", "Mass",
@@ -45,10 +46,6 @@ namespace Moyu.Components.Massing
     }
 
     public override GH_Exposure Exposure => GH_Exposure.primary;
-
-    public override void CreateAttributes() => m_attributes = new RunButtonAttributes(this);
-
-    public bool IsRunning => GameSession.Current != null && ReferenceEquals(GameSession.Current.Owner, this);
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
@@ -60,7 +57,6 @@ namespace Moyu.Components.Massing
       pManager.AddNumberParameter("Size", "S", "Voxel edge in model units. Default: one 7.2 m structural bay.", GH_ParamAccess.item);
       pManager.AddIntegerParameter("Mode", "M", "0 = Marathon (endless), 1 = Blitz (3 minutes), 2 = Zen (no gravity, no game over).", GH_ParamAccess.item, 0);
       pManager.AddIntegerParameter("Level", "Lv", "Starting level (1–15); higher falls faster.", GH_ParamAccess.item, 1);
-      AddLanguageInput(pManager);
       pManager[0].Optional = true;
       pManager[4].Optional = true;
       pManager[5].Optional = true;
@@ -75,6 +71,14 @@ namespace Moyu.Components.Massing
       pManager.AddIntegerParameter("Best", "B", "Best score for this mode and well size on this computer.", GH_ParamAccess.item);
       pManager.AddMeshParameter("Mass", "Ms", "The stack as a massing mesh (one voxel = one bay, three storeys).", GH_ParamAccess.item);
       pManager.AddTextParameter("Metrics", "Mt", "Site area, GFA, FAR, floors, coverage and height of the massing.", GH_ParamAccess.list);
+    }
+
+    // A required input with no data skips SolveInstance, so clear the settings here: Run must not start a game from
+    // the inputs of an earlier solution.
+    protected override void BeforeSolveInstance()
+    {
+      _pending = null;
+      base.BeforeSolveInstance();
     }
 
     protected override void SolveInstance(IGH_DataAccess DA)
@@ -96,15 +100,13 @@ namespace Moyu.Components.Massing
       DA.GetData(5, ref size);
       DA.GetData(6, ref mode);
       DA.GetData(7, ref level);
-      _language = LanguageInput.Read(this, DA, 8);
-      if (IsRunning) LanguageInput.Apply(GameSession.Current, _language);
 
       _pending = null;
       var errors = new List<string>();
       if (nx < 4 || nx > 10 || ny < 4 || ny > 10) errors.Add("Width and Depth must be between 4 and 10 voxels.");
       if (nz < 8 || nz > 20) errors.Add("Height must be between 8 and 20 voxels.");
       if (mode < 0 || mode > 2) errors.Add("Mode must be 0 (Marathon), 1 (Blitz) or 2 (Zen).");
-      if (!(size > 0)) errors.Add("Size must be positive.");
+      if (!(size > 0) || double.IsInfinity(size)) errors.Add("Size must be a positive finite number.");
       if (!plane.IsValid) errors.Add("Plane is not valid.");
       level = Math.Max(1, Math.Min(15, level));
 
@@ -115,6 +117,8 @@ namespace Moyu.Components.Massing
         else if (MoyuGoo<StackUnit>.TryGet(libGoo, out var unit)) pieces = new[] { unit.Piece };
         else errors.Add(WrongInput("Library", libGoo, "Unit Library (or a single Voxel Unit)"));
       }
+      if (errors.Count == 0 && pieces.All(p => p.Weight <= 0))
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Every unit has Weight 0, so they are all dealt evenly.");
       if (errors.Count == 0)
         foreach (var p in pieces)
         {
@@ -123,6 +127,7 @@ namespace Moyu.Components.Massing
         }
 
       foreach (var e in errors) AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e);
+      if (_runError != null) AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, _runError);
       if (errors.Count == 0)
       {
         _pending = new StackSettings { Nx = nx, Ny = ny, Nz = nz, Mode = (StackMode)mode, StartLevel = level, Pieces = pieces };
@@ -135,6 +140,7 @@ namespace Moyu.Components.Massing
       {
         string key = $"{(StackMode)mode}-{nx}x{ny}x{nz}";
         _best = Math.Max(GameScores.Best(ScoreFile, key), key == _bestKey ? _best : 0);
+        _bestKey = key;
       }
       DA.SetData(0, _state);
       DA.SetData(1, (int)Math.Min(int.MaxValue, _score));
@@ -154,8 +160,9 @@ namespace Moyu.Components.Massing
     }
 
     /// <summary>Starts a game, or stops the one this component is running.</summary>
-    public void Run()
+    public override void Run()
     {
+      _runError = null;
       if (IsRunning)
       {
         GameSession.Current.Stop();
@@ -163,7 +170,7 @@ namespace Moyu.Components.Massing
       }
       if (_pending == null)
       {
-        CannotRun("Fix the errors on the component first.");
+        CannotRun("Fix the errors or empty inputs on the component first.");
         return;
       }
       var settings = new StackSettings
@@ -172,8 +179,11 @@ namespace Moyu.Components.Massing
         Pieces = _pending.Pieces, Seed = Environment.TickCount,
       };
       var session = StackSession.Start(settings, _plane, _size, this, OnSessionChanged, out string error);
-      if (session == null) CannotRun(error);
-      else LanguageInput.Apply(session, _language);
+      if (session == null)
+      {
+        _runError = error;
+        CannotRun(error);
+      }
     }
 
     /// <summary>Shows why the Run button did nothing on the component, where the user is looking.</summary>
@@ -206,7 +216,8 @@ namespace Moyu.Components.Massing
       else if (g.IsOver) _state = "Study complete";
       else if (g.State == StackState.Paused) _state = "Study paused";
       else _state = "Study running";
-      Message = s.Boss ? $"Option B · FAR {m.Far:F2}" : s.Stopped ? (g.IsOver ? $"Score {g.Score:N0}" : "Ready") : g.IsOver ? $"Score {g.Score:N0}" : "Running";
+      // Stopped first: Stop leaves Boss set, and a stopped game must not keep the disguise's label.
+      Message = s.Stopped ? (g.IsOver ? $"Score {g.Score:N0}" : "Ready") : s.Boss ? $"Option B · FAR {m.Far:F2}" : g.IsOver ? $"Score {g.Score:N0}" : "Running";
 
       if (_closing) return;
       Instances.RedrawCanvas();
@@ -232,7 +243,13 @@ namespace Moyu.Components.Massing
       if (context == GH_DocumentContext.Close || context == GH_DocumentContext.Unloaded)
       {
         _closing = true;
-        if (IsRunning) GameSession.Current.Stop();
+        if (IsRunning)
+        {
+          GameSession.Current.Stop();
+          // Another tab took the canvas, so the stop refreshed nothing. Expire now (the document is disabled, so
+          // nothing solves); the solution Grasshopper runs when the tab comes back recomputes the outputs.
+          if (context == GH_DocumentContext.Unloaded) ExpireSolution(false);
+        }
       }
       else if (context == GH_DocumentContext.Open || context == GH_DocumentContext.Loaded) _closing = false;
       base.DocumentContextChanged(document, context);

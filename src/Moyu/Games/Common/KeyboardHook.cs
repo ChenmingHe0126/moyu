@@ -123,6 +123,9 @@ namespace Moyu.Games.Common
           var mapped = (Keys)MapVirtualKey(scan, MAPVK_VSC_TO_VK_EX);
           if (mapped != Keys.None) key = mapped;
         }
+        // A scan code names the left or right Shift, Ctrl or Alt, a plain message the generic key: fold to the generic
+        // one so a press pairs with its release and the games' Shift checks see it.
+        key = (Keys)KeyTransitions.Generic((int)key);
         // The boss key is the key left of 1 on every layout (` on US and UK, ^ on German, ² on French), so it is matched
         // by position; a layout that gives VK_OEM_3 to another key (UK ' @, German Ö) does not get a second boss key.
         if (scanCode == BossScanCode && !extended) key = GameSession.BossKey;
@@ -143,7 +146,11 @@ namespace Moyu.Games.Common
     /// <summary>Forgets which keys are down, e.g. after the app lost focus and missed their release.</summary>
     public void Reset() => _keys.Reset();
 
-    /// <summary>Drops any half-typed IME text and switches the focused window's IME to direct (English) input.</summary>
+    /// <summary>
+    /// Drops any half-typed IME text and switches the focused window's IME to direct (English) input. Once the
+    /// handler has stopped the game (Esc on the result screen) and Dispose has run, it only drops the text: nothing
+    /// would switch the IME back on.
+    /// </summary>
     void CloseIme()
     {
       var hwnd = GetFocus();
@@ -151,7 +158,7 @@ namespace Moyu.Games.Common
       var himc = ImmGetContext(hwnd);
       if (himc == IntPtr.Zero) return;
       ImmNotifyIME(himc, NI_COMPOSITIONSTR, CPS_CANCEL, 0);
-      if (ImmGetOpenStatus(himc))
+      if (_hook != IntPtr.Zero && ImmGetOpenStatus(himc))
       {
         ImmSetOpenStatus(himc, false);
         if (!_imeClosed.Contains(hwnd)) _imeClosed.Add(hwnd);

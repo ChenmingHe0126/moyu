@@ -39,7 +39,8 @@ namespace Moyu.RhinoTests
         "点 Path Study 下面的 ▶ Run · Click ▶ Run under Path Study.\n" +
         "← / A 左转 · → / D 右转（以蛇头为准）· 按住 ↑ / Shift 冲刺 · C 切换镜头 · Turn left / right, hold ↑ to sprint, C camera\n" +
         "Esc 暂停 / 继续，Shift+Esc 退出 · Home 复位视角 · Esc pause / resume, Shift+Esc quit, Home reset view\n" +
-        "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key");
+        "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key\n" +
+        "右键游戏组件 › Language · 语言：Auto 跟随 Windows / 中文 / English · Right-click the study › Language: Auto (follows Windows), 中文 or English");
       QuickStart(b, 0, 0);
       Shapes(b, 0, 300);
       Sphere(b, 0, 720);
@@ -67,7 +68,8 @@ namespace Moyu.RhinoTests
       var m = new List<IGH_DocumentObject>();
       var study = b.Moyu(Study, x, y + 20, m);
       Metrics(b, study, x + 260, y + 20, m);
-      b.Group("A · 快速开始：直接点 ▶ Run（内置起伏地形、28 格、经典模式）", Color.FromArgb(70, 190, 236, 90), m);
+      b.Group("A · 快速开始：直接点 ▶ Run（内置起伏地形、28 格、经典模式）",
+        "A · Quick start: just click ▶ Run (built-in rolling terrain, 28 cells, Classic mode)", Color.FromArgb(70, 190, 236, 90), m);
     }
 
     /// <summary>B: Site Surface's shapes. Its own preview is off so the game draws over a clean viewport.</summary>
@@ -89,7 +91,8 @@ namespace Moyu.RhinoTests
       b.Wire(mode, study, 2);
       b.Wire(level, study, 3);
       Metrics(b, study, x + 740, y + 60, m);
-      b.Group("B · 换场地：Type 0 起伏地形 · 1 环面（上下左右都能穿）· 2 圆管（绕一圈）· 3 马鞍屋面 · 4 球面。Mode 1 = 3 分钟闪电，2 = 禅（不会死）", Color.FromArgb(70, 90, 200, 210), m);
+      b.Group("B · 换场地：Type 0 起伏地形 · 1 环面（上下左右都能穿）· 2 圆管（绕一圈）· 3 马鞍屋面 · 4 球面。Mode 1 = 3 分钟闪电，2 = 禅（不会死）",
+        "B · Other sites: Type 0 rolling terrain · 1 torus (wraps on every side) · 2 pipe (wraps around) · 3 saddle roof · 4 sphere. Mode 1 = 3-minute Blitz, 2 = Zen (no dying)", Color.FromArgb(70, 90, 200, 210), m);
     }
 
     /// <summary>C: any surface works; here Grasshopper's own sphere.</summary>
@@ -102,7 +105,8 @@ namespace Moyu.RhinoTests
       var study = b.Moyu(Study, x + 480, y + 30, m);
       b.Wire(sphere, 0, study, 0);
       Metrics(b, study, x + 740, y + 30, m);
-      b.Group("C · 你自己的曲面：接任意单个曲面（这里是 GH 原生 Sphere）。闭合方向会绕过去，球的两极当墙", Color.FromArgb(70, 200, 150, 255), m);
+      b.Group("C · 你自己的曲面：接任意单个曲面（这里是 GH 原生 Sphere）。闭合方向会绕过去，球的两极当墙",
+        "C · Your own surface: plug in any single surface (here Grasshopper's own Sphere). Closed directions wrap around; a sphere's poles act as walls", Color.FromArgb(70, 200, 150, 255), m);
     }
 
     static void Metrics(GhBuilder b, GH_Component study, float x, float y, List<IGH_DocumentObject> m)

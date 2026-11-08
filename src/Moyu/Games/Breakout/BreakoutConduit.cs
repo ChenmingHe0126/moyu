@@ -44,14 +44,14 @@ namespace Moyu.Games.Breakout
     /// <summary>One line on what a power-up does, shown as it is caught.</summary>
     static readonly Dictionary<PowerKind, string> PowerHelp = new Dictionary<PowerKind, string>
     {
-      [PowerKind.Wide] = $"挡板变宽 · 接 {BreakoutGame.WideHits} 次球", [PowerKind.Multi] = "每个球分成三个", [PowerKind.Slow] = $"球变慢 · 接 {BreakoutGame.SlowHits} 次球",
+      [PowerKind.Wide] = $"挡板变宽 · 接 {BreakoutGame.WideHits} 次球", [PowerKind.Multi] = $"每个球分成三个 · 最多 {BreakoutGame.MaxBalls} 个", [PowerKind.Slow] = $"球变慢 · 接 {BreakoutGame.SlowHits} 次球",
       [PowerKind.Sticky] = $"球粘在挡板上，空格放出 · {BreakoutGame.StickyCatches} 次", [PowerKind.Pierce] = $"直接穿过 {BreakoutGame.PierceBricks} 块砖",
       [PowerKind.Life] = "多一条命", [PowerKind.Narrow] = $"坏道具：挡板变短 · {BreakoutGame.NarrowHits} 次接球",
     };
 
     static readonly Dictionary<PowerKind, string> PowerHelpEnglish = new Dictionary<PowerKind, string>
     {
-      [PowerKind.Wide] = $"Wider paddle · {BreakoutGame.WideHits} catches", [PowerKind.Multi] = "Every ball splits in three",
+      [PowerKind.Wide] = $"Wider paddle · {BreakoutGame.WideHits} catches", [PowerKind.Multi] = $"Every ball splits in three · up to {BreakoutGame.MaxBalls}",
       [PowerKind.Slow] = $"Slower balls · {BreakoutGame.SlowHits} catches", [PowerKind.Sticky] = $"Balls stick to the paddle, Space lets go · {BreakoutGame.StickyCatches} times",
       [PowerKind.Pierce] = $"Straight through {BreakoutGame.PierceBricks} bricks", [PowerKind.Life] = "One more life",
       [PowerKind.Narrow] = $"Bad luck: a shorter paddle · {BreakoutGame.NarrowHits} catches",

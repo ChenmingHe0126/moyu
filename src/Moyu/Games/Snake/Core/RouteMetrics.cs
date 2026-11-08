@@ -44,40 +44,121 @@ namespace Moyu.Games.Snake.Core
       return m;
     }
 
-    /// <summary>A plausible meandering route across the field for when the snake is too short to pass as a path.</summary>
+    /// <summary>Shortest decoy worth drawing as a path; anything shorter falls back to a straight walk.</summary>
+    public const int MinDecoy = 6;
+
+    /// <summary>
+    /// A plausible meandering route across the field for when the snake is too short to pass as a path. On a trimmed
+    /// site each bend keeps to the free cells of its column, and a hole only splits the route: the longest continuous
+    /// run is kept, so a trimmed edge never cuts it down to a cell or two.
+    /// </summary>
     public static List<Cell> Decoy(SurfaceGrid grid, int seed)
     {
       var rng = new Random(seed);
-      var route = new List<Cell>();
       double phase = rng.NextDouble() * Math.PI * 2, amp = Math.Max(1, grid.Nv / 4.0), period = 4 + rng.NextDouble() * 3;
       int mid = grid.Nv / 2;
-      Cell? last = null;
+      var best = new List<Cell>();
+      var route = new List<Cell>();
+      var used = new HashSet<Cell>();
+      void Split()
+      {
+        if (route.Count > best.Count) best = route;
+        route = new List<Cell>();
+        used = new HashSet<Cell>();
+      }
       for (int u = 1; u < grid.Nu - 1; u++)
       {
         int v = Math.Max(0, Math.Min(grid.Nv - 1, mid + (int)Math.Round(amp * Math.Sin(u / period + phase))));
-        var target = new Cell(u, v);
-        if (last != null)
+        int free = NearestFree(grid, u, v);
+        if (free < 0)
         {
-          // Walk there one grid step at a time so the route stays continuous.
-          var c = last.Value;
-          while (c.V != v)
-          {
-            c = new Cell(c.U, c.V + Math.Sign(v - c.V));
-            if (grid.IsBlocked(c)) return route;
-            route.Add(c);
-          }
-          c = new Cell(u, c.V);
-          if (grid.IsBlocked(c)) return route;
-          route.Add(c);
-          last = c;
+          Split();
+          continue;
         }
-        else if (!grid.IsBlocked(target))
+        var target = new Cell(u, free);
+        if (route.Count > 0 && Join(grid, route, used, target)) continue;
+        // The first cell, or no way round from the last column: start a new run here.
+        Split();
+        route.Add(target);
+        used.Add(target);
+      }
+      Split();
+      if (best.Count < MinDecoy)
+      {
+        var line = LongestLine(grid);
+        if (line.Count > best.Count) best = line;
+      }
+      return best;
+    }
+
+    /// <summary>The free row of column <paramref name="u"/> nearest <paramref name="v"/>, or −1 when the whole column is blocked.</summary>
+    static int NearestFree(SurfaceGrid grid, int u, int v)
+    {
+      for (int d = 0; d < grid.Nv; d++)
+      {
+        if (!grid.IsBlocked(new Cell(u, v - d))) return v - d;
+        if (!grid.IsBlocked(new Cell(u, v + d))) return v + d;
+      }
+      return -1;
+    }
+
+    /// <summary>
+    /// Walks from the route's end to <paramref name="to"/> in the next column one grid step at a time, so the route
+    /// stays continuous: along the last column and then across, or across and then along the new one, whichever stays
+    /// on free cells it has not used yet.
+    /// </summary>
+    static bool Join(SurfaceGrid grid, List<Cell> route, HashSet<Cell> used, Cell to)
+    {
+      var from = route[route.Count - 1];
+      int dv = Math.Sign(to.V - from.V);
+      foreach (bool alongFirst in new[] { true, false })
+      {
+        int column = alongFirst ? from.U : to.U;
+        var steps = new List<Cell>();
+        if (!alongFirst) steps.Add(new Cell(to.U, from.V));
+        for (int v = from.V; v != to.V; )
         {
-          route.Add(target);
-          last = target;
+          v += dv;
+          steps.Add(new Cell(column, v));
+        }
+        if (alongFirst) steps.Add(to);
+        bool clear = true;
+        foreach (var c in steps) clear &= !grid.IsBlocked(c) && !used.Contains(c);
+        if (!clear) continue;
+        route.AddRange(steps);
+        used.UnionWith(steps);
+        return true;
+      }
+      return false;
+    }
+
+    /// <summary>The longest straight run of free cells along a row or a column; of equal ones, the nearest the middle.</summary>
+    static List<Cell> LongestLine(SurfaceGrid grid)
+    {
+      var best = new List<Cell>();
+      foreach (bool rows in new[] { true, false })
+      {
+        int lines = rows ? grid.Nv : grid.Nu, cells = rows ? grid.Nu : grid.Nv;
+        // Middle line first, then outwards, so a tie keeps the walk off the edge.
+        for (int k = 0; k < lines; k++)
+        {
+          int a = lines / 2 + (k % 2 == 0 ? k / 2 : -(k + 1) / 2);
+          var run = new List<Cell>();
+          // One past the end counts as blocked, which closes the last run.
+          for (int b = 0; b <= cells; b++)
+          {
+            var c = rows ? new Cell(b, a) : new Cell(a, b);
+            if (!grid.IsBlocked(c))
+            {
+              run.Add(c);
+              continue;
+            }
+            if (run.Count > best.Count) best = run;
+            run = new List<Cell>();
+          }
         }
       }
-      return route;
+      return best;
     }
   }
 }

@@ -33,7 +33,7 @@ namespace Moyu.Components.Massing
     {
       pManager.AddGeometryParameter("Geometry", "G", "Closed breps or meshes; every voxel whose centre lies inside one of them is kept. Boxes need not sit on a grid.", GH_ParamAccess.list);
       pManager.AddPointParameter("Points", "Pt", "Alternative to Geometry: one point per voxel centre.", GH_ParamAccess.list);
-      pManager.AddTextParameter("Pattern", "Pa", "Alternative: layers bottom-up separated by '|', rows by '/' or new lines, '#' = voxel. E.g. ###/#.#|#..", GH_ParamAccess.item);
+      pManager.AddTextParameter("Pattern", "Pa", "Alternative: layers bottom-up separated by '|', rows by '/' or new lines, '#' = voxel, '.' or a space = empty, so do not pad '/' or '|' with spaces. E.g. ###/#.#|#..", GH_ParamAccess.item);
       pManager.AddNumberParameter("Size", "S", "Voxel edge. Default: the thinnest side of the sketched solids, the closest spacing of the points, or 1 for a pattern.", GH_ParamAccess.item);
       pManager.AddTextParameter("Name", "N", "Name of the unit.", GH_ParamAccess.item, "Custom");
       pManager.AddColourParameter("Colour", "C", "Colour of the unit while it falls.", GH_ParamAccess.item, Color.FromArgb(255, 122, 69));
@@ -63,12 +63,13 @@ namespace Moyu.Components.Massing
       DA.GetData(4, ref name);
       DA.GetData(5, ref colour);
       DA.GetData(6, ref weight);
-      if (hasSize && !(size > 0))
+      if (hasSize && (!(size > 0) || double.IsInfinity(size)))
       {
-        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Size must be positive.");
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Size must be a positive finite number.");
         return;
       }
       if (!(weight > 0)) AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Weight is not positive, so this unit is never dealt.");
+      else if (weight > PieceDef.MaxWeight) AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, $"Weight is capped at {PieceDef.MaxWeight} (copies per round of pieces).");
 
       List<Int3> cells;
       Plane frame;
@@ -118,6 +119,9 @@ namespace Moyu.Components.Massing
         if (!hasSize) size = 1;
         cells = Polycube.ParsePattern(pattern).ToList();
         frame = Plane.WorldXY;
+        if (!new HashSet<Int3>(cells).SetEquals(LegacyPattern(pattern)))
+          AddRuntimeMessage(GH_RuntimeMessageLevel.Remark,
+            "Spaces and blank rows in the pattern now count as empty cells, so this pattern gives a different unit than Moyu 1.0.0 did. Remove any spaces that are only padding.");
       }
       else
       {
@@ -154,6 +158,27 @@ namespace Moyu.Components.Massing
           if (d > 1e-9 && d < best) best = d;
         }
       return best == double.MaxValue ? 0 : best;
+    }
+
+    /// <summary>
+    /// How Moyu 1.0.0 read a pattern (every row trimmed, blank rows dropped). Only used to point out patterns whose shape
+    /// changed when spaces started to count as empty cells.
+    /// </summary>
+    static Int3[] LegacyPattern(string pattern)
+    {
+      var cells = new List<Int3>();
+      var layers = pattern.Split('|');
+      for (int z = 0; z < layers.Length; z++)
+      {
+        var rows = layers[z].Split(new[] { '/', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        for (int y = 0; y < rows.Length; y++)
+        {
+          var row = rows[y].Trim();
+          for (int x = 0; x < row.Length; x++)
+            if ("#xXoO1█".IndexOf(row[x]) >= 0) cells.Add(new Int3(x, y, z));
+        }
+      }
+      return Polycube.Normalize(cells);
     }
 
     public override Guid ComponentGuid => new Guid("b8e2c4d1-7a93-4f56-8c0e-3e5a1f6d2b47");

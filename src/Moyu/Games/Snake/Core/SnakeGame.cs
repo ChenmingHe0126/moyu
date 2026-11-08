@@ -6,7 +6,8 @@ namespace Moyu.Games.Snake.Core
 {
   public enum SnakeMode { Classic, Blitz, Zen }
 
-  public enum SnakeState { Playing, Paused, Dead, TimeUp }
+  /// <summary><see cref="SnakeState.Won"/>: the body covers every free cell it can reach (not in zen, which passes over itself and runs on).</summary>
+  public enum SnakeState { Playing, Paused, Dead, TimeUp, Won }
 
   public enum ItemKind { Apple, Grape, Melon, Bomb, Ice, Ghost }
 
@@ -59,7 +60,10 @@ namespace Moyu.Games.Snake.Core
     readonly List<Item> _items = new List<Item>();
     readonly Queue<(int du, int dv)> _turns = new Queue<(int, int)>();
     readonly Random _rng;
-    readonly int _playable;
+    /// <summary>The island of each cell (-1 when blocked), the size of each, and the one the snake is on.</summary>
+    readonly int[] _island;
+    readonly List<int> _islandSize = new List<int>();
+    readonly int _home, _playable;
     double _acc, _interval, _nextGrape, _nextMelon, _nextBomb, _nextPower;
     int _grow;
     SnakeState _beforePause;
@@ -93,9 +97,13 @@ namespace Moyu.Games.Snake.Core
       Grid = grid ?? throw new ArgumentNullException(nameof(grid));
       Settings = settings ?? new SnakeSettings();
       _rng = new Random(Settings.Seed);
-      _playable = Grid.FreeCells().Count();
+      _island = Islands(Grid, _islandSize);
       Level = Math.Max(1, Settings.StartLevel);
       if (!PlaceSnake(Math.Max(MinLength, Settings.StartLength))) throw new ArgumentException("The surface has no free run of cells long enough for the snake.");
+      // A trim can cut the site into islands the snake can never cross between: only its own island is played,
+      // so an apple is never put where it cannot be eaten (and would hold its place for good).
+      _home = _island[Grid.Index(Head)];
+      _playable = _islandSize[_home];
       PreviousHead = Head;
       _nextGrape = 6 + 6 * _rng.NextDouble();
       _nextMelon = 15 + 10 * _rng.NextDouble();
@@ -111,7 +119,7 @@ namespace Moyu.Games.Snake.Core
     public int Length => _body.Count;
     public Cell Head => _body.First.Value;
     public IReadOnlyList<Item> Items => _items;
-    public bool IsOver => State == SnakeState.Dead || State == SnakeState.TimeUp;
+    public bool IsOver => State == SnakeState.Dead || State == SnakeState.TimeUp || State == SnakeState.Won;
     public bool GhostActive => Elapsed < GhostUntil;
     public bool IceActive => Elapsed < IceUntil;
     public double TimeLeft => Settings.Mode == SnakeMode.Blitz ? Math.Max(0, Settings.BlitzSeconds - Elapsed) : double.PositiveInfinity;
@@ -132,7 +140,8 @@ namespace Moyu.Games.Snake.Core
     bool PlaceSnake(int length)
     {
       var start = new Cell(Grid.Nu / 2, Grid.Nv / 2);
-      var candidates = new[] { start }.Concat(Grid.FreeCells().OrderBy(c => Grid.GridDistance(c, start)));
+      // Nearest the middle, on the largest island first.
+      var candidates = Grid.FreeCells().OrderByDescending(c => _islandSize[_island[Grid.Index(c)]]).ThenBy(c => Grid.GridDistance(c, start));
       foreach (var head in candidates)
         foreach (var (du, dv) in new[] { (1, 0), (0, 1), (-1, 0), (0, -1) })
         {
@@ -291,6 +300,12 @@ namespace Moyu.Games.Snake.Core
       }
       var item = _items.FirstOrDefault(i => i.Cell == next);
       if (item != null) Eat(item);
+      // The whole site is filled: a win, not a bite into the tail on the next step (or an endless chase with nothing left to eat).
+      if (State == SnakeState.Playing && !zen && _occupied.Count >= _playable)
+      {
+        State = SnakeState.Won;
+        Boost = false;
+      }
     }
 
     void Die(DeathCause cause)
@@ -331,8 +346,8 @@ namespace Moyu.Games.Snake.Core
             lost.Add(t);
           }
           ev.Lost = lost.ToArray();
-          // The new last segment came from the first cut cell, not from the far end that moved away.
-          RemovedTail = lost[0];
+          // The new last segment came from the last cell cut (the one right behind it), not from the far end.
+          RemovedTail = lost[lost.Count - 1];
           // Growth still owed from fruit eaten just before is lost with the tail.
           _grow = 0;
           break;
@@ -396,7 +411,7 @@ namespace Moyu.Games.Snake.Core
     Cell? RandomFreeCell(int awayFromHead)
     {
       var taken = new HashSet<Cell>(_items.Select(i => i.Cell));
-      bool Free(Cell c) => !Grid.IsBlocked(c) && !_occupied.ContainsKey(c) && !taken.Contains(c) && Grid.GridDistance(c, Head) >= awayFromHead;
+      bool Free(Cell c) => !Grid.IsBlocked(c) && _island[Grid.Index(c)] == _home && !_occupied.ContainsKey(c) && !taken.Contains(c) && Grid.GridDistance(c, Head) >= awayFromHead;
       if ((_occupied.Count + taken.Count) * 2 < _playable)
       {
         for (int attempt = 0; attempt < 300; attempt++)
@@ -407,6 +422,34 @@ namespace Moyu.Games.Snake.Core
       }
       var free = Grid.FreeCells().Where(Free).ToList();
       return free.Count > 0 ? free[_rng.Next(free.Count)] : (Cell?)null;
+    }
+
+    /// <summary>Numbers the islands of free cells joined by steps (wrapping where the grid does) and counts each one.</summary>
+    static int[] Islands(SurfaceGrid grid, List<int> sizes)
+    {
+      var island = new int[grid.Count];
+      for (int i = 0; i < island.Length; i++) island[i] = -1;
+      var queue = new Queue<Cell>();
+      foreach (var seed in grid.FreeCells())
+      {
+        if (island[grid.Index(seed)] >= 0) continue;
+        int id = sizes.Count, size = 0;
+        island[grid.Index(seed)] = id;
+        queue.Enqueue(seed);
+        while (queue.Count > 0)
+        {
+          var c = queue.Dequeue();
+          size++;
+          foreach (var (du, dv) in new[] { (1, 0), (0, 1), (-1, 0), (0, -1) })
+            if (grid.TryStep(c, du, dv, out var next) && island[grid.Index(next)] < 0)
+            {
+              island[grid.Index(next)] = id;
+              queue.Enqueue(next);
+            }
+        }
+        sizes.Add(size);
+      }
+      return island;
     }
   }
 }

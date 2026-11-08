@@ -55,19 +55,30 @@ namespace Moyu.Components.Facade
         AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, $"{curves.Count - closed.Count} open curve(s) ignored; panels must be closed.");
       if (closed.Count > 0)
       {
-        // Measure the panels in the plane they were drawn in: the thinnest world axis is the facade's normal, and of
-        // the two in-plane axes the later one (Z, else Y) is up.
-        var all = new BoundingBox(closed.SelectMany(c => c.GetBoundingBox(true).GetCorners()));
-        var span = all.Diagonal;
-        double sx = Math.Abs(span.X), sy = Math.Abs(span.Y), sz = Math.Abs(span.Z);
-        int normal = sz <= sx && sz <= sy ? 2 : sy <= sx ? 1 : 0;
-        bool alongY = normal == 0, upZ = normal != 2;
+        // Measure the panels in the plane they were drawn in, on an upright frame there (up the plane's slope, or
+        // World Y on a level plane), so a facade off the world axes keeps its true panel sizes.
+        var points = closed.SelectMany(c => c.ToNurbsCurve()?.Points.Select(p => p.Location) ?? Enumerable.Empty<Point3d>()).ToList();
+        Vector3d normal;
+        if (Plane.FitPlaneToPoints(points, out Plane fit) != PlaneFitResult.Failure) normal = fit.ZAxis;
+        else
+        {
+          // No plane through the points at all: take the thinnest world axis as the normal.
+          var span = new BoundingBox(points).Diagonal;
+          double sx = Math.Abs(span.X), sy = Math.Abs(span.Y), sz = Math.Abs(span.Z);
+          normal = sz <= sx && sz <= sy ? Vector3d.ZAxis : sy <= sx ? Vector3d.YAxis : Vector3d.XAxis;
+        }
+        var up = Math.Abs(normal.Z) > 0.99 ? Vector3d.YAxis - normal * normal.Y : Vector3d.ZAxis - normal * normal.Z;
+        up.Unitize();
+        var along = Vector3d.CrossProduct(up, normal);
+        // Left to right along +X (+Y on a YZ wall), as on the world planes; the flip falls at an odd angle, not on an axis or a diagonal.
+        if (along.X * 2 + along.Y < 0) along = -along;
+        var frame = new Plane(Point3d.Origin, along, up);
         custom = new CustomWall();
         foreach (var c in closed)
         {
-          var b = c.GetBoundingBox(true);
-          double u0 = alongY ? b.Min.Y : b.Min.X, u1 = alongY ? b.Max.Y : b.Max.X;
-          double v0 = upZ ? b.Min.Z : b.Min.Y, v1 = upZ ? b.Max.Z : b.Max.Y;
+          // In frame coordinates: X along the wall, Y up.
+          var b = c.GetBoundingBox(frame);
+          double u0 = b.Min.X, u1 = b.Max.X, v0 = b.Min.Y, v1 = b.Max.Y;
           if (u1 - u0 > 1e-9 && v1 - v0 > 1e-9) custom.Rects.Add((u0, v0, u1, v1));
         }
         Message = $"Custom · {custom.Rects.Count}";

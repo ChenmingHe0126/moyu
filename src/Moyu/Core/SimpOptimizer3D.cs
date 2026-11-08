@@ -61,6 +61,9 @@ namespace Moyu.Core
         throw new InvalidOperationException("The structure is not stable: add supports that stop it from sliding and rotating.");
 
       for (int d = 0; d < _f.Length; d++) _f[d] = p.Fixed[d] ? 0.0 : p.Force[d];
+      // A failed solve (e.g. a NaN load) can leave non-finite displacements; warm-starting from them would fail forever.
+      for (int d = 0; d < _u.Length; d++)
+        if (double.IsNaN(_u[d]) || double.IsInfinity(_u[d])) { Array.Clear(_u, 0, _u.Length); break; }
       LastSolverIterations = _solver.Solve(_f, _u, SolverTolerance, SolverMaxIterations, out double residual);
       if (double.IsNaN(residual))
         throw new InvalidOperationException("The structure is not stable: add supports that stop it from sliding and rotating.");

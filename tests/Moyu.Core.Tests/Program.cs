@@ -23,8 +23,10 @@ namespace Moyu.Core.Tests
       Tests3D.PatchTest(Check);
       Tests3D.SizeGuard(Check);
       Tests3D.MultigridMatchesDirect(Check);
+      Tests3D.HeavySupports(Check);
       Tests3D.SurfaceNetsClosed(Check);
       Tests3D.Cantilever(Check);
+      Tests3D.NaNLoadRecovers(Check);
       TestsStack.Run(Check);
       TestsSnake.Run(Check);
       TestsBreakout.Run(Check);
@@ -171,8 +173,7 @@ namespace Moyu.Core.Tests
       for (int j = 2; j <= 4; j++)
         for (int i = 2; i <= 4; i++)
           d[g.Element(i, j)] = 1.0;
-      var nodal = MarchingSquares.NodalField(g, d, null);
-      var loops = MarchingSquares.Contour(g.Nx, g.Ny, nodal, 0.5);
+      var loops = MarchingSquares.ContourPixels(g, d, null, 0.5);
       Check(loops.Count == 1, $"one loop around a 3x3 solid block (got {loops.Count})");
       var loop = loops[0];
       bool closed = loop[0][0] == loop[loop.Count - 1][0] && loop[0][1] == loop[loop.Count - 1][1];
@@ -186,8 +187,22 @@ namespace Moyu.Core.Tests
       var d2 = new double[g.ElementCount];
       d2[g.Element(0, 0)] = 1.0;
       d2[g.Element(4, 3)] = 1.0;
-      var loops2 = MarchingSquares.Contour(g.Nx, g.Ny, MarchingSquares.NodalField(g, d2, null), 0.2);
+      var loops2 = MarchingSquares.ContourPixels(g, d2, null, 0.2);
       Check(loops2.Count == 2, $"two edge-touching blobs → two loops (got {loops2.Count})");
+
+      // Members one pixel thin keep their outline: a 2x1 solid grid, and a grey strut between two blocks.
+      var thin = new Grid2D(2, 1);
+      var loops3 = MarchingSquares.ContourPixels(thin, new[] { 0.99995, 0.99995 }, null, 0.5);
+      Check(loops3.Count == 1 && Math.Abs(loops3[0].Min(q => q[0])) < 1e-3 && Math.Abs(loops3[0].Max(q => q[0]) - 2) < 1e-3,
+        $"a 2x1 solid grid keeps one loop over its full length (got {loops3.Count})");
+      var bar = new Grid2D(11, 5);
+      var d4 = new double[bar.ElementCount];
+      for (int j = 1; j <= 3; j++)
+        for (int i = 0; i < 11; i++)
+          if (i <= 2 || i >= 8) d4[bar.Element(i, j)] = 1.0;
+      for (int i = 3; i <= 7; i++) d4[bar.Element(i, 2)] = 0.95;
+      var loops4 = MarchingSquares.ContourPixels(bar, d4, null, 0.5);
+      Check(loops4.Count == 1, $"a one-pixel strut of density 0.95 joins the two blocks in one loop (got {loops4.Count})");
     }
 
     /// <summary>Moving the load mid-run keeps densities and clears convergence.</summary>

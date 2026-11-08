@@ -23,33 +23,44 @@ namespace Moyu.Games.Common
       lock (_lock)
       {
         if (_best.TryGetValue((game, key), out long cached)) return cached;
-        long best = ReadBest(game, key);
-        _best[(game, key)] = best;
+        // A read that failed (another Rhino appending, a locked file) is not cached, so the next call tries again.
+        if (TryReadBest(game, key, out long best)) _best[(game, key)] = best;
         return best;
       }
     }
 
-    static long ReadBest(string game, string key)
+    /// <summary>False when the file could not be read; no file or no line for the key is a best of 0.</summary>
+    static bool TryReadBest(string game, string key, out long best)
     {
+      best = 0;
       try
       {
         string path = FilePath(game);
-        if (!File.Exists(path)) return 0;
-        return File.ReadAllLines(path)
+        if (!File.Exists(path)) return true;
+        best = File.ReadAllLines(path)
           .Select(l => l.Split('|'))
           .Where(p => p.Length >= 2 && p[0] == key)
           .Select(p => long.TryParse(p[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var s) ? s : 0)
           .DefaultIfEmpty(0)
           .Max();
+        return true;
       }
-      catch (Exception) { return 0; }
+      catch (Exception)
+      {
+        best = 0;
+        return false;
+      }
     }
 
     /// <summary>Appends the result; true when it beats the previous best.</summary>
     public static bool Record(string game, string key, long score)
     {
       long best = Best(game, key);
-      lock (_lock) _best[(game, key)] = Math.Max(best, score);
+      // Only on top of a best that was read: after a failed read the next Best reads the file again, this line included.
+      lock (_lock)
+      {
+        if (_best.TryGetValue((game, key), out long cached)) _best[(game, key)] = Math.Max(cached, score);
+      }
       try
       {
         string path = FilePath(game);

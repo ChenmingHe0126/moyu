@@ -80,6 +80,9 @@ namespace Moyu.TwoD
     /// <summary><see cref="ElementKind.Solid"/> or <see cref="ElementKind.Void"/>.</summary>
     public readonly ElementKind Kind;
 
+    Polyline _dotted;
+    bool _dottedBuilt;
+
     public Area2D(Curve region, ElementKind kind) { Region = region; Kind = kind; }
 
     public BoundingBox Bounds => Region.GetBoundingBox(false);
@@ -89,9 +92,21 @@ namespace Moyu.TwoD
       if (Kind == ElementKind.Solid) d.DrawCurve(Region, highlight ?? Glyphs.SolidAreaColor, 3);
       else
       {
-        var pl = Region.TryGetPolyline(out var p) ? p : Region.ToPolyline(0.0, 0.05, 0.0, 0.0)?.ToPolyline();
+        var pl = DottedOutline();
         if (pl != null) d.DrawDottedPolyline(pl, highlight ?? Glyphs.VoidAreaColor, true);
       }
+    }
+
+    /// <summary>The void outline as a polyline, built once: Draw runs every frame and the region never changes.</summary>
+    Polyline DottedOutline()
+    {
+      if (_dottedBuilt) return _dotted;
+      _dottedBuilt = true;
+      if (Region.TryGetPolyline(out var p)) _dotted = p;
+      else
+        using (var plc = Region.ToPolyline(0.0, 0.05, 0.0, 0.0))
+          _dotted = plc?.ToPolyline();
+      return _dotted;
     }
 
     public override string ToString() => $"Area 2D ({(Kind == ElementKind.Solid ? "solid" : "void")})";

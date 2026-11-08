@@ -80,6 +80,52 @@ namespace Moyu.Core.Tests
       check(res <= 1e-10 && err < 1e-7, $"{its} PCG iterations, relative difference {err:E2}");
     }
 
+    /// <summary>
+    /// A support surface half a voxel off the nodes fixes two node layers. A free odd layer between fixed ones made
+    /// the masked coarse operator singular, so a stable structure was refused as not stable; real mechanisms still are,
+    /// including ones whose near-singular factorisation passed the pivot floor and then solved to garbage.
+    /// </summary>
+    public static void HeavySupports(Action<bool, string> check)
+    {
+      Console.WriteLine("3D heavy supports (12x12x12 solid, node planes x = 0, 2, 3 fixed)");
+      Problem3D Make(int[] planes, int fixedComponents)
+      {
+        var g = new Grid3D(12, 12, 12);
+        var p = new Problem3D(g);
+        for (int e = 0; e < g.ElementCount; e++) p.Kinds[e] = ElementKind.Solid;
+        foreach (int x in planes)
+          for (int k = 0; k <= g.Nz; k++)
+            for (int j = 0; j <= g.Ny; j++)
+              for (int c = 0; c < fixedComponents; c++) p.Fixed[3 * g.Node(x, j, k) + c] = true;
+        p.Force[3 * g.Node(12, 6, 6) + 2] = -1.0;
+        return p;
+      }
+
+      var stable = Make(new[] { 0, 2, 3 }, 3);
+      var opt = new SimpOptimizer3D(stable, new SimpSettings()) { SolverTolerance = 1e-10 };
+      bool solved = !Program.Throws<Exception>(opt.Step);
+      var grid = stable.Grid;
+      var direct = new MultigridSolver3D(grid, H8Element.Stiffness(0.3), stable.Fixed, minCoarseNodes: int.MaxValue);
+      direct.SetElementScale(Enumerable.Repeat(1.0, grid.ElementCount).ToArray());
+      var f = stable.Force.Select((v, d) => stable.Fixed[d] ? 0.0 : v).ToArray();
+      var u = new double[grid.DofCount];
+      direct.Solve(f, u, 1e-12, 5, out _);
+      double c0 = f.Zip(u, (a, b) => a * b).Sum();
+      check(solved && opt.MultigridLevels > 1 && Math.Abs(opt.Compliance - c0) < 1e-8 * c0,
+        $"solves with {opt.MultigridLevels} multigrid levels: compliance {opt.Compliance:F8} (direct {c0:F8})");
+
+      var rollers = new SimpOptimizer3D(Make(new[] { 0, 2, 3 }, 1), new SimpSettings());
+      check(Program.Throws<InvalidOperationException>(rollers.Step), "the same planes as X rollers only are still refused as a mechanism");
+
+      // Held in X and Y only, so free to slide in Z: the retry with the fixed diagonal used to factor this and return
+      // a compliance of about -3e13 with no error.
+      var sliding = Make(new[] { 2, 4, 6, 9, 11 }, 2);
+      var slider = new SimpOptimizer3D(sliding, new SimpSettings());
+      var oneLevel = new MultigridSolver3D(grid, H8Element.Stiffness(0.3), sliding.Fixed, minCoarseNodes: int.MaxValue);
+      check(Program.Throws<InvalidOperationException>(slider.Step) && !oneLevel.SetElementScale(Enumerable.Repeat(1.0, grid.ElementCount).ToArray()),
+        "planes x = 2, 4, 6, 9, 11 held in X and Y only are refused as a mechanism (multigrid and direct)");
+    }
+
     public static void SurfaceNetsClosed(Action<bool, string> check)
     {
       Console.WriteLine("Surface nets");
@@ -159,6 +205,20 @@ namespace Moyu.Core.Tests
       int solid = opt.XPhys.Count(x => x >= 0.5);
       check(closed && volume > 0.6 * solid && volume < 1.2 * solid,
         $"iso-surface of the result is closed and encloses {volume:F0} voxels ({solid} voxels at or above 0.5)");
+    }
+
+    /// <summary>A NaN load fails its step, but once the load is fixed the next step must solve without a Reset.</summary>
+    public static void NaNLoadRecovers(Action<bool, string> check)
+    {
+      Console.WriteLine("3D NaN load recovery (12x6x6 cantilever)");
+      var (bad, s) = CantileverProblem(12, 6, 6);
+      bad.Force[3 * bad.Grid.Node(12, 3, 0) + 2] = double.NaN;
+      var opt = new SimpOptimizer3D(bad, s);
+      check(Program.Throws<InvalidOperationException>(opt.Step), "the NaN load step fails");
+      var (good, _) = CantileverProblem(12, 6, 6);
+      opt.Update(good, s);
+      check(!Program.Throws<Exception>(opt.Step) && opt.Compliance > 0 && !double.IsInfinity(opt.Compliance),
+        $"the next step with a valid load solves from a clean start (compliance {opt.Compliance:F2})");
     }
 
     /// <summary>Canopy as in the Rhino test: four corner pins, roof load, solid roof slab, void passage.</summary>

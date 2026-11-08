@@ -106,8 +106,8 @@
       <li><zh>被 Windows 阻止时：右键 › 属性 › 解除锁定，重启 Rhino</zh><en>If Windows blocks it: right-click › Properties › Unblock; restart Rhino</en></li></ol></div>
   </div>
 
-  <h2 class="mt"><zh>Moyu 页签上的六个面板</zh><en>Six panels on the Moyu tab</en></h2>
-  <p class="lead"><zh>重启后，Grasshopper 工具栏上多出一个 Moyu 页签。四个游戏面板故意起了建筑研究的名字，图标也画成研究工具。</zh><en>After the restart Grasshopper shows a Moyu tab. The four game panels are named and drawn like architecture study tools on purpose.</en></p>
+  <h2 class="mt"><zh>Moyu 页签上的七个面板</zh><en>Seven panels on the Moyu tab</en></h2>
+  <p class="lead"><zh>重启后，Grasshopper 工具栏上多出一个 Moyu 页签。四个游戏面板故意起了建筑研究的名字，图标也画成研究工具。最后的 Examples 面板只有一个组件，用来打开示例（第 4 页）。</zh><en>After the restart Grasshopper shows a Moyu tab. The four game panels are named and drawn like architecture study tools on purpose. The last panel, Examples, holds one component that opens the examples (page 4).</en></p>
   @@RIBBON@@
   <div class="pcards mt">
     <div><img class="fit" src="img/bridge.jpg" alt=""><b>2D</b><span><zh>平面像素拓扑优化：边界、荷载、支座、区域、材料 → 求解器 → 显示（第 5 页）。</zh><en>Pixel topology optimisation in a plane: boundary, loads, supports, areas, material → solver → display (page 5).</en></span></div>
@@ -124,8 +124,13 @@
 <section class="page">
   <div class="ph"><span class="num">03</span><span><zh>示例文件</zh><en>Example files</en></span></div>
   <h2><zh>从示例开始</zh><en>Start from an example</en></h2>
-  <p class="lead"><zh>发布包的 examples 文件夹里有 6 个现成的 .gh 文件。在 Grasshopper 里 File › Open 打开，或者直接拖到画布上；画布顶部有两三行中英文说明。</zh><en>The examples folder of the download holds six ready-made .gh files. Open one in Grasshopper (File › Open, or drag it onto the canvas); the lines at the top of the canvas say what to do.</en></p>
-  <div class="note"><zh><b>文件在哪：</b>包管理器装的在 <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>；food4rhino 压缩包里的在 <code>examples\</code>。</zh><en><b>Where they are:</b> after a Package Manager install, in <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>; in the food4rhino archive, in <code>examples\</code>.</en></div>
+  <div class="g23" style="grid-template-columns: 1fr 46mm">
+    <div>
+    <p class="lead"><zh>Moyu 带 6 个现成的示例。最快的打开办法：把 <b>Moyu › Examples</b> 面板里的 <b>Examples</b> 组件拖到画布上（或在画布上双击搜“示例”），点上面的按钮，示例就在新标签页里打开；那是一份未命名的副本，保存时会问存到哪里。画布顶部有几行中英文说明。</zh><en>Moyu comes with six ready-made examples. The quickest way in: drop the <b>Examples</b> component (<b>Moyu › Examples</b>, or search “example” on the canvas) and click a button; the example opens in a new tab as an unnamed copy, so saving asks where to keep it. The lines at the top of the canvas say what to do.</en></p>
+    <div class="note"><zh><b>文件本身在哪（也可以 File › Open 或拖进画布）：</b>包管理器装的在 <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>；food4rhino 压缩包里的在 <code>examples\</code>。</zh><en><b>Where the files are (File › Open or drag them in also works):</b> after a Package Manager install, in <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>; in the food4rhino archive, in <code>examples\</code>.</en></div>
+    </div>
+    <figure><img src="img/examples_component.jpg" alt=""><figcaption><zh>Examples 组件：每个按钮打开一个示例。</zh><en>The Examples component: each button opens one example.</en></figcaption></figure>
+  </div>
   <div class="g2 mt">
     <div class="ex"><img class="fit" src="img/vis_pixels.jpg" alt=""><div><b>Topo2D.gh</b><span><zh>三组 2D：悬臂梁、立面上的桥、带螺栓孔的 L 形支架。每组有自己的 Run 开关和 Reset 按钮，Timer 已接好。</zh><en>Three 2D set-ups: a cantilever, a bridge elevation and an L-bracket with bolt holes. Each has its own Run toggle and Reset button; the Timer is wired.</en></span></div></div>
     <div class="ex"><img class="fit" src="img/canopy.jpg" alt=""><div><b>Topo3D.gh</b><span><zh>三组 3D：悬臂梁、四角支撑的雨棚、带孔的 L 形支架。</zh><en>Three 3D set-ups: a cantilever, a canopy on four corners and an L-bracket with holes.</en></span></div></div>
@@ -135,7 +140,7 @@
     <div class="ex"><img src="img/swift.jpg" alt=""><div><b>Swift.gh</b><span><zh>A 普通风压、经典模式；B 调风压、开口高度、开间和种子。</zh><en>A: normal exposure, classic mode. B: tune exposure, opening height, bay width and seed.</en></span></div></div>
   </div>
   <h3 class="mt"><zh>真实画布：VoxStack.gh 的 B 组</zh><en>A real canvas: group B of VoxStack.gh</en></h3>
-  <figure><img src="img/vox_canvas.jpg" alt=""><figcaption><zh>两个 Voxel Unit（左：随手画的几何；下：文本图案）接进 Unit Library，再接到 Massing Study。滑块是井的尺寸和模式；组件下方的 ▶ Run 开始游戏。</zh><en>Two Voxel Units (left: sketched geometry; below: a text pattern) feed the Unit Library, which feeds Massing Study. The sliders set the well size and the mode; ▶ Run under the component starts the game.</en></figcaption></figure>
+  <figure><img src="img/vox_canvas.jpg" alt="" style="height: 95mm; object-fit: cover; object-position: center bottom"><figcaption><zh>两个 Voxel Unit（左：随手画的几何；下：文本图案）接进 Unit Library，再接到 Massing Study。滑块是井的尺寸和模式；组件下方的 ▶ Run 开始游戏。</zh><en>Two Voxel Units (left: sketched geometry; below: a text pattern) feed the Unit Library, which feeds Massing Study. The sliders set the well size and the mode; ▶ Run under the component starts the game.</en></figcaption></figure>
   <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>4</span></footer>
 </section>
 

@@ -9,6 +9,8 @@ namespace Moyu.Games.Stack.Core
   {
     /// <summary>Validation limits for custom pieces.</summary>
     public const int MaxCells = 10, MaxExtent = 4;
+    /// <summary>Most copies of one kind per bag; the bag holds that many entries, so a huge weight would stall the game.</summary>
+    public const double MaxWeight = 20;
 
     public readonly string Name;
     /// <summary>Normalised cells (bounding box starts at the origin).</summary>
@@ -25,7 +27,8 @@ namespace Moyu.Games.Stack.Core
       Cells = Polycube.Normalize(cells);
       if (Cells.Length == 0) throw new ArgumentException("A piece needs at least one cell.", nameof(cells));
       Colour = colour == 0 ? unchecked((int)0xFF000000) : colour;
-      Weight = Math.Max(0, weight);
+      // NaN → 0; infinity and huge values → MaxWeight (past 2^31 the copy count would also overflow to none).
+      Weight = weight > 0 ? Math.Min(weight, MaxWeight) : 0;
       IsCustom = isCustom;
     }
 

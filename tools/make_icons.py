@@ -28,6 +28,7 @@ SETS = {
     "landscape": ["PathStudyComponent", "SiteSurfaceComponent"],
     "facade": ["FacadeStudyComponent", "BrickBondComponent"],
     "section": ["AirflowStudyComponent", "StoreyGridComponent"],
+    "examples": ["ExamplesComponent"],
     # The plug-in's own icon (ribbon tab, package manager, food4rhino): a 1x1 sheet.
     "plugin": ["Moyu"],
 }

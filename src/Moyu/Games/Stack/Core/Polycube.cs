@@ -93,19 +93,24 @@ namespace Moyu.Games.Stack.Core
 
     /// <summary>
     /// Parses a text pattern: layers bottom-up separated by '|', rows within a layer separated by '/' or new lines
-    /// (row index → y, character index → x). '#', 'x', 'X', 'o', 'O', '1' and '█' are filled; anything else is empty.
+    /// (a '/' followed by a new line counts once; row index → y, character index → x). '#', 'x', 'X', 'o', 'O', '1'
+    /// and '█' are filled; anything else, a space or a blank row included, is empty.
     /// </summary>
     public static Int3[] ParsePattern(string pattern)
     {
       var cells = new List<Int3>();
       if (string.IsNullOrWhiteSpace(pattern)) return Array.Empty<Int3>();
-      var layers = pattern.Split('|');
+      // A line break right after a '/' only lays the text out ("###/\n#.#" is two rows, not three); '//' or two
+      // line breaks still give a blank row.
+      var layers = pattern.Replace("\r\n", "\n").Replace('\r', '\n').Replace("/\n", "/").Split('|');
       for (int z = 0; z < layers.Length; z++)
       {
-        var rows = layers[z].Split(new[] { '/', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        // Line breaks next to a '|' only lay the text out. Blank rows inside a layer and leading spaces are empty
+        // cells, so they are kept: trimming them would shift a row and give another shape. Normalize drops any margin.
+        var rows = layers[z].Trim('\n').Split('/', '\n');
         for (int y = 0; y < rows.Length; y++)
         {
-          var row = rows[y].Trim();
+          var row = rows[y];
           for (int x = 0; x < row.Length; x++)
             if ("#xXoO1█".IndexOf(row[x]) >= 0) cells.Add(new Int3(x, y, z));
         }

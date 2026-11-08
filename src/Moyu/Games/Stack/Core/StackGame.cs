@@ -42,11 +42,14 @@ namespace Moyu.Games.Stack.Core
     public const int MaxLockResets = 15, LayersPerLevel = 5;
     static readonly int[] ClearPoints = { 0, 100, 300, 700, 1500 };
 
-    /// <summary>Offsets tried in order when a turn collides: in place, sideways, then up.</summary>
+    /// <summary>
+    /// Offsets tried in order when a turn collides: in place, sideways, then up. The two-cell lift is for a 4-long
+    /// unit tipped on the floor or the stack: its pivot is off-centre, so one way puts two cells under the support.
+    /// </summary>
     static readonly Int3[] Kicks =
     {
       new Int3(0, 0, 0), new Int3(-1, 0, 0), new Int3(1, 0, 0), new Int3(0, -1, 0), new Int3(0, 1, 0), new Int3(0, 0, 1),
-      new Int3(-2, 0, 0), new Int3(2, 0, 0), new Int3(0, -2, 0), new Int3(0, 2, 0),
+      new Int3(-2, 0, 0), new Int3(2, 0, 0), new Int3(0, -2, 0), new Int3(0, 2, 0), new Int3(0, 0, 2),
     };
 
     public readonly StackSettings Settings;
@@ -172,6 +175,9 @@ namespace Moyu.Games.Stack.Core
       if (!zen || SoftDrop)
       {
         double interval = SoftDrop ? Math.Min(GravityInterval, SoftDropInterval) : GravityInterval;
+        // Time saved up towards the next slow step is not spent at the soft-drop rate, or pressing it after a wait sent
+        // the piece down the whole well in one frame: at most one cell comes at once, then one per interval.
+        if (SoftDrop) _fall = Math.Min(_fall, interval);
         _fall += dt;
         while (_fall >= interval)
         {
@@ -186,7 +192,9 @@ namespace Moyu.Games.Stack.Core
         _lockTimer += dt;
         if (_lockTimer >= LockDelayFor(Level)) Lock();
       }
-      else _lockTimer = 0;
+      // Only falling to a new low starts the delay afresh: a turn that kicks the piece up into the air must not, or
+      // turning it over and over would keep it from ever locking (the lock resets per height are capped instead).
+      else if (Position.Z <= _lowestZ) _lockTimer = 0;
     }
 
     void FinishClear()
@@ -254,10 +262,15 @@ namespace Moyu.Games.Stack.Core
       Lock();
     }
 
-    /// <summary>Puts the falling piece aside (once per piece) and brings in the held one, or the next.</summary>
+    /// <summary>
+    /// Puts the falling piece aside (once per piece) and brings in the held one, or the next. Refused when that one has
+    /// no room at the top, so a hold never ends the game or resets a zen site while the falling piece is fine.
+    /// </summary>
     public bool Hold()
     {
       if (State != StackState.Playing || Current == null || HoldUsed) return false;
+      // Peek(0) is the piece Next() deals below.
+      if (!Fits(SpawnOffsets(Held ?? _bag.Peek(0), out var at), at)) return false;
       var swap = Held;
       Held = Current;
       Spawn(swap ?? _bag.Next());
@@ -321,7 +334,8 @@ namespace Moyu.Games.Stack.Core
       State = StackState.Clearing;
     }
 
-    void TopOut()
+    /// <param name="blocked">The piece that had no room at the top, if that is why: zen deals it again on the cleared site.</param>
+    void TopOut(PieceDef blocked = null)
     {
       Current = null;
       if (Settings.Mode == StackMode.Zen)
@@ -329,26 +343,34 @@ namespace Moyu.Games.Stack.Core
         Well.Clear();
         Combo = 0;
         SiteResetTime = Elapsed;
-        Spawn(_bag.Next());
+        // Every piece fits an empty well (checked in the constructor), so this does not recurse again.
+        Spawn(blocked ?? _bag.Next());
         return;
       }
       State = StackState.ToppedOut;
     }
 
-    void Spawn(PieceDef def)
+    /// <summary>Where a new piece of this kind appears: its cells round the pivot, and the pivot's cell at the top centre.</summary>
+    Int3[] SpawnOffsets(PieceDef def, out Int3 position)
     {
       var s = def.Size;
       double cx = (s.X - 1) / 2.0, cy = (s.Y - 1) / 2.0, cz = (s.Z - 1) / 2.0;
       // Turning about the cell nearest the middle keeps the piece where you expect it.
       var pivot = def.Cells.OrderBy(c => (c.X - cx) * (c.X - cx) + (c.Y - cy) * (c.Y - cy) + (c.Z - cz) * (c.Z - cz)).First();
-      Offsets = def.Cells.Select(c => c - pivot).ToArray();
-      Position = new Int3((Well.Nx - s.X) / 2, (Well.Ny - s.Y) / 2, Well.Nz - s.Z) + pivot;
+      position = new Int3((Well.Nx - s.X) / 2, (Well.Ny - s.Y) / 2, Well.Nz - s.Z) + pivot;
+      return def.Cells.Select(c => c - pivot).ToArray();
+    }
+
+    void Spawn(PieceDef def)
+    {
+      Offsets = SpawnOffsets(def, out var position);
+      Position = position;
       Current = def;
       _lowestZ = Position.Z;
       _lockResets = 0;
       _lockTimer = 0;
       _fall = 0;
-      if (!Fits(Offsets, Position)) TopOut();
+      if (!Fits(Offsets, Position)) TopOut(def);
     }
   }
 }

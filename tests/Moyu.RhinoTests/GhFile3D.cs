@@ -113,7 +113,8 @@ namespace Moyu.RhinoTests
       b.Wire(load, 0, solver, 1);
       b.Wire(sup, 0, solver, 2);
       b.Visualize(x + V, y + 30, solver, mode, m);
-      b.Group("A · 3D 悬臂梁（World XY，原点）· x = 0 端面固定，自由端底边线荷载", Color.FromArgb(70, 120, 170, 220), m);
+      b.Group("A · 3D 悬臂梁（World XY，原点）· x = 0 端面固定，自由端底边线荷载",
+        "A · 3D cantilever (World XY, origin) · end face at x = 0 fixed, line load on the free end's bottom edge", Color.FromArgb(70, 120, 170, 220), m);
     }
 
     /// <summary>Canopy at x = 60: surface load on the roof, four corner pins, solid roof slab, void passage underneath.</summary>
@@ -210,7 +211,8 @@ namespace Moyu.RhinoTests
       b.Wire(slabArea, 0, solver, 3);
       b.Wire(passArea, 0, solver, 3, append: true);
       b.Visualize(x + vx, y + 90, solver, mode, m);
-      b.Group("B · 3D 雨棚（x = 60…100）· 顶面面荷载 + 四角铰支 + 实心屋面板 + 空心通道", Color.FromArgb(70, 220, 170, 120), m);
+      b.Group("B · 3D 雨棚（x = 60…100）· 顶面面荷载 + 四角铰支 + 实心屋面板 + 空心通道",
+        "B · 3D canopy (x = 60…100) · surface load on the roof + four pinned corners + solid roof slab + void passage underneath", Color.FromArgb(70, 220, 170, 120), m);
     }
 
     /// <summary>Bracket at x = 120: extruded L plate with a bolt hole (nested cylinder), fixed top face, tip load.</summary>
@@ -277,7 +279,8 @@ namespace Moyu.RhinoTests
       b.Wire(load, 0, solver, 1);
       b.Wire(sup, 0, solver, 2);
       b.Visualize(x + V, y + 30, solver, mode, m);
-      b.Group("C · 3D L 形支架 + 螺栓孔（x = 120…220）· 嵌套圆柱 = 孔，顶面固定，端部水平荷载", Color.FromArgb(70, 200, 140, 200), m);
+      b.Group("C · 3D L 形支架 + 螺栓孔（x = 120…220）· 嵌套圆柱 = 孔，顶面固定，端部水平荷载",
+        "C · 3D L-shaped bracket with a bolt hole (x = 120…220) · a nested cylinder is a hole, top face fixed, horizontal load at the tip", Color.FromArgb(70, 200, 140, 200), m);
     }
   }
 }

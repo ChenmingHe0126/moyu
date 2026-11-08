@@ -42,6 +42,11 @@ namespace Moyu.Components.TwoD
         AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Expected a point or curve, got {geometry?.TypeName}.");
         return;
       }
+      if (anchor.Point.HasValue && !anchor.Point.Value.IsValid)
+      {
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "The point is not valid (unset, NaN or infinite).");
+        return;
+      }
       if (!fixX && !fixY) AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Neither X nor Y is fixed; this support does nothing.");
 
       Message = fixX && fixY ? "Pin" : fixX ? "Roller X" : fixY ? "Roller Y" : "Free";

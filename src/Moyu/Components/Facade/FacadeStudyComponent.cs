@@ -17,15 +17,13 @@ namespace Moyu.Components.Facade
   /// The Rebound game, presented as a facade elevation study. Run (the button on the component) starts a game in the
   /// active Rhino viewport; the outputs refresh when the game pauses, switches to boss mode or ends.
   /// </summary>
-  public class FacadeStudyComponent : MoyuComponent, IRunnable
+  public class FacadeStudyComponent : GameComponent
   {
     const string ScoreFile = "rebound";
 
     BreakoutSettings _pending;
     Plane _plane;
     double _size;
-    /// <summary>The Language input's choice; null follows the system.</summary>
-    UiLanguage? _language;
 
     // Snapshot of the last session, shown on the outputs.
     string _state = "Ready";
@@ -36,6 +34,9 @@ namespace Moyu.Components.Facade
     List<string> _metrics = new List<string>();
     // The document is going away: a session stopped now must not schedule a solution on it.
     bool _closing;
+    // Why the last Run could not start. A failed start stops itself, and the solution that schedules clears runtime
+    // messages, so SolveInstance shows it again until the next Run.
+    string _runError;
 
     public FacadeStudyComponent()
       : base("Facade Study", "Facade",
@@ -45,10 +46,6 @@ namespace Moyu.Components.Facade
     }
 
     public override GH_Exposure Exposure => GH_Exposure.primary;
-
-    public override void CreateAttributes() => m_attributes = new RunButtonAttributes(this);
-
-    public bool IsRunning => GameSession.Current != null && ReferenceEquals(GameSession.Current.Owner, this);
 
     /// <summary>A facade standing on the World XZ plane: X along the wall, Z up.</summary>
     public static Plane DefaultPlane => new Plane(Point3d.Origin, Vector3d.XAxis, Vector3d.ZAxis);
@@ -60,7 +57,6 @@ namespace Moyu.Components.Facade
       pManager.AddIntegerParameter("Level", "Lv", "Starting level (1–15); higher is faster and harder.", GH_ParamAccess.item, 1);
       pManager.AddPlaneParameter("Plane", "P", "The facade plane (X along the wall, Y up). Default: World XZ at the origin.", GH_ParamAccess.item);
       pManager.AddNumberParameter("Size", "S", "Model units per facade module. Default: 2.4 m.", GH_ParamAccess.item);
-      AddLanguageInput(pManager);
       pManager[0].Optional = true;
       pManager[3].Optional = true;
       pManager[4].Optional = true;
@@ -75,6 +71,14 @@ namespace Moyu.Components.Facade
       pManager.AddCurveParameter("Panels", "Pn", "Facade units still standing (outlines on the facade plane).", GH_ParamAccess.list);
       pManager.AddCurveParameter("Windows", "Wn", "Units opened up as clear vision glass (outlines).", GH_ParamAccess.list);
       pManager.AddTextParameter("Metrics", "Mt", "Storeys, curtain-wall panels, window-to-wall ratio, vision glass area, facade U-value, solar factor and embodied carbon.", GH_ParamAccess.list);
+    }
+
+    // A required input with no data skips SolveInstance, so clear the settings here: Run must not start a game from
+    // the inputs of an earlier solution.
+    protected override void BeforeSolveInstance()
+    {
+      _pending = null;
+      base.BeforeSolveInstance();
     }
 
     protected override void SolveInstance(IGH_DataAccess DA)
@@ -93,19 +97,18 @@ namespace Moyu.Components.Facade
       DA.GetData(2, ref level);
       DA.GetData(3, ref plane);
       DA.GetData(4, ref size);
-      _language = LanguageInput.Read(this, DA, 5);
-      if (IsRunning) LanguageInput.Apply(GameSession.Current, _language);
 
       _pending = null;
       var errors = new List<string>();
       if (mode < 0 || mode > 2) errors.Add("Mode must be 0 (Classic), 1 (Blitz) or 2 (Zen).");
-      if (!(size > 0)) errors.Add("Size must be positive.");
+      if (!(size > 0) || double.IsInfinity(size)) errors.Add("Size must be a positive finite number.");
       if (!plane.IsValid) errors.Add("Plane is not valid.");
       level = Math.Max(1, Math.Min(15, level));
       WallSpec wall = null;
       if (wallGoo != null && !MoyuGoo<WallSpec>.TryGet(wallGoo, out wall)) errors.Add(WrongInput("Wall", wallGoo, "Brick Bond"));
 
       foreach (var e in errors) AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e);
+      if (_runError != null) AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, _runError);
       if (errors.Count == 0)
       {
         _pending = new BreakoutSettings
@@ -121,6 +124,7 @@ namespace Moyu.Components.Facade
       {
         string key = $"{(BreakoutMode)mode}-{(wall?.Custom != null ? "custom" : wall?.Bond?.ToString() ?? "bonds")}";
         _best = Math.Max(GameScores.Best(ScoreFile, key), key == _bestKey ? _best : 0);
+        _bestKey = key;
       }
       DA.SetData(0, _state);
       DA.SetData(1, (int)Math.Min(int.MaxValue, _score));
@@ -133,12 +137,18 @@ namespace Moyu.Components.Facade
       else if (!IsRunning && _state == "Ready") Message = wall?.Custom != null ? "Custom wall" : wall?.Bond != null ? BondName(wall.Bond.Value) : "Ready";
     }
 
-    /// <summary>The bond's name in the Language input's language ("顺砌 Stretcher bond" → 顺砌 or Stretcher bond).</summary>
+    /// <summary>The bond's name in the component's language ("顺砌 Stretcher bond" → 顺砌 or Stretcher bond).</summary>
     string BondName(BondType bond)
     {
       string both = Bonds.Names[(int)bond];
       int space = both.IndexOf(' ');
-      return GameSession.Resolve(_language) == UiLanguage.Chinese ? both.Substring(0, space) : both.Substring(space + 1);
+      return Language == UiLanguage.Chinese ? both.Substring(0, space) : both.Substring(space + 1);
+    }
+
+    /// <summary>The bond name under the component follows the language.</summary>
+    protected override void OnLanguageChanged()
+    {
+      if (!IsRunning) ExpireSolution(true);
     }
 
     public static double DefaultSize()
@@ -148,8 +158,9 @@ namespace Moyu.Components.Facade
     }
 
     /// <summary>Starts a game, or stops the one this component is running.</summary>
-    public void Run()
+    public override void Run()
     {
+      _runError = null;
       if (IsRunning)
       {
         GameSession.Current.Stop();
@@ -157,7 +168,7 @@ namespace Moyu.Components.Facade
       }
       if (_pending == null)
       {
-        CannotRun("Fix the errors on the component first.");
+        CannotRun("Fix the errors or empty inputs on the component first.");
         return;
       }
       var settings = new BreakoutSettings
@@ -166,8 +177,11 @@ namespace Moyu.Components.Facade
         Seed = Environment.TickCount,
       };
       var session = BreakoutSession.Start(settings, _plane, _size, this, OnSessionChanged, out string error);
-      if (session == null) CannotRun(error);
-      else LanguageInput.Apply(session, _language);
+      if (session == null)
+      {
+        _runError = error;
+        CannotRun(error);
+      }
     }
 
     /// <summary>Shows why the Run button did nothing on the component, where the user is looking.</summary>
@@ -198,7 +212,8 @@ namespace Moyu.Components.Facade
       else if (g.IsOver) _state = "Study complete";
       else if (g.State == BreakoutState.Paused) _state = "Study paused";
       else _state = "Study running";
-      Message = s.Boss ? $"Elevation B · WWR {t.Wwr * 100:F0} %" : s.Stopped ? (g.IsOver ? $"Score {g.Score:N0}" : "Ready") : g.IsOver ? $"Score {g.Score:N0}" : "Running";
+      // Stopped first: Stop leaves Boss set, and a stopped game must not keep the disguise's label.
+      Message = s.Stopped ? (g.IsOver ? $"Score {g.Score:N0}" : "Ready") : s.Boss ? $"Elevation B · WWR {t.Wwr * 100:F0} %" : g.IsOver ? $"Score {g.Score:N0}" : "Running";
 
       if (_closing) return;
       Instances.RedrawCanvas();
@@ -224,7 +239,13 @@ namespace Moyu.Components.Facade
       if (context == GH_DocumentContext.Close || context == GH_DocumentContext.Unloaded)
       {
         _closing = true;
-        if (IsRunning) GameSession.Current.Stop();
+        if (IsRunning)
+        {
+          GameSession.Current.Stop();
+          // Another tab took the canvas, so the stop refreshed nothing. Expire now (the document is disabled, so
+          // nothing solves); the solution Grasshopper runs when the tab comes back recomputes the outputs.
+          if (context == GH_DocumentContext.Unloaded) ExpireSolution(false);
+        }
       }
       else if (context == GH_DocumentContext.Open || context == GH_DocumentContext.Loaded) _closing = false;
       base.DocumentContextChanged(document, context);

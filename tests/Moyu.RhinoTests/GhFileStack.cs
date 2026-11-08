@@ -42,7 +42,8 @@ namespace Moyu.RhinoTests
         "点 Massing Study 下面的 ▶ Run，在当前 Rhino 视口里玩 · Click ▶ Run under Massing Study to play in the active viewport.\n" +
         "← ↑ ↓ → 移动 · 拖右下角 gumball 圆环或 Q E / W S / A D 旋转 · 空格 落下 · C 暂存 · Move, rotate (gumball or keys), Space drop, C hold\n" +
         "Esc 暂停 / 继续，Shift+Esc 退出 · Home 复位视角 · Esc pause / resume, Shift+Esc quit, Home reset view\n" +
-        "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key");
+        "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key\n" +
+        "右键游戏组件 › Language · 语言：Auto 跟随 Windows / 中文 / English · Right-click the study › Language: Auto (follows Windows), 中文 or English");
       QuickStart(b, 0, 0);
       Custom(b, 0, 330);
 
@@ -71,7 +72,8 @@ namespace Moyu.RhinoTests
       panel.Attributes.Bounds = new RectangleF(x + 260, y + 20, 230, 170);
       panel.AddSource(study.Params.Output[0]);
       panel.AddSource(study.Params.Output[6]);
-      b.Group("A · 快速开始：直接点 ▶ Run（默认 5×5×12 井、标准 8 块、马拉松模式）", Color.FromArgb(70, 255, 140, 90), m);
+      b.Group("A · 快速开始：直接点 ▶ Run（默认 5×5×12 井、标准 8 块、马拉松模式）",
+        "A · Quick start: just click ▶ Run (5×5×12 well, the standard 8 units, Marathon mode)", Color.FromArgb(70, 255, 140, 90), m);
     }
 
     /// <summary>B: two custom units (sketched boxes, a text pattern) plus the standard set, played in Blitz mode.</summary>
@@ -119,7 +121,8 @@ namespace Moyu.RhinoTests
       panel.Attributes.Bounds = new RectangleF(x + 990, y + 110, 230, 170);
       panel.AddSource(study.Params.Output[0]);
       panel.AddSource(study.Params.Output[6]);
-      b.Group("B · 自定义积木：Sketch 里 3 个随手画的盒子 + Pattern 文本 → Voxel Unit → Unit Library（Preset：-1 只用自定义，0 入门，1 标准，2 困难）。Mode 1 = 3 分钟闪电", Color.FromArgb(70, 120, 170, 220), m);
+      b.Group("B · 自定义积木：Sketch 里 3 个随手画的盒子 + Pattern 文本 → Voxel Unit → Unit Library（Preset：-1 只用自定义，0 入门，1 标准，2 困难）。Mode 1 = 3 分钟闪电",
+        "B · Custom units: 3 rough boxes in Sketch + a Pattern text → Voxel Unit → Unit Library (Preset: -1 custom only, 0 easy, 1 standard, 2 hard). Mode 1 = 3-minute Blitz", Color.FromArgb(70, 120, 170, 220), m);
     }
 
     static void Inspect(GH_Document doc, string when)

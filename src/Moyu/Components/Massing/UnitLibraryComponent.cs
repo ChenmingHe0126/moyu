@@ -59,6 +59,8 @@ namespace Moyu.Components.Massing
         AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No units: connect Voxel Units or choose a preset.");
         return;
       }
+      // The bag skips weight-0 units only while some unit has weight; with none it deals them all.
+      if (pieces.All(p => p.Weight <= 0)) AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Every unit has Weight 0, so they are all dealt evenly.");
       string description = (preset >= 0 ? PieceSets.Names[preset] : "Custom") + (preset >= 0 && custom.Count > 0 ? $" + {custom.Count}" : "");
       Message = description;
       DA.SetData(0, new MoyuGoo<UnitLibrary>(new UnitLibrary(pieces, description)));

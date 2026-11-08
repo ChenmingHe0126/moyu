@@ -32,7 +32,12 @@ namespace Moyu.Components.ThreeD
     public static Anchor3D ToAnchor(IGH_GeometricGoo goo)
     {
       if (goo is GH_Point gp) return new Anchor3D(gp.Value);
-      if (goo is GH_Mesh) return new Anchor3D(ToMesh(goo, out _));
+      if (goo is GH_Mesh)
+      {
+        // Same test as below: an empty wrapper or a faceless mesh gives the solver nothing to land on.
+        var m = ToMesh(goo, out _);
+        return m != null && m.Faces.Count > 0 ? new Anchor3D(m) : null;
+      }
       Curve curve = null;
       if (!(goo is GH_Brep || goo is GH_Surface || goo is GH_Box) &&
           GH_Convert.ToCurve(goo, ref curve, GH_Conversion.Both) && curve != null)

@@ -19,6 +19,7 @@ namespace Moyu.Core.Tests
       ComboScoring(check);
       PowerUps(check);
       NoTunnelling(check);
+      NoEndlessLoops(check);
       BlitzAndReplay(check);
       CustomWalls(check);
       EveryBrickReachable(check);
@@ -211,6 +212,39 @@ namespace Moyu.Core.Tests
       check(g.State == BreakoutState.Cleared && g.Score >= 500, "the last breakable brick clears the wall (steel does not count), +500 × level");
       RunUntil(g, () => g.State == BreakoutState.Serving, 3);
       check(g.Level == 2 && g.Remaining > 20 && g.Bond == BondType.Stack, "after a pause: level 2, a fresh wall in the next bond");
+
+      // With several balls in play, clearing the wall empties the ball list mid-step: whichever ball breaks the last brick.
+      foreach (bool pierce in new[] { false, true })
+        for (int k = 1; k < 3; k++)
+        {
+          var m = Empty();
+          m.SetWall(new[] { new Brick(3.2, 12, 4.8, 12.55, BrickMaterial.Glass), new Brick(0.2, 15, 1.2, 15.5, BrickMaterial.Steel) });
+          m.AddBall(6.5, 4, 0, 10);
+          m.Apply(PowerKind.Multi);
+          if (pierce) m.Apply(PowerKind.Pierce);
+          int n = m.Balls.Count;
+          // Ball k goes straight up into the brick, the others rise well clear of it.
+          for (int i = 0; i < n; i++)
+          {
+            var b = m.Balls[i];
+            b.X = i == k ? 4 : 9 + i;
+            b.Y = 11;
+            b.Vx = 0;
+            b.Vy = 10;
+          }
+          string result;
+          try
+          {
+            bool cleared = RunUntil(m, () => m.State == BreakoutState.Cleared, 2);
+            bool served = RunUntil(m, () => m.State == BreakoutState.Serving, 3);
+            result = cleared && served && m.Level == 2 && m.Balls.Count == 1 ? "level 2 served" : $"{m.State} on level {m.Level}";
+          }
+          catch (Exception e)
+          {
+            result = e.GetType().Name;
+          }
+          check(result == "level 2 served", $"{n} balls{(pierce ? " and pierce" : "")}: Balls[{k}] breaks the last brick, the wall clears ({result})");
+        }
     }
 
     static void ComboScoring(Action<bool, string> check)
@@ -270,6 +304,8 @@ namespace Moyu.Core.Tests
       multi.AddBall(6.5, 8, 2, 8);
       multi.Apply(PowerKind.Multi);
       check(multi.Balls.Count == 3, "multi: three balls (instant)");
+      for (int i = 0; i < 4; i++) multi.Apply(PowerKind.Multi);
+      check(multi.Balls.Count == BreakoutGame.MaxBalls, $"more multis stop at {BreakoutGame.MaxBalls} balls ({multi.Balls.Count})");
 
       var sticky = Empty(BreakoutMode.Zen);
       sticky.SetWall(new[] { new Brick(0.2, 15, 1.2, 15.5, BrickMaterial.Steel), new Brick(11.8, 15, 12.8, 15.5, BrickMaterial.Glass) });
@@ -352,6 +388,28 @@ namespace Moyu.Core.Tests
       check(shown.Count == 6 && shown.Distinct().Count() == 6 && !shown.Contains(PowerKind.Narrow),
         $"the first six drops are the six helpful ones, once each ({string.Join(", ", shown)})");
 
+      // Walls cleared by their only brick (a custom wall of a few panels): the clear sweeps the field, so that brick
+      // drops nothing and the tour keeps every kind for the drops that can be caught.
+      var cleared = new BreakoutGame(new BreakoutSettings { Seed = 9, PowerChance = 1 });
+      int clears = 0;
+      for (int i = 0; i < 3; i++)
+      {
+        cleared.SetWall(new[] { new Brick(5.5, 8, 7.5, 8.55, BrickMaterial.Glass), new Brick(0.2, 15, 1.2, 15.5, BrickMaterial.Steel) });
+        cleared.AddBall(6.5, 4, 0, 10);
+        if (RunUntil(cleared, () => cleared.State == BreakoutState.Cleared, 2)) clears++;
+      }
+      var after = new List<PowerKind>();
+      seen.Clear();
+      for (int i = 0; i < 6; i++)
+      {
+        cleared.SetWall(new[] { new Brick(5.5, 8, 7.5, 8.55, BrickMaterial.Glass), new Brick(0.2, 15, 1.2, 15.5, BrickMaterial.Glass) });
+        cleared.AddBall(6.5, 4, 0, 10);
+        RunUntil(cleared, () => cleared.Powers.Any(pw => !seen.Contains(pw)), 2);
+        foreach (var pw in cleared.Powers.Where(pw => seen.Add(pw))) after.Add(pw.Kind);
+      }
+      check(clears == 3 && after.Count == 6 && after.Distinct().Count() == 6 && !after.Contains(PowerKind.Narrow),
+        $"the brick that clears a wall drops nothing, so the tour still shows all six after {clears} clears ({string.Join(", ", after)})");
+
       var drop = new BreakoutGame(new BreakoutSettings { Seed = 1, PowerChance = 1 });
       drop.SetWall(new[] { new Brick(5.5, 8, 7.5, 8.55, BrickMaterial.Glass), new Brick(0.2, 15, 1.2, 15.5, BrickMaterial.Glass) });
       drop.AddBall(6.5, 4, 0, 10);
@@ -377,6 +435,26 @@ namespace Moyu.Core.Tests
         if (g.Balls.Count > 0 && g.Balls[0].Y > 9.5) through = true;
       }
       check(!through, "even at full speed with a coarse frame the ball does not pass through a thin wall");
+    }
+
+    static void NoEndlessLoops(Action<bool, string> check)
+    {
+      Console.WriteLine("Rebound: no ball caught in a loop");
+      Brick Steel(double x0, double y0, double x1, double y1) => new Brick(x0, y0, x1, y1, BrickMaterial.Steel);
+      // A pocket of steel (from a Flemish wall at level 13) where exact mirror bounces close into a loop.
+      var pocket = new BreakoutGame(new BreakoutSettings { Seed = 3, StartLevel = 13, PowerChance = 0 });
+      pocket.SetWall(new[]
+      {
+        Steel(7.24, 11.47, 8.76, 12.02), new Brick(8.84, 11.47, 9.56, 12.02, BrickMaterial.Glass), Steel(8.44, 10.84, 9.96, 11.39),
+        Steel(6.44, 10.21, 7.16, 10.76), Steel(6.04, 9.58, 7.56, 10.13), new Brick(0.2, 15, 1.2, 15.5, BrickMaterial.Glass),
+      });
+      pocket.AddBall(7.40, 10.37, -11.22, 11.40);
+      check(RunUntil(pocket, () => pocket.Balls.Count == 0 || pocket.Balls[0].Y < 5 || pocket.Score > 0, 60),
+        $"a ball looping in a steel pocket turns a little now and then until it gets out ({pocket.Elapsed:F1} s)");
+      var shaft = Empty();
+      shaft.SetWall(new[] { Steel(5.0, 15.17, 6.6, 15.72), new Brick(0.2, 15, 1.2, 15.5, BrickMaterial.Glass) });
+      var b = shaft.AddBall(5.8, 16.3, 0, -10);
+      check(RunUntil(shaft, () => shaft.Balls.Count == 0 || b.Y < 15, 60), $"a ball bouncing straight up and down on steel drifts off it ({shaft.Elapsed:F1} s)");
     }
 
     static void BlitzAndReplay(Action<bool, string> check)
@@ -454,6 +532,51 @@ namespace Moyu.Core.Tests
       return reached;
     }
 
+    /// <summary>
+    /// Breakable bricks the ball cannot touch, by a flood fill of where its centre fits between the steel (breakable
+    /// bricks break, so only steel stands in the way). The ball is taken a hair wider, so a squeeze it only makes by luck counts as shut.
+    /// </summary>
+    static List<Brick> Untouchable(List<Brick> wall)
+    {
+      const double step = 0.04, w = 13, h = 17;
+      double fit = BreakoutGame.BallRadius + 0.02, touch = BreakoutGame.BallRadius + step;
+      var steel = wall.Where(b => !b.Breakable).ToList();
+      double Dist2(Brick b, double x, double y)
+      {
+        double dx = Math.Max(0, Math.Max(b.X0 - x, x - b.X1)), dy = Math.Max(0, Math.Max(b.Y0 - y, y - b.Y1));
+        return dx * dx + dy * dy;
+      }
+      int nx = (int)(w / step) + 1, ny = (int)(h / step) + 1;
+      bool Fits(int i, int j)
+      {
+        double x = i * step, y = j * step;
+        return x >= fit && x <= w - fit && y >= fit && y <= h - fit && steel.All(b => Dist2(b, x, y) >= fit * fit);
+      }
+      var seen = new bool[nx, ny];
+      var queue = new Queue<(int i, int j)>();
+      // From the open field above the paddle.
+      seen[nx / 2, (int)(2 / step)] = true;
+      queue.Enqueue((nx / 2, (int)(2 / step)));
+      while (queue.Count > 0)
+      {
+        var (i, j) = queue.Dequeue();
+        foreach (var (a, c) in new[] { (i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1) })
+          if (a >= 0 && c >= 0 && a < nx && c < ny && !seen[a, c] && Fits(a, c))
+          {
+            seen[a, c] = true;
+            queue.Enqueue((a, c));
+          }
+      }
+      bool Touched(Brick b)
+      {
+        for (int i = Math.Max(0, (int)((b.X0 - touch) / step)); i <= Math.Min(nx - 1, (int)((b.X1 + touch) / step) + 1); i++)
+          for (int j = Math.Max(0, (int)((b.Y0 - touch) / step)); j <= Math.Min(ny - 1, (int)((b.Y1 + touch) / step) + 1); j++)
+            if (seen[i, j] && Dist2(b, i * step, j * step) <= touch * touch) return true;
+        return false;
+      }
+      return wall.Where(b => b.Breakable && !Touched(b)).ToList();
+    }
+
     static void EveryBrickReachable(Action<bool, string> check)
     {
       Console.WriteLine("Rebound: no brick walled in by steel");
@@ -487,6 +610,19 @@ namespace Moyu.Core.Tests
         }
         check(sealedBricks == 0 && steel > walls, $"{type}: {walls} walls at levels 6–15, every breakable brick reachable, {steel / (double)walls:F1} steel bricks a wall");
       }
+
+      // Half a header and its two joints are exactly the ball's width: a header whose only way in is past steel corners that close is shut in too.
+      var pinched = Bonds.Lay(BondType.English, 20, 13, 15.8, 14, new Random(505));
+      var header = pinched.FirstOrDefault(b => Math.Abs(b.X0 - 8.44) < 1e-6 && Math.Abs(b.Y0 - 9.58) < 1e-6);
+      check(header != null && header.Breakable && Untouchable(pinched).Count == 0, "a header reached only through gaps as wide as the ball gets its steel opened up");
+      int shut = 0, laid = 0;
+      foreach (var type in new[] { BondType.English, BondType.Flemish })
+        for (int seed = 0; seed < 60; seed++)
+        {
+          laid++;
+          if (Untouchable(Bonds.Lay(type, 10 + seed % 11, 13, 15.8, 14, new Random(seed))).Count > 0) shut++;
+        }
+      check(shut == 0, $"English and Flemish, {laid} walls at levels 10–20: the ball fits up to every breakable brick ({shut} shut)");
     }
 
     static void HeldBalls(Action<bool, string> check)

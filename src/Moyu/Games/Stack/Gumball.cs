@@ -34,6 +34,10 @@ namespace Moyu.Games.Stack
     double _pixelsPerRadian, _scale = 1, _reach = HitPixels;
     int _applied;
     bool _decided;
+    /// <summary>The piece the drag took hold of: its game, pieces placed and hold flag (a lock or a hold changes one of them).</summary>
+    StackGame _game;
+    int _placed;
+    bool _held;
     readonly List<(int axis, double t, Vector2d tangent, double perRadian, double dist)> _candidates = new List<(int, double, Vector2d, double, double)>();
 
     /// <summary>The ring under the mouse, or -1.</summary>
@@ -261,6 +265,9 @@ namespace Moyu.Games.Stack
       }
       _grab = at;
       _applied = 0;
+      _game = _s.Game;
+      _placed = _s.Game.PiecesPlaced;
+      _held = _s.Game.HoldUsed;
       _decided = _candidates.Count == 1;
       Take(_candidates[0]);
       return true;
@@ -280,6 +287,13 @@ namespace Moyu.Games.Stack
     public void Drag(Point pixel)
     {
       if (Dragging < 0) return;
+      // The piece locked or was held mid-drag: let go, so the turns counted for it (or their undo) do not turn the next one.
+      // Not by the Current reference: a hold can bring back the same kind.
+      if (_s.Game != _game || _s.Game.PiecesPlaced != _placed || _s.Game.HoldUsed != _held)
+      {
+        End();
+        return;
+      }
       var d = new Vector2d(pixel.X - _grab.X, pixel.Y - _grab.Y);
       if (!_decided)
       {

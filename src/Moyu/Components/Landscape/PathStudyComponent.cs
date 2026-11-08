@@ -17,14 +17,12 @@ namespace Moyu.Components.Landscape
   /// component) starts a game in the active Rhino viewport; the outputs refresh when the game pauses, switches to
   /// boss mode or ends.
   /// </summary>
-  public class PathStudyComponent : MoyuComponent, IRunnable
+  public class PathStudyComponent : GameComponent
   {
     const string ScoreFile = "serpentine";
 
     SurfaceField _field;
     SnakeSettings _pending;
-    /// <summary>The Language input's choice; null follows the system.</summary>
-    UiLanguage? _language;
     // What the field was built from (the input goo, or the built-in terrain), so a slider nudge elsewhere does not resample the surface.
     object _fieldSource;
     int _fieldCells;
@@ -41,6 +39,9 @@ namespace Moyu.Components.Landscape
     List<string> _metrics = new List<string>();
     // The document is going away: a session stopped now must not schedule a solution on it.
     bool _closing;
+    // Why the last Run could not start. A failed start stops itself, and the solution that schedules clears runtime
+    // messages, so SolveInstance shows it again until the next Run.
+    string _runError;
 
     public PathStudyComponent()
       : base("Path Study", "Path",
@@ -51,10 +52,6 @@ namespace Moyu.Components.Landscape
 
     public override GH_Exposure Exposure => GH_Exposure.primary;
 
-    public override void CreateAttributes() => m_attributes = new RunButtonAttributes(this);
-
-    public bool IsRunning => GameSession.Current != null && ReferenceEquals(GameSession.Current.Owner, this);
-
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
       pManager.AddSurfaceParameter("Surface", "S", "Site surface to walk on (a trimmed face works; closed directions wrap round). Default: rolling terrain from Site Surface.", GH_ParamAccess.item);
@@ -62,7 +59,6 @@ namespace Moyu.Components.Landscape
       pManager.AddIntegerParameter("Mode", "M", "0 = Classic (endless), 1 = Blitz (3 minutes), 2 = Zen (no walls to die on, no bombs).", GH_ParamAccess.item, 0);
       pManager.AddIntegerParameter("Level", "Lv", "Starting level (1–15); higher is faster.", GH_ParamAccess.item, 1);
       pManager.AddBooleanParameter("Slope", "Sl", "Downhill is faster and uphill slower.", GH_ParamAccess.item, true);
-      AddLanguageInput(pManager);
       pManager[0].Optional = true;
     }
 
@@ -74,6 +70,14 @@ namespace Moyu.Components.Landscape
       pManager.AddIntegerParameter("Best", "B", "Best score for this mode and grid on this computer.", GH_ParamAccess.item);
       pManager.AddCurveParameter("Route", "R", "The route as a smooth curve over the surface.", GH_ParamAccess.item);
       pManager.AddTextParameter("Metrics", "Mt", "Route length, elevation gain, average and maximum slope, accessible share and nodes.", GH_ParamAccess.list);
+    }
+
+    // A required input with no data skips SolveInstance, so clear the settings here: Run must not start a game from
+    // the inputs of an earlier solution.
+    protected override void BeforeSolveInstance()
+    {
+      _pending = null;
+      base.BeforeSolveInstance();
     }
 
     protected override void SolveInstance(IGH_DataAccess DA)
@@ -94,8 +98,6 @@ namespace Moyu.Components.Landscape
       DA.GetData(2, ref mode);
       DA.GetData(3, ref level);
       DA.GetData(4, ref slope);
-      _language = LanguageInput.Read(this, DA, 5);
-      if (IsRunning) LanguageInput.Apply(GameSession.Current, _language);
 
       _pending = null;
       var errors = new List<string>();
@@ -114,6 +116,7 @@ namespace Moyu.Components.Landscape
         if (_field == null) errors.Add(why);
       }
       foreach (var e in errors) AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e);
+      if (_runError != null) AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, _runError);
       if (errors.Count == 0) _pending = new SnakeSettings { Mode = (SnakeMode)mode, StartLevel = level, SlopeAffectsSpeed = slope };
 
       // Best follows the inputs; a stopped game's score counts only while the inputs still match it.
@@ -121,6 +124,7 @@ namespace Moyu.Components.Landscape
       {
         string key = $"{(SnakeMode)mode}-{_field.Grid.Nu}x{_field.Grid.Nv}";
         _best = Math.Max(GameScores.Best(ScoreFile, key), key == _bestKey ? _best : 0);
+        _bestKey = key;
       }
       DA.SetData(0, _state);
       DA.SetData(1, (int)Math.Min(int.MaxValue, _score));
@@ -144,8 +148,9 @@ namespace Moyu.Components.Landscape
     }
 
     /// <summary>Starts a game, or stops the one this component is running.</summary>
-    public void Run()
+    public override void Run()
     {
+      _runError = null;
       if (IsRunning)
       {
         GameSession.Current.Stop();
@@ -153,7 +158,7 @@ namespace Moyu.Components.Landscape
       }
       if (_pending == null || _field == null)
       {
-        CannotRun("Fix the errors on the component first.");
+        CannotRun("Fix the errors or empty inputs on the component first.");
         return;
       }
       var settings = new SnakeSettings
@@ -161,8 +166,11 @@ namespace Moyu.Components.Landscape
         Mode = _pending.Mode, StartLevel = _pending.StartLevel, SlopeAffectsSpeed = _pending.SlopeAffectsSpeed, Seed = Environment.TickCount,
       };
       var session = SnakeSession.Start(_field, settings, this, OnSessionChanged, out string error);
-      if (session == null) CannotRun(error);
-      else LanguageInput.Apply(session, _language);
+      if (session == null)
+      {
+        _runError = error;
+        CannotRun(error);
+      }
     }
 
     /// <summary>Shows why the Run button did nothing on the component, where the user is looking.</summary>
@@ -181,8 +189,11 @@ namespace Moyu.Components.Landscape
       _best = Math.Max(s.Best, g.Score);
       _bestKey = s.ScoreKey;
       var dz = s.CurrentDisguise();
-      _route = CirculationDisguise.RouteCurve(s.Field, g.Body.Reverse().ToList());
-      var m = dz.Metrics;
+      // Route and Metrics both read the snake itself; a short snake's disguise draws a decoy route, which only the
+      // boss label below describes.
+      var cells = g.Body.Reverse().ToList();
+      _route = CirculationDisguise.RouteCurve(s.Field, cells);
+      var m = RouteMetrics.From(cells, s.Field.Grid, s.ToMetres);
       _metrics = new List<string>
       {
         $"Route length {m.Length:F1} m", $"Elevation gain {m.Gain:F1} m", $"Average slope {m.AverageSlope * 100:F1} %",
@@ -193,7 +204,8 @@ namespace Moyu.Components.Landscape
       else if (g.IsOver) _state = "Study complete";
       else if (g.State == SnakeState.Paused) _state = "Study paused";
       else _state = "Study running";
-      Message = s.Boss ? $"Route A · {m.Length:F0} m" : s.Stopped ? (g.IsOver ? $"Score {g.Score:N0}" : s.Field.Describe()) : g.IsOver ? $"Score {g.Score:N0}" : "Running";
+      // Stopped first: Stop leaves Boss set, and a stopped game must not keep the disguise's label.
+      Message = s.Stopped ? (g.IsOver ? $"Score {g.Score:N0}" : s.Field.Describe()) : s.Boss ? $"Route A · {dz.Metrics.Length:F0} m" : g.IsOver ? $"Score {g.Score:N0}" : "Running";
 
       if (_closing) return;
       Instances.RedrawCanvas();
@@ -219,7 +231,13 @@ namespace Moyu.Components.Landscape
       if (context == GH_DocumentContext.Close || context == GH_DocumentContext.Unloaded)
       {
         _closing = true;
-        if (IsRunning) GameSession.Current.Stop();
+        if (IsRunning)
+        {
+          GameSession.Current.Stop();
+          // Another tab took the canvas, so the stop refreshed nothing. Expire now (the document is disabled, so
+          // nothing solves); the solution Grasshopper runs when the tab comes back recomputes the outputs.
+          if (context == GH_DocumentContext.Unloaded) ExpireSolution(false);
+        }
       }
       else if (context == GH_DocumentContext.Open || context == GH_DocumentContext.Loaded) _closing = false;
       base.DocumentContextChanged(document, context);

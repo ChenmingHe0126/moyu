@@ -46,6 +46,14 @@ namespace Moyu.Games.Stack
 
     public StackConduit(StackSession session) : base(session) => _s = session;
 
+    public override void Release()
+    {
+      _locked?.Dispose();
+      _plinth?.Dispose();
+      _locked = _plinth = null;
+      base.Release();
+    }
+
     // ---------------------------------------------------------------- palette
 
     double Blend => Math.Min(1, (_s.Time - _blendStart) / BlendSeconds);
@@ -151,8 +159,12 @@ namespace Moyu.Games.Stack
     /// <summary>The well stands on a plinth like a model on its base; only the two far walls show their grid.</summary>
     void DrawWell(DisplayPipeline d, Well w, Point3d eye, Palette p, Color plinth)
     {
+      // Rebuilt on every frame of a chapter blend so its colour fades; the old mesh is freed now, not by the finalizer.
       if (_plinth == null || Blend < 1 || _lockedKey.palette.Shadow != p.Shadow)
+      {
+        _plinth?.Dispose();
         _plinth = Toon.Cube(-0.45, -0.45, -0.6, w.Nx + 0.45, w.Ny + 0.45, 0, plinth, p.Shadow);
+      }
       d.DrawMeshFalseColors(_plinth);
       var floor = new List<Line>();
       for (int i = 0; i <= w.Nx; i++) floor.Add(new Line(i, 0, 0.003, i, w.Ny, 0.003));
@@ -189,6 +201,8 @@ namespace Moyu.Games.Stack
         _lockedKey.palette.Shadow == p.Shadow) return;
       _lockedKey = (g, g.Well.Version, clearing, p);
       var skip = new HashSet<int>(g.ClearingLayers);
+      // Once per lock and every blend frame: free the old stack mesh rather than leave it to the finalizer.
+      _locked?.Dispose();
       _locked = new Mesh();
       var edges = new List<Line>();
       foreach (var (c, _) in g.Well.Cells())
@@ -433,7 +447,11 @@ namespace Moyu.Games.Stack
           var left = TimeSpan.FromSeconds(Math.Ceiling(g.TimeLeft));
           third = ("TIME", $"{(int)left.TotalMinutes}:{left.Seconds:00}", g.TimeLeft < 15 ? p.Accent : (Color?)null);
           break;
-        case StackMode.Zen: third = ("PIECES", g.PiecesPlaced.ToString(), null); break;
+        case StackMode.Zen:
+          // PIECES is already the second figure: show the time played instead (like Blitz's clock).
+          var played = TimeSpan.FromSeconds(Math.Floor(g.Elapsed));
+          third = ("TIME", $"{(int)played.TotalMinutes}:{played.Seconds:00}", null);
+          break;
         default: third = ("BEST", Math.Max(_s.Best, g.Score).ToString("N0"), null); break;
       }
       ScoreBlock(d, "VoxStack", g.Score, ("LAYERS", g.Layers.ToString(), null), ("PIECES", g.PiecesPlaced.ToString(), null), third);

@@ -44,6 +44,11 @@ namespace Moyu.Components.ThreeD
         AddRuntimeMessage(GH_RuntimeMessageLevel.Error, $"Expected a point, curve, surface or mesh, got {geometry?.TypeName}.");
         return;
       }
+      if (anchor.Point.HasValue && !anchor.Point.Value.IsValid)
+      {
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "The point is not valid (unset, NaN or infinite).");
+        return;
+      }
       if (!fixX && !fixY && !fixZ) AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "No direction is fixed; this support does nothing.");
 
       Message = fixX && fixY && fixZ ? "Fixed" : $"Fix {(fixX ? "X" : "")}{(fixY ? "Y" : "")}{(fixZ ? "Z" : "")}";

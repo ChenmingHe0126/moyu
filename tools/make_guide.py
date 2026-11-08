@@ -66,12 +66,13 @@ SHOTS = {
     "swift_boss": ("swift_boss.jpg", None, 1100),
     "vox_proto": ("stack_mock_game.jpg", None, 800), "snake_proto": ("snake_mock_game.jpg", None, 800),
     "snake_pause": ("serpentine_pause.jpg", None, 800), "snake_count": ("serpentine_countdown.jpg", None, 800),
+    "examples_component": ("examples_component.png", None, 600),
 }
 
 # Icon sheets that have no high-resolution cells in docs/images (columns, rows); the other sets do.
 SHEETS = {"2d": ("moyu-icons-blue-violet-source.png", 4, 2), "3d": ("moyu-icons-3d-blue-violet-source.png", 4, 2),
           "massing": ("moyu-icons-massing-source.png", 2, 2)}
-HD = {"landscape": "landscape-icons-hd", "facade": "facade-icons-hd", "section": "section-icons-hd"}
+HD = {"landscape": "landscape-icons-hd", "facade": "facade-icons-hd", "section": "section-icons-hd", "examples": "examples-icons-hd"}
 
 INK, BLUE, IRIS, ICE, CORAL, MUTED, LINE = "#263867", "#477DDA", "#8067C7", "#EFF4FF", "#E8735F", "#687085", "#D9DEE8"
 FONT = "Segoe UI, Microsoft YaHei UI, Microsoft YaHei, sans-serif"
@@ -192,8 +193,10 @@ def wiring(lang, dim):
 
 def ribbon(lang):
     groups = [("2D", SETS["2d"][1:], 4), ("3D", SETS["3d"], 4), ("Massing", SETS["massing"], 2),
-              ("Landscape", SETS["landscape"], 1), ("Facade", SETS["facade"], 1), ("Section", SETS["section"], 1)]
-    cell, pad, minw = 42, 14, 70
+              ("Landscape", SETS["landscape"], 1), ("Facade", SETS["facade"], 1), ("Section", SETS["section"], 1),
+              ("Examples", SETS["examples"], 1)]
+    # Seven panels must fit the 760-wide strip.
+    cell, pad, minw = 38, 14, 62
     out = ['<svg viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">',
            '<rect x="0.5" y="0.5" width="759" height="159" rx="9" fill="#F4F5F8" stroke="#D3D8E2"/>']
     x = 12
@@ -211,7 +214,7 @@ def ribbon(lang):
         x0 = x + (w - cols * cell) / 2
         for i, ic in enumerate(icons):
             cx, cy = x0 + (i % cols) * cell, 42 + (i // cols) * cell + (2 - rows) * cell / 2
-            out.append(f'<image href="icons/{ic}.png" x="{cx + 3}" y="{cy}" width="36" height="36"/>')
+            out.append(f'<image href="icons/{ic}.png" x="{cx + 3}" y="{cy}" width="32" height="32"/>')
         out.append(text(x + w / 2, 146, name, 11.5, MUTED, 600, "middle"))
         x += w + pad
         out.append(f'<line x1="{x - pad / 2}" y1="42" x2="{x - pad / 2}" y2="150" stroke="#D3D8E2"/>')

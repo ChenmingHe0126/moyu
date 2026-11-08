@@ -7,30 +7,20 @@ namespace Moyu.Core
   public static class MarchingSquares
   {
     /// <summary>
-    /// Node values are the average of the four surrounding pixels (missing/outside pixels count as 0),
-    /// so a solid pixel edge sits exactly on the 0.5 contour. The field is padded with zeros,
-    /// which guarantees every contour is closed.
+    /// Contours of a pixel density field at <paramref name="level"/>, as closed polylines in grid units.
+    /// The field is sampled at pixel centres (outside pixels count as 0), as the 3D surface samples voxel centres:
+    /// a solid pixel edge sits exactly on the 0.5 contour, and a member one pixel thin keeps a band where averaging
+    /// the pixels onto the nodes would drop it. The zero padding guarantees every contour is closed.
     /// </summary>
-    public static double[] NodalField(Grid2D grid, double[] density, ElementKind[] kinds)
+    public static List<List<double[]>> ContourPixels(Grid2D grid, double[] density, ElementKind[] kinds, double level)
     {
-      int nx = grid.Nx, ny = grid.Ny;
-      var f = new double[(nx + 1) * (ny + 1)];
-      for (int j = 0; j <= ny; j++)
-        for (int i = 0; i <= nx; i++)
-        {
-          double s = 0.0;
-          for (int dj = -1; dj <= 0; dj++)
-            for (int di = -1; di <= 0; di++)
-            {
-              int ii = i + di, jj = j + dj;
-              if (ii < 0 || jj < 0 || ii >= nx || jj >= ny) continue;
-              int e = grid.Element(ii, jj);
-              if (kinds != null && kinds[e] == ElementKind.Outside) continue;
-              s += density[e];
-            }
-          f[j * (nx + 1) + i] = 0.25 * s;
-        }
-      return f;
+      var f = new double[grid.ElementCount];
+      for (int e = 0; e < f.Length; e++) f[e] = kinds != null && kinds[e] == ElementKind.Outside ? 0.0 : density[e];
+      // Pixel centres form an (Nx-1)·(Ny-1) lattice (e = j·Nx + i) half a pixel in from the grid corner.
+      var loops = Contour(grid.Nx - 1, grid.Ny - 1, f, level);
+      foreach (var loop in loops)
+        foreach (var q in loop) { q[0] += 0.5; q[1] += 0.5; }
+      return loops;
     }
 
     /// <summary>Contours of the nodal field (row-major, (nx+1)·(ny+1) values) at <paramref name="level"/>.</summary>

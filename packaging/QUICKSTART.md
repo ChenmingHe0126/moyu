@@ -3,6 +3,9 @@
 Rhino 8 for Windows. Open an example in Grasshopper, then follow its note at the top of the canvas.
 Windows 版 Rhino 8。在 Grasshopper 里打开一个示例，按画布顶部的说明操作。
 
+**Quickest way / 最快的办法:** drop the **Examples** component (Moyu › Examples, or search `example`) on the canvas and click a button; the example opens in a new tab as an unnamed copy.
+把 **Examples** 组件（Moyu › Examples，或在画布上搜 `example` / `示例`）拖到画布上，点一个按钮，示例就在新标签页里打开（未命名的副本）。
+
 ## Examples / 示例 (`examples/`)
 
 | File / 文件 | What / 内容 |

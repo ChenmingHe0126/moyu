@@ -31,9 +31,10 @@ namespace Moyu.Components.TwoD
       double e = 1.0, nu = 0.3;
       DA.GetData(0, ref e);
       DA.GetData(1, ref nu);
-      if (!(e > 0.0))
+      // An infinite E (e.g. a Panel holding 1e400) would reach the solver as NaN stiffness and read as "not stable".
+      if (!(e > 0.0) || double.IsInfinity(e))
       {
-        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Young's modulus must be positive.");
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Young's modulus must be a positive, finite number.");
         return;
       }
       if (!(nu > -1.0 && nu < 0.5))

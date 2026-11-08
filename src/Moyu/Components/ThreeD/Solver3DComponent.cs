@@ -33,7 +33,13 @@ namespace Moyu.Components.ThreeD
       var supports = Collect<Support3D>(DA, 2, "Supports", errors);
       var areas = Collect<Area3D>(DA, 3, "Areas", errors);
       IGH_Goo materialGoo = null;
-      var material = DA.GetData(4, ref materialGoo) && MoyuGoo<Material3D>.TryGet(materialGoo, out var m) ? m : Material3D.Default;
+      var material = Material3D.Default;
+      // The default stands in only for an empty input; anything else wired in must be a Material 3D.
+      if (DA.GetData(4, ref materialGoo) && materialGoo != null)
+      {
+        if (MoyuGoo<Material3D>.TryGet(materialGoo, out var m)) material = m;
+        else errors.Add(WrongInput("Material", materialGoo, nameof(Material3D)));
+      }
 
       foreach (var e in errors) AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e);
       if (errors.Count > 0) return null;

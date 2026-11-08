@@ -31,5 +31,20 @@ namespace Moyu.Games.Common.Core
 
     /// <summary>Forgets which keys are down, e.g. after the app lost focus and missed their release.</summary>
     public void Reset() => _down.Clear();
+
+    /// <summary>
+    /// The virtual key a plain key message names: left/right Shift, Ctrl and Alt (what the scan code of a key an
+    /// input method took maps to) become Shift, Ctrl and Alt; any other key is returned as it is.
+    /// </summary>
+    public static int Generic(int key)
+    {
+      switch (key)
+      {
+        case 0xA0: case 0xA1: return 0x10; // VK_LSHIFT, VK_RSHIFT → VK_SHIFT
+        case 0xA2: case 0xA3: return 0x11; // VK_LCONTROL, VK_RCONTROL → VK_CONTROL
+        case 0xA4: case 0xA5: return 0x12; // VK_LMENU, VK_RMENU → VK_MENU (Alt)
+        default: return key;
+      }
+    }
   }
 }

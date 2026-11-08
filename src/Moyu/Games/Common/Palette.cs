@@ -128,17 +128,20 @@ namespace Moyu.Games.Common
       {
         var ring = new Polyline(outline.Select(q => P(q, z)));
         ring.Add(ring[0]);
-        var cap = Mesh.CreateFromClosedPolyline(ring);
-        if (cap == null) continue;
-        var col = Shade(paint, shadow, nrm);
-        int off = m.Vertices.Count;
-        foreach (var v in cap.Vertices)
+        // Only copied from, and built every frame by Swift's feathers: free it now, not at a finalizer run.
+        using (var cap = Mesh.CreateFromClosedPolyline(ring))
         {
-          m.Vertices.Add(v);
-          m.Normals.Add(nrm);
-          m.VertexColors.Add(col);
+          if (cap == null) continue;
+          var col = Shade(paint, shadow, nrm);
+          int off = m.Vertices.Count;
+          foreach (var v in cap.Vertices)
+          {
+            m.Vertices.Add(v);
+            m.Normals.Add(nrm);
+            m.VertexColors.Add(col);
+          }
+          foreach (var f in cap.Faces) m.Faces.AddFace(f.A + off, f.B + off, f.C + off);
         }
-        foreach (var f in cap.Faces) m.Faces.AddFace(f.A + off, f.B + off, f.C + off);
       }
       double cx = outline.Average(q => q.X), cy = outline.Average(q => q.Y);
       for (int i = 0; i < n; i++)

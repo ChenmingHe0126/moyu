@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Grasshopper;
 using Grasshopper.Kernel;
@@ -30,7 +32,7 @@ namespace Moyu.RhinoTests
         var bmp = get.Invoke(null, new object[] { p.Type.Name }) as System.Drawing.Bitmap;
         Check(bmp != null && bmp.Width == 24 && bmp.Height == 24, $"{p.Desc.SubCategory} {p.Desc.Name}: {p.Type.Name}.png {(bmp == null ? "missing" : $"{bmp.Width}×{bmp.Height}")}");
       }
-      Check(proxies.Count == 23, $"{proxies.Count} components (7 × 2D, 7 × 3D, 3 × Massing, 2 × Landscape, 2 × Facade, 2 × Section)");
+      Check(proxies.Count == 24, $"{proxies.Count} components (7 × 2D, 7 × 3D, 3 × Massing, 2 × Landscape, 2 × Facade, 2 × Section, 1 × Examples)");
       Check(Instances.ComponentServer.GetCategoryIcon("Moyu") != null, "Moyu tab has its icon");
       Console.WriteLine(_failures == 0 ? "ALL PASSED" : $"{_failures} FAILURE(S)");
       return _failures == 0 ? 0 : 1;
@@ -50,6 +52,7 @@ namespace Moyu.RhinoTests
       var withIcon = proxies.Where(p => icons.Invoke(null, new object[] { p.Type.Name }) != null).Select(p => p.Desc.NickName).ToList();
       Console.WriteLine($"  info: embedded icons for {withIcon.Count} of {proxies.Count} components [{string.Join(", ", withIcon)}]");
 
+      Examples(gha);
       Cantilever();
       Bridge();
       Bracket();
@@ -57,6 +60,44 @@ namespace Moyu.RhinoTests
       Scenarios3D.Run(Check);
       Console.WriteLine(_failures == 0 ? "ALL PASSED" : $"{_failures} FAILURE(S)");
       return _failures == 0 ? 0 : 1;
+    }
+
+    /// <summary>
+    /// The Examples component's six definitions, embedded in the plugin: each reads back as an unnamed document holding
+    /// its main component, and matches packaging/examples (a stale build would open old examples).
+    /// </summary>
+    static void Examples(string gha)
+    {
+      Console.WriteLine("Examples component: the six embedded example definitions");
+      var proxy = Instances.ComponentServer.ObjectProxies.FirstOrDefault(p => p.Guid == new Guid("a106111d-3409-475f-99ce-8a0d65cdfc47"));
+      Check(proxy != null && proxy.Desc.Category == "Moyu" && proxy.Desc.SubCategory == "Examples", "Examples component in Moyu > Examples");
+      var asm = System.Reflection.Assembly.LoadFrom(gha);
+      var files = asm.GetType("Moyu.Components.Examples.ExampleFiles");
+      var all = ((Array)files.GetField("All").GetValue(null)).Cast<object>().ToList();
+      Check(all.Count == 6, $"{all.Count} examples");
+      var main = new Dictionary<string, Guid>
+      {
+        ["Topo2D"] = Solver, ["Topo3D"] = Solver3D, ["VoxStack"] = GhFileStack.Study,
+        ["Serpentine"] = GhFileSnake.Study, ["Rebound"] = GhFileBreakout.Study, ["Swift"] = GhFileSwift.Study,
+      };
+      // The repo's packaging/examples, found upwards from the plugin (a build folder or an unpacked package in dist/).
+      var dir = new DirectoryInfo(Path.GetDirectoryName(Path.GetFullPath(gha)));
+      while (dir != null && !Directory.Exists(Path.Combine(dir.FullName, "packaging", "examples"))) dir = dir.Parent;
+      string folder = dir == null ? "" : Path.Combine(dir.FullName, "packaging", "examples");
+      foreach (var example in all)
+      {
+        string file = (string)example.GetType().GetField("File").GetValue(example);
+        var doc = (GH_Document)files.GetMethod("Load").Invoke(null, new[] { example });
+        int count = doc.Objects.OfType<GH_Component>().Count(c => main.TryGetValue(file, out var id) && c.ComponentGuid == id);
+        Check(count > 0 && string.IsNullOrEmpty(doc.FilePath), $"{file}: opens unnamed, {doc.ObjectCount} objects, {count} main component(s)");
+        string onDisk = Path.Combine(folder, file + ".gh");
+        using (var stream = asm.GetManifestResourceStream($"Moyu.Examples.{file}.gh"))
+        using (var memory = new MemoryStream())
+        {
+          stream.CopyTo(memory);
+          Check(File.Exists(onDisk) && memory.ToArray().SequenceEqual(File.ReadAllBytes(onDisk)), $"{file}: embedded copy matches packaging/examples (rebuild after regenerating examples)");
+        }
+      }
     }
 
     /// <summary>Cantilever in World XY driven tick by tick like a Timer, then edited live.</summary>
@@ -95,8 +136,9 @@ namespace Moyu.RhinoTests
       Render.Result(vis, solver, "solver_iter020.png", contours: false);
 
       var sw = Stopwatch.StartNew();
-      Set(solver, 9, new GH_Integer(500));
+      Set(solver, 9, new GH_Integer(50));
       doc.NewSolution(false);
+      Converge(doc, solver);
       Check(Bool(solver, 4), $"converged at iteration {Int(solver, 1)}, {sw.ElapsedMilliseconds} ms ({solver.Message})");
       Check(Math.Abs(Num(solver, 3) - 0.4) < 0.002, $"volume {Num(solver, 3):F4}");
       var history = Nums(solver, 5);
@@ -124,8 +166,9 @@ namespace Moyu.RhinoTests
       Set(solver, 9, new GH_Integer(3));
       doc.NewSolution(false);
       Check(Int(solver, 1) == before + 3 && !Bool(solver, 4), $"moved load continues {before} → {Int(solver, 1)}");
-      Set(solver, 9, new GH_Integer(500));
+      Set(solver, 9, new GH_Integer(50));
       doc.NewSolution(false);
+      Converge(doc, solver);
       Check(Bool(solver, 4), $"re-converged at iteration {Int(solver, 1)}");
       Render.Result(vis, solver, "live_moved_load.png");
 
@@ -168,7 +211,7 @@ namespace Moyu.RhinoTests
       Wire(mat, 0, solver, 4);
       Set(solver, 5, new GH_Number(0.3));
       Set(solver, 7, new GH_Number(2.5));
-      Set(solver, 9, new GH_Integer(500));
+      Set(solver, 9, new GH_Integer(50));
       var vis = Add(doc, Visualize);
       Wire(solver, 0, vis, 0);
 
@@ -183,6 +226,7 @@ namespace Moyu.RhinoTests
       var sw = Stopwatch.StartNew();
       doc.NewSolution(false);
       PrintMessages(solver);
+      Converge(doc, solver);
       Check(Bool(solver, 4) && !HasMessage(solver, GH_RuntimeMessageLevel.Error), $"converged at iteration {Int(solver, 1)}, {sw.ElapsedMilliseconds} ms");
       Check(Math.Abs(Num(solver, 3) - 0.3) < 0.003, $"volume {Num(solver, 3):F4}");
 
@@ -225,7 +269,7 @@ namespace Moyu.RhinoTests
       Wire(load, 0, solver, 1);
       Wire(sup, 0, solver, 2);
       Set(solver, 5, new GH_Number(0.35));
-      Set(solver, 9, new GH_Integer(500));
+      Set(solver, 9, new GH_Integer(50));
       var vis = Add(doc, Visualize);
       Wire(solver, 0, vis, 0);
       doc.NewSolution(false);
@@ -239,6 +283,7 @@ namespace Moyu.RhinoTests
       dynamic r = Result(solver);
       int outside = ((Array)r.Kinds).Cast<object>().Count(k => k.ToString() == "Outside");
       Check(Math.Abs(outside - (2400 + 113)) < 40, $"L cut-out (2400 px) + hole (~113 px) are outside the domain ({outside})");
+      Converge(doc, solver);
       Check(Bool(solver, 4) && !HasMessage(solver, GH_RuntimeMessageLevel.Error), $"converged at iteration {Int(solver, 1)}, {sw.ElapsedMilliseconds} ms");
       Render.Result(vis, solver, "bracket_result.png");
     }
@@ -280,6 +325,15 @@ namespace Moyu.RhinoTests
       doc.NewSolution(false);
       PrintMessages(open);
       Check(HasMessage(open, GH_RuntimeMessageLevel.Error, "closed"), "an open boundary curve is rejected");
+    }
+
+    /// <summary>
+    /// Re-solves the way a Timer would until the solver converges: without a Timer one solution runs at most 50
+    /// iterations (Steps is clamped to 1–50).
+    /// </summary>
+    static void Converge(GH_Document doc, GH_Component solver)
+    {
+      for (int k = 0; k < 40 && !Bool(solver, 4) && !HasMessage(solver, GH_RuntimeMessageLevel.Error); k++) Tick(doc, solver);
     }
   }
 }

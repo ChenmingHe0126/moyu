@@ -40,7 +40,8 @@ namespace Moyu.RhinoTests
         "点 Facade Study 下面的 ▶ Run · Click ▶ Run under Facade Study.\n" +
         "← → / A D 或移动鼠标 控制挡板 · 空格 发球 · Paddle with arrows, A D or the mouse, Space serves\n" +
         "Esc 暂停 / 继续，Shift+Esc 退出 · Home 复位视角 · Esc pause / resume, Shift+Esc quit, Home reset view\n" +
-        "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key");
+        "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key\n" +
+        "右键游戏组件 › Language · 语言：Auto 跟随 Windows / 中文 / English · Right-click the study › Language: Auto (follows Windows), 中文 or English");
       QuickStart(b, 0, 0);
       Bonds(b, 0, 300);
       Custom(b, 0, 640);
@@ -74,7 +75,8 @@ namespace Moyu.RhinoTests
       var m = new List<IGH_DocumentObject>();
       var study = b.Moyu(Study, x, y + 20, m);
       Metrics(b, study, x + 260, y + 20, m);
-      b.Group("A · 快速开始：直接点 ▶ Run（六种砌法逐关轮换、经典模式、3 条命）", Color.FromArgb(70, 227, 111, 90), m);
+      b.Group("A · 快速开始：直接点 ▶ Run（六种砌法逐关轮换、经典模式、3 条命）",
+        "A · Quick start: just click ▶ Run (the six bonds take turns by level, Classic mode, 3 lives)", Color.FromArgb(70, 227, 111, 90), m);
     }
 
     /// <summary>B: one bond for every level. Brick Bond's own preview is off so the game draws over a clean viewport.</summary>
@@ -94,7 +96,8 @@ namespace Moyu.RhinoTests
       b.Wire(mode, study, 1);
       b.Wire(level, study, 2);
       Metrics(b, study, x + 740, y + 60, m);
-      b.Group("B · 换砌法：Type −1 轮换 · 0 顺砌 · 1 通缝 · 2 英式 · 3 荷兰式 · 4 花墙 · 5 拱。Mode 1 = 3 分钟闪电，2 = 禅（不掉命）", Color.FromArgb(70, 240, 138, 98), m);
+      b.Group("B · 换砌法：Type −1 轮换 · 0 顺砌 · 1 通缝 · 2 英式 · 3 荷兰式 · 4 花墙 · 5 拱。Mode 1 = 3 分钟闪电，2 = 禅（不掉命）",
+        "B · Pick a bond: Type −1 take turns · 0 stretcher · 1 stack · 2 English · 3 Flemish · 4 screen wall · 5 arch. Mode 1 = 3-minute Blitz, 2 = Zen (no lives lost)", Color.FromArgb(70, 240, 138, 98), m);
     }
 
     /// <summary>C: a custom wall drawn as closed curves (a little composition of panels and a band of small tiles).</summary>
@@ -121,7 +124,8 @@ namespace Moyu.RhinoTests
       var study = b.Moyu(Study, x + 480, y + 30, m);
       b.Wire(bond, 0, study, 0);
       Metrics(b, study, x + 740, y + 30, m);
-      b.Group("C · 自定义墙：Panels 里是一组闭合矩形（按大小分成玻璃 / 砖 / 混凝土），可以换成你在 Rhino 里画的立面分格", Color.FromArgb(70, 150, 170, 220), m);
+      b.Group("C · 自定义墙：Panels 里是一组闭合矩形（按大小分成玻璃 / 砖 / 混凝土），可以换成你在 Rhino 里画的立面分格",
+        "C · Custom wall: Panels holds closed rectangles (sorted by size into glass / brick / concrete); swap in a facade grid you drew in Rhino", Color.FromArgb(70, 150, 170, 220), m);
     }
 
     static List<GH_Component> Studies(GH_Document doc) => doc.Objects.OfType<GH_Component>().Where(c => c.ComponentGuid == Study).OrderBy(c => c.Attributes.Pivot.Y).ToList();

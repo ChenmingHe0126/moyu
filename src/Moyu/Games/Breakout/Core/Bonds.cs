@@ -151,12 +151,19 @@ namespace Moyu.Games.Breakout.Core
       return true;
     }
 
+    /// <summary>
+    /// Shared edge two neighbours need for a ball to pass from one's hole into the other's. Between steel the opening is
+    /// that edge plus a joint either side, so half a header (0.32 + 0.16 = 0.48) is exactly the ball's width: it gets
+    /// through only by luck, so such a brick counts as walled in.
+    /// </summary>
+    const double Passage = 2 * Clearance - 2 * Joint + 0.05;
+
     /// <summary>Neighbours across a joint sharing enough edge for a ball to reach one through the other's hole.</summary>
     static bool Touch(Brick a, Brick b)
     {
       double gap = Joint + 0.02;
       double ox = Math.Min(a.X1, b.X1) - Math.Max(a.X0, b.X0), oy = Math.Min(a.Y1, b.Y1) - Math.Max(a.Y0, b.Y0);
-      return (ox > 0.2 && oy > -gap && oy <= 1e-9) || (oy > 0.2 && ox > -gap && ox <= 1e-9);
+      return (ox > Passage && oy > -gap && oy <= 1e-9) || (oy > Passage && ox > -gap && ox <= 1e-9);
     }
 
     static IEnumerable<(double, double)> CourseUnits(BondType type, int c, double width)

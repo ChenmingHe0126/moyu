@@ -73,10 +73,9 @@ namespace Moyu.TwoD
     {
       var d = r.Domain;
       var g = d.Grid;
-      var nodal = MarchingSquares.NodalField(g, r.Density, r.Kinds);
       var curves = new List<Curve>();
       double tol = d.PixelSize * 1e-6;
-      foreach (var loop in MarchingSquares.Contour(g.Nx, g.Ny, nodal, threshold))
+      foreach (var loop in MarchingSquares.ContourPixels(g, r.Density, r.Kinds, threshold))
       {
         var pl = new Polyline(loop.Count);
         foreach (var q in loop) pl.Add(d.ToWorld(q[0], q[1]));

@@ -79,6 +79,11 @@ namespace Moyu.TwoD
           result.Warnings.Add("A load has an out-of-plane component; only its in-plane part is used.");
 
         var nodes = Snap(domain, active, load.Anchor);
+        if (nodes.Count == 0)
+        {
+          result.Warnings.Add("A load lies at NaN, infinite or overflowing coordinates and was ignored.");
+          continue;
+        }
         foreach (int n in nodes)
         {
           p.Force[2 * n] += fx / nodes.Count;
@@ -91,6 +96,11 @@ namespace Moyu.TwoD
       {
         if (!support.FixX && !support.FixY) continue;
         var nodes = Snap(domain, active, support.Anchor);
+        if (nodes.Count == 0)
+        {
+          result.Warnings.Add("A support lies at NaN, infinite or overflowing coordinates and was ignored.");
+          continue;
+        }
         foreach (int n in nodes)
         {
           if (support.FixX) p.Fixed[2 * n] = true;
@@ -126,10 +136,12 @@ namespace Moyu.TwoD
         var ts = c.DivideByCount(n, true) ?? new[] { c.Domain.Min, c.Domain.Max };
         foreach (var t in ts) set.Add(Nearest(domain, active, domain.ToGrid(c.PointAt(t))));
       }
+      // Nearest finds nothing (-1) for NaN, infinite or overflowing coordinates; such positions land nowhere.
+      set.Remove(-1);
       return set.ToList();
     }
 
-    /// <summary>Nearest active node to grid coordinates, growing a square search ring until no closer node can exist.</summary>
+    /// <summary>Nearest active node to grid coordinates, growing a square search ring until no closer node can exist; -1 if none.</summary>
     static int Nearest(PixelDomain2D domain, bool[] active, Point2d g)
     {
       var grid = domain.Grid;

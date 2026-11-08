@@ -41,10 +41,11 @@ namespace Moyu.Games.Swift
 
     readonly SwiftSession _s;
     readonly List<(double x, double w, double h, double z)> _skyline = new List<(double, double, double, double)>();
-    /// <summary>Static for a palette (slabs, skyline, far wall; the last two slide along X) and one wall mesh refilled each frame.</summary>
+    /// <summary>Static for a palette (slabs, skyline, far wall; the last two slide along X); the walls and the swift are refilled each frame.</summary>
     Mesh _slabs, _sky, _farWall;
-    readonly Mesh _walls = new Mesh();
-    Palette _slabsFor;
+    readonly Mesh _walls = new Mesh(), _swift = new Mesh();
+    /// <summary>The colours the static meshes were built with.</summary>
+    (Palette palette, Color wall, Color slab) _staticFor;
     SwiftGame _levelGame;
     int _band = -1, _fromBand, _levelSeen = 1;
     double _blendStart = double.NegativeInfinity, _levelAt = double.NegativeInfinity;
@@ -59,6 +60,17 @@ namespace Moyu.Games.Swift
         _skyline.Add((x, w, h, Skyline - rng.NextDouble() * 4));
         x += w + rng.NextDouble() * 1.5;
       }
+    }
+
+    public override void Release()
+    {
+      _slabs?.Dispose();
+      _sky?.Dispose();
+      _farWall?.Dispose();
+      _slabs = _sky = _farWall = null;
+      _walls.Dispose();
+      _swift.Dispose();
+      base.Release();
     }
 
     // ---------------------------------------------------------------- palette
@@ -112,12 +124,16 @@ namespace Moyu.Games.Swift
     void BuildStatic((Palette palette, Color wall, Color slab) ch)
     {
       var sh = ch.palette.Shadow;
+      // A chapter blend rebuilds these many times: free the old ones now, not at some later finalizer run.
+      _slabs?.Dispose();
+      _sky?.Dispose();
+      _farWall?.Dispose();
       _slabs = new Mesh();
       Box(_slabs, Left, -1.3, FarWall, Right, 0, Front, ch.slab, sh);
       Box(_slabs, Left, SwiftGame.Height, FarWall, Right, SwiftGame.Height + 0.55, Front, ch.slab, sh);
       _sky = BuildSkyline(ch.palette);
       _farWall = BuildFarWall(ch.wall, ch.palette);
-      _slabsFor = ch.palette;
+      _staticFor = ch;
     }
 
     /// <summary>The far skyline: one quiet tone between the horizon and the shadow; two periods, slid back by up to one.</summary>
@@ -183,7 +199,9 @@ namespace Moyu.Games.Swift
       var g = _s.Game;
       var ch = Current;
       var p = ch.palette;
-      if (_slabs == null || Blend < 1 || !_slabsFor.Near(p) || _slabsFor.Shadow != p.Shadow) BuildStatic(ch);
+      // Rebuilt when a colour baked into them changes: most frames of a chapter blend, then not until the next one. BuildStatic frees the old meshes.
+      var built = _staticFor;
+      if (_slabs == null || !built.palette.Near(p) || built.palette.Shadow != p.Shadow || built.wall != ch.wall || built.slab != ch.slab) BuildStatic(ch);
       Slid(d, _sky, g.Distance * Parallax % 64);
       Slid(d, _farWall, g.Distance % WindowPitch);
       d.DrawMeshFalseColors(_slabs);
@@ -253,17 +271,22 @@ namespace Moyu.Games.Swift
       var frame = new Plane(_s.At(x, f.Y + lift, 0.2), _s.Plane.XAxis, _s.Plane.YAxis);
       frame.Rotate(spin, frame.ZAxis);
       var pts = outline.Select(q => new Point2d(q.X * 1.0 * scale * _s.Size, q.Y * scale * _s.Size)).ToList();
-      var m = new Mesh();
-      Toon.AddPrism(m, frame, pts, -0.035 * _s.Size, 0.035 * _s.Size, FeatherPaint, p.Shadow);
-      d.DrawMeshFalseColors(m);
+      using (var m = new Mesh())
+      {
+        Toon.AddPrism(m, frame, pts, -0.035 * _s.Size, 0.035 * _s.Size, FeatherPaint, p.Shadow);
+        d.DrawMeshFalseColors(m);
+      }
       d.DrawLine(frame.PointAt(-0.55 * scale * _s.Size, 0, 0.05 * _s.Size), frame.PointAt(0.45 * scale * _s.Size, 0, 0.05 * _s.Size), Lerp(FeatherPaint, p.Shadow, 0.45), 1);
     }
+
+    /// <summary>Seconds since the crash. The game's clock stops when the round ends (at once on a floor landing), so the result screen's time carries it on.</summary>
+    double CrashAge(SwiftGame g) => g.Clock - g.CrashTime + (g.IsOver ? _s.OverTime : 0);
 
     /// <summary>A wisp of air behind the swift: small fading beads along its last few metres, dying away as it falls.</summary>
     void DrawTrail(DisplayPipeline d, SwiftGame g, Palette p)
     {
       if (g.State == SwiftState.Ready) return;
-      double fade = g.State == SwiftState.Flying || g.State == SwiftState.Paused ? 1 : 1 - (g.Clock - g.CrashTime) / SwiftGame.CrashSeconds;
+      double fade = g.State == SwiftState.Flying || g.State == SwiftState.Paused ? 1 : 1 - CrashAge(g) / SwiftGame.CrashSeconds;
       if (fade <= 0) return;
       var trail = g.Trail;
       int n = Math.Min(12, trail.Count);
@@ -318,7 +341,11 @@ namespace Moyu.Games.Swift
         double c = Math.Cos(tilt), sn = Math.Sin(tilt);
         return origin + _s.Plane.XAxis * ((x * c - y * sn) * s) + _s.Plane.YAxis * ((x * sn + y * c) * s) + _s.Plane.ZAxis * (z * s);
       }
-      var m = new Mesh();
+      var m = _swift;
+      m.Vertices.Clear();
+      m.Faces.Clear();
+      m.Normals.Clear();
+      m.VertexColors.Clear();
       void Tri(Point3d a, Point3d b, Point3d c, Color paint)
       {
         var n = Vector3d.CrossProduct(b - a, c - a);
@@ -407,8 +434,9 @@ namespace Moyu.Games.Swift
         var at = e.Viewport.WorldToClient(_s.AtCourse(f.X, f.Y + 0.8));
         Text(d, T("羽毛 +1", "Feather +1"), Fade(p.Accent, 1.2 - t), at.X, at.Y - 26 * k * t, (int)Math.Round(16 * k), TextFace, true);
       }
-      if ((g.State == SwiftState.Crashed || g.IsOver) && g.Clock - g.CrashTime < 0.3)
-        d.Draw2dRectangle(new Rectangle(0, 0, frame.Width, frame.Height), Color.Transparent, 0, Color.FromArgb((int)(55 * (1 - (g.Clock - g.CrashTime) / 0.3)), 255, 110, 90));
+      double crashAge = CrashAge(g);
+      if ((g.State == SwiftState.Crashed || g.IsOver) && crashAge < 0.3)
+        d.Draw2dRectangle(new Rectangle(0, 0, frame.Width, frame.Height), Color.Transparent, 0, Color.FromArgb((int)(55 * (1 - crashAge / 0.3)), 255, 110, 90));
 
       // Chapter card as each new level begins; a new round starts at level 1 without one.
       if (!ReferenceEquals(g, _levelGame))

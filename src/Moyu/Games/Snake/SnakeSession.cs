@@ -19,6 +19,7 @@ namespace Moyu.Games.Snake
   public sealed class SnakeSession : GameSession
   {
     const string ScoreFile = "serpentine";
+    static readonly Keys[] SprintKeys = { Keys.ShiftKey, Keys.Up, Keys.W };
 
     public SnakeGame Game { get; private set; }
     public readonly SnakeSettings Settings;
@@ -104,7 +105,13 @@ namespace Moyu.Games.Snake
       Best = Math.Max(Best, Game.Score);
     }
 
-    protected override void ClearInput() => Game.Boost = false;
+    protected override void ClearInput()
+    {
+      Game.Boost = false;
+      // A sprint key held into a pause counts again only when pressed again: a held Shift must not turn the Esc that
+      // resumes into Shift+Esc (quit), and a release missed while away must not leave the sprint on.
+      foreach (var k in SprintKeys) Held.Remove(k);
+    }
 
     // ---------------------------------------------------------------- where things are drawn
 
@@ -142,10 +149,11 @@ namespace Moyu.Games.Snake
 
     protected override void GameKey(Keys key, bool down, bool repeat)
     {
-      // Shift or ↑ sprint while held.
-      if (key == Keys.ShiftKey || key == Keys.Up || key == Keys.W)
+      // Shift, ↑ or W sprint while any of them is still held: letting go of one keeps the sprint if another is down
+      // (Held already has this press or release).
+      if (Array.IndexOf(SprintKeys, key) >= 0)
       {
-        Game.Boost = down;
+        Game.Boost = SprintKeys.Any(k => Held.Contains(k));
         return;
       }
       if (!down || repeat) return;

@@ -17,13 +17,11 @@ namespace Moyu.Components.Section
   /// The Swift game, presented as a section airflow study. Run (the button on the component) starts it in the active
   /// Rhino viewport; the outputs refresh when the game pauses, switches to boss mode, ends or stops.
   /// </summary>
-  public class AirflowStudyComponent : MoyuComponent, IRunnable
+  public class AirflowStudyComponent : GameComponent
   {
     FlightSpec _spec;
     Plane _plane;
     double _size;
-    /// <summary>The Language input's choice; null follows the system.</summary>
-    UiLanguage? _language;
     /// <summary>Set while the document closes or the component leaves it: the session's last change must not touch the canvas or schedule a solution.</summary>
     bool _closing;
 
@@ -31,6 +29,7 @@ namespace Moyu.Components.Section
     string _state = "Ready";
     int _score;
     long _best;
+    string _bestKey;
     Curve _path;
     List<Curve> _section = new List<Curve>();
     List<string> _metrics = new List<string>();
@@ -43,10 +42,6 @@ namespace Moyu.Components.Section
     }
 
     public override GH_Exposure Exposure => GH_Exposure.primary;
-
-    public override void CreateAttributes() => m_attributes = new RunButtonAttributes(this);
-
-    public bool IsRunning => GameSession.Current != null && ReferenceEquals(GameSession.Current.Owner, this);
 
     /// <summary>A section standing on the World XZ plane: X across, Z up.</summary>
     public static Plane DefaultPlane => new Plane(Point3d.Origin, Vector3d.XAxis, Vector3d.ZAxis);
@@ -63,7 +58,6 @@ namespace Moyu.Components.Section
       pManager.AddGenericParameter("Grid", "G", "Course settings from Storey Grid. Default: normal exposure, classic.", GH_ParamAccess.item);
       pManager.AddPlaneParameter("Plane", "P", "The section plane (X across, Y up). Default: World XZ at the origin.", GH_ParamAccess.item);
       pManager.AddNumberParameter("Size", "Sz", "Model units per course unit. Default: 0.75 m.", GH_ParamAccess.item);
-      AddLanguageInput(pManager);
       pManager[0].Optional = true;
       pManager[1].Optional = true;
       pManager[2].Optional = true;
@@ -92,20 +86,24 @@ namespace Moyu.Components.Section
       DA.GetData(0, ref specGoo);
       DA.GetData(1, ref plane);
       DA.GetData(2, ref size);
-      _language = LanguageInput.Read(this, DA, 3);
-      if (IsRunning) LanguageInput.Apply(GameSession.Current, _language);
 
       var errors = new List<string>();
       var spec = FlightSpec.Default;
       if (specGoo != null && !MoyuGoo<FlightSpec>.TryGet(specGoo, out spec)) errors.Add($"Grid input received {specGoo.TypeName}; connect Storey Grid.");
-      if (!(size > 0)) errors.Add("Size must be positive.");
+      if (!(size > 0) || double.IsInfinity(size)) errors.Add("Size must be a positive finite number.");
       if (!plane.IsValid) errors.Add("Plane is not valid.");
       foreach (var e in errors) AddRuntimeMessage(GH_RuntimeMessageLevel.Error, e);
       _spec = errors.Count == 0 ? spec : null;
       _plane = plane;
       _size = size;
 
-      if (!IsRunning && _state == "Ready" && _spec != null) _best = GameScores.Best(SwiftSession.ScoreFile, SwiftSession.ScoreKeyFor(_spec.Settings));
+      // Best follows the inputs (also after a finished flight); a stopped flight's score counts only while the inputs still match it.
+      if (!IsRunning && _spec != null)
+      {
+        string key = SwiftSession.ScoreKeyFor(_spec.Settings);
+        _best = Math.Max(GameScores.Best(SwiftSession.ScoreFile, key), key == _bestKey ? _best : 0);
+        _bestKey = key;
+      }
       DA.SetData(0, _state);
       DA.SetData(1, _score);
       DA.SetData(2, (int)Math.Min(int.MaxValue, _best));
@@ -117,7 +115,7 @@ namespace Moyu.Components.Section
     }
 
     /// <summary>Starts a flight, or stops the one this component is running.</summary>
-    public void Run()
+    public override void Run()
     {
       if (IsRunning)
       {
@@ -131,7 +129,6 @@ namespace Moyu.Components.Section
       }
       var session = SwiftSession.Start(_spec.Settings.Copy(), _spec.Seed, _plane, _size, this, OnSessionChanged, out string error);
       if (session == null) RhinoApp.WriteLine($"Airflow Study: {error}");
-      else LanguageInput.Apply(session, _language);
     }
 
     void OnSessionChanged(GameSession session)
@@ -140,6 +137,7 @@ namespace Moyu.Components.Section
       var g = s.Game;
       _score = g.Score;
       _best = Math.Max(s.Best, g.Score);
+      _bestKey = s.ScoreKey;
       var trail = g.Trail.Skip(Math.Max(0, g.Trail.Count - 200)).Select(q => s.AtCourse(q.X, q.Y)).ToList();
       _path = trail.Count >= 2 ? new PolylineCurve(trail) : null;
       var dz = s.Boss && s.Disguise != null ? s.Disguise : s.CurrentDisguise();
@@ -155,7 +153,8 @@ namespace Moyu.Components.Section
       else if (g.IsOver) _state = "Study complete";
       else if (g.State == SwiftState.Paused) _state = "Study paused";
       else _state = "Study running";
-      Message = s.Boss ? $"Section A-A · {m.CrossAch:F1} ach" : s.Stopped || g.IsOver ? (g.Score > 0 ? $"Score {g.Score}" : "Ready") : "Running";
+      // Not while stopped: Stop leaves Boss set, and a stopped flight must not keep the disguise's label.
+      Message = s.Boss && !s.Stopped ? $"Section A-A · {m.CrossAch:F1} ach" : s.Stopped || g.IsOver ? (g.Score > 0 ? $"Score {g.Score}" : "Ready") : "Running";
 
       if (_closing) return;
       Instances.RedrawCanvas();
@@ -181,7 +180,13 @@ namespace Moyu.Components.Section
       if (context == GH_DocumentContext.Close || context == GH_DocumentContext.Unloaded)
       {
         _closing = true;
-        if (IsRunning) GameSession.Current.Stop();
+        if (IsRunning)
+        {
+          GameSession.Current.Stop();
+          // Another tab took the canvas, so the stop refreshed nothing. Expire now (the document is disabled, so
+          // nothing solves); the solution Grasshopper runs when the tab comes back recomputes the outputs.
+          if (context == GH_DocumentContext.Unloaded) ExpireSolution(false);
+        }
       }
       else if (context == GH_DocumentContext.Open || context == GH_DocumentContext.Loaded) _closing = false;
       base.DocumentContextChanged(document, context);

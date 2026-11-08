@@ -132,7 +132,7 @@ Volume Fraction、Penalty、Filter Radius 收到 NaN 或无穷大时按默认值
 
 - 输出 **Mesh**（顶点着色）、**Contour**（阈值处的闭合多段线，可直接 Boundary Surfaces / Offset / Extrude）、**Density**（逐像素数值，从左下角逐行）。
 - 输入 Threshold（0.5）、Solid / Void Colour、Conditions（是否画荷载与支座）。
-- 轮廓用 Marching Squares 在节点平均密度上取等值线；0.5 时正好沿实心像素块的边。
+- 轮廓用 Marching Squares 在像素中心的密度上取等值线（边界外的像素按 0 计，四周补零保证闭合）；0.5 时正好沿实心和空心像素之间的边，一像素宽的细杆也保留轮廓（2026-11-08 起，以前在节点平均密度上取，会抹掉细杆）。Smooth 显示仍用节点平均。
 
 ## 9. 验证
 
