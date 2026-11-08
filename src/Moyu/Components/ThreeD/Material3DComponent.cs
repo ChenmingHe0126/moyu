@@ -9,7 +9,7 @@ namespace Moyu.Components.ThreeD
     public Material3DComponent()
       : base("Material 3D", "Mat",
         "Isotropic linear-elastic material. E only scales compliance; ν changes the layout slightly.",
-        "3D")
+        Panels.ThreeD)
     {
     }
 

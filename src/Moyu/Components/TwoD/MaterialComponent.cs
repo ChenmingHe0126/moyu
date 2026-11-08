@@ -9,7 +9,7 @@ namespace Moyu.Components.TwoD
     public MaterialComponent()
       : base("Material 2D", "Mat",
         "Isotropic linear-elastic material (plane stress). E only scales compliance; ν changes the layout slightly.",
-        "2D")
+        Panels.TwoD)
     {
     }
 

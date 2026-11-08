@@ -11,7 +11,7 @@ namespace Moyu.Components.ThreeD
     public Area3DComponent()
       : base("Area 3D", "Area",
         "Non-design region inside the boundary: always solid (e.g. a slab) or always empty (e.g. a passage). Later areas override earlier ones.",
-        "3D")
+        Panels.ThreeD)
     {
     }
 

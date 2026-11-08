@@ -13,7 +13,7 @@ namespace Moyu.Components.Massing
     public UnitLibraryComponent()
       : base("Unit Library", "Lib",
         "The units Massing Study deals: a built-in set (Easy, Standard, Hard) plus any custom Voxel Units.",
-        "Massing")
+        Panels.Massing)
     {
     }
 

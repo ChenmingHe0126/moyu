@@ -41,7 +41,7 @@ namespace Moyu.Components.Facade
     public FacadeStudyComponent()
       : base("Facade Study", "Facade",
         "Studies the panel and window layout of a brick facade and reports window-to-wall ratio and envelope figures. Press Run on the component to start.",
-        "Facade")
+        Panels.Facade)
     {
     }
 

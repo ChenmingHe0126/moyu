@@ -27,7 +27,7 @@ namespace Moyu.Components.ThreeD
     public Visualize3DComponent()
       : base("Visualize 3D", "Vis",
         "Shows a 3D optimisation result as voxels or a smooth surface, with the loads and supports that were applied.",
-        "3D")
+        Panels.ThreeD)
     {
     }
 

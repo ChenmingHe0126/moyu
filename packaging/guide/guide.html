@@ -107,15 +107,15 @@
   </div>
 
   <h2 class="mt"><zh>Moyu 页签上的七个面板</zh><en>Seven panels on the Moyu tab</en></h2>
-  <p class="lead"><zh>重启后，Grasshopper 工具栏上多出一个 Moyu 页签。四个游戏面板故意起了建筑研究的名字，图标也画成研究工具。最后的 Examples 面板只有一个组件，用来打开示例（第 4 页）。</zh><en>After the restart Grasshopper shows a Moyu tab. The four game panels are named and drawn like architecture study tools on purpose. The last panel, Examples, holds one component that opens the examples (page 4).</en></p>
+  <p class="lead"><zh>重启后，Grasshopper 工具栏上多出一个 Moyu 页签。四个游戏面板故意起了建筑研究的名字，图标也画成研究工具。面板按编号排：最前面的 0 | Examples 只有一个组件，用来打开示例（第 4 页），其余按开发顺序。</zh><en>After the restart Grasshopper shows a Moyu tab. The four game panels are named and drawn like architecture study tools on purpose. The panels are numbered: the first, 0 | Examples, holds one component that opens the examples (page 4); the rest follow the order they were built.</en></p>
   @@RIBBON@@
   <div class="pcards mt">
-    <div><img class="fit" src="img/bridge.jpg" alt=""><b>2D</b><span><zh>平面像素拓扑优化：边界、荷载、支座、区域、材料 → 求解器 → 显示（第 5 页）。</zh><en>Pixel topology optimisation in a plane: boundary, loads, supports, areas, material → solver → display (page 5).</en></span></div>
-    <div><img class="fit" src="img/c3d_voxels.jpg" alt=""><b>3D</b><span><zh>封闭实体的体素拓扑优化，条件可以加在点、线、面上（第 6 页）。</zh><en>Voxel topology optimisation of a closed solid, with conditions on points, curves or faces (page 6).</en></span></div>
-    <div><img src="img/vox_boss.jpg" alt=""><b>Massing</b><span><zh>VoxStack 叠楼：三维落块。图是它的老板画面，一张体块研究（第 8 页）。</zh><en>VoxStack: 3D falling blocks. Shown: its boss screen, a massing study (page 8).</en></span></div>
-    <div><img src="img/snake_boss.jpg" alt=""><b>Landscape</b><span><zh>Serpentine 蜿蜒：曲面上的贪吃蛇。图是它的老板画面，一张景观平面（第 9 页）。</zh><en>Serpentine: a snake on any surface. Shown: its boss screen, a landscape plan (page 9).</en></span></div>
-    <div><img src="img/rebound_boss.jpg" alt=""><b>Facade</b><span><zh>Rebound 回弹：按真实砌法排的打砖块。图是它的老板画面，塔楼幕墙立面（第 10 页）。</zh><en>Rebound: brick breaker on real bonds. Shown: its boss screen, a curtain-wall elevation (page 10).</en></span></div>
-    <div><img src="img/swift_boss.jpg" alt=""><b>Section</b><span><zh>Swift 雨燕：剖面里单键飞行。图是它的老板画面，采光通风剖面（第 11 页）。</zh><en>Swift: one-key flight through a section. Shown: its boss screen, a daylight and ventilation section (page 11).</en></span></div>
+    <div><img class="fit" src="img/bridge.jpg" alt=""><b>1 | 2D</b><span><zh>平面像素拓扑优化：边界、荷载、支座、区域、材料 → 求解器 → 显示（第 5 页）。</zh><en>Pixel topology optimisation in a plane: boundary, loads, supports, areas, material → solver → display (page 5).</en></span></div>
+    <div><img class="fit" src="img/c3d_voxels.jpg" alt=""><b>2 | 3D</b><span><zh>封闭实体的体素拓扑优化，条件可以加在点、线、面上（第 6 页）。</zh><en>Voxel topology optimisation of a closed solid, with conditions on points, curves or faces (page 6).</en></span></div>
+    <div><img src="img/vox_boss.jpg" alt=""><b>3 | Massing</b><span><zh>VoxStack 叠楼：三维落块。图是它的老板画面，一张体块研究（第 8 页）。</zh><en>VoxStack: 3D falling blocks. Shown: its boss screen, a massing study (page 8).</en></span></div>
+    <div><img src="img/snake_boss.jpg" alt=""><b>4 | Landscape</b><span><zh>Serpentine 蜿蜒：曲面上的贪吃蛇。图是它的老板画面，一张景观平面（第 9 页）。</zh><en>Serpentine: a snake on any surface. Shown: its boss screen, a landscape plan (page 9).</en></span></div>
+    <div><img src="img/rebound_boss.jpg" alt=""><b>5 | Facade</b><span><zh>Rebound 回弹：按真实砌法排的打砖块。图是它的老板画面，塔楼幕墙立面（第 10 页）。</zh><en>Rebound: brick breaker on real bonds. Shown: its boss screen, a curtain-wall elevation (page 10).</en></span></div>
+    <div><img src="img/swift_boss.jpg" alt=""><b>6 | Section</b><span><zh>Swift 雨燕：剖面里单键飞行。图是它的老板画面，采光通风剖面（第 11 页）。</zh><en>Swift: one-key flight through a section. Shown: its boss screen, a daylight and ventilation section (page 11).</en></span></div>
   </div>
   <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>3</span></footer>
 </section>
@@ -126,7 +126,7 @@
   <h2><zh>从示例开始</zh><en>Start from an example</en></h2>
   <div class="g23" style="grid-template-columns: 1fr 46mm">
     <div>
-    <p class="lead"><zh>Moyu 带 6 个现成的示例。最快的打开办法：把 <b>Moyu › Examples</b> 面板里的 <b>Examples</b> 组件拖到画布上（或在画布上双击搜“示例”），点上面的按钮，示例就在新标签页里打开；那是一份未命名的副本，保存时会问存到哪里。画布顶部有几行中英文说明。</zh><en>Moyu comes with six ready-made examples. The quickest way in: drop the <b>Examples</b> component (<b>Moyu › Examples</b>, or search “example” on the canvas) and click a button; the example opens in a new tab as an unnamed copy, so saving asks where to keep it. The lines at the top of the canvas say what to do.</en></p>
+    <p class="lead"><zh>Moyu 带 6 个现成的示例。最快的打开办法：把最前面 <b>Moyu › 0 | Examples</b> 面板里的 <b>Examples</b> 组件拖到画布上（或在画布上双击搜“示例”），点上面的按钮，示例就在新标签页里打开；那是一份未命名的副本，保存时会问存到哪里。画布顶部有几行中英文说明。</zh><en>Moyu comes with six ready-made examples. The quickest way in: drop the <b>Examples</b> component (the first panel, <b>Moyu › 0 | Examples</b>, or search “example” on the canvas) and click a button; the example opens in a new tab as an unnamed copy, so saving asks where to keep it. The lines at the top of the canvas say what to do.</en></p>
     <div class="note"><zh><b>文件本身在哪（也可以 File › Open 或拖进画布）：</b>包管理器装的在 <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>；food4rhino 压缩包里的在 <code>examples\</code>。</zh><en><b>Where the files are (File › Open or drag them in also works):</b> after a Package Manager install, in <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>; in the food4rhino archive, in <code>examples\</code>.</en></div>
     </div>
     <figure><img src="img/examples_component.jpg" alt=""><figcaption><zh>Examples 组件：每个按钮打开一个示例。</zh><en>The Examples component: each button opens one example.</en></figcaption></figure>

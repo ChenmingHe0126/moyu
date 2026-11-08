@@ -9,6 +9,16 @@ using Rhino.Geometry;
 namespace Moyu.Components
 {
   /// <summary>
+  /// The Moyu tab's panels. Grasshopper sorts panels by name, so each starts with its number: the Examples launcher
+  /// first, then the parts in the order they were built (topology 2D and 3D, then VoxStack, Serpentine, Rebound, Swift).
+  /// </summary>
+  public static class Panels
+  {
+    public const string Examples = "0 | Examples", TwoD = "1 | 2D", ThreeD = "2 | 3D", Massing = "3 | Massing",
+      Landscape = "4 | Landscape", Facade = "5 | Facade", Section = "6 | Section";
+  }
+
+  /// <summary>
   /// Base for all Moyu components. Output data implementing <see cref="IMoyuPreview"/> is drawn in the viewport,
   /// so condition components show their loads, supports and regions without extra wiring.
   /// </summary>

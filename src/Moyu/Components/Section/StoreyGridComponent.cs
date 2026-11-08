@@ -13,7 +13,7 @@ namespace Moyu.Components.Section
     public StoreyGridComponent()
       : base("Storey Grid", "Grid",
         "Sets out the section grid for Airflow Study: wind exposure class, opening height and bay width factors, and a fixed seed for a repeatable layout.",
-        "Section")
+        Panels.Section)
     {
     }
 

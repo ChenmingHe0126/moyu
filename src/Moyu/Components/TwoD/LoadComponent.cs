@@ -11,7 +11,7 @@ namespace Moyu.Components.TwoD
     public LoadComponent()
       : base("Load 2D", "Load",
         "Force on the design domain. A point loads the nearest node; a curve spreads the force evenly over the nodes it passes.",
-        "2D")
+        Panels.TwoD)
     {
     }
 

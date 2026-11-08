@@ -14,7 +14,7 @@ namespace Moyu.Components.Landscape
     public SiteSurfaceComponent()
       : base("Site Surface", "Site",
         "Generates a site surface to study: 0 rolling terrain, 1 torus, 2 tube, 3 saddle roof, 4 sphere.",
-        "Landscape")
+        Panels.Landscape)
     {
     }
 

@@ -14,7 +14,7 @@ namespace Moyu.Components.Facade
     public BrickBondComponent()
       : base("Brick Bond", "Bond",
         "Lays out a brick facade: stretcher, stack, English or Flemish bond, a perforated screen or an arched opening; or panels from closed curves.",
-        "Facade")
+        Panels.Facade)
     {
     }
 

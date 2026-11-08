@@ -11,7 +11,7 @@ namespace Moyu.Components.TwoD
     public AreaComponent()
       : base("Area 2D", "Area",
         "Non-design region inside the boundary: always solid (e.g. a slab) or always void (e.g. an opening). Later areas override earlier ones.",
-        "2D")
+        Panels.TwoD)
     {
     }
 

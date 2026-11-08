@@ -29,7 +29,7 @@ namespace Moyu.Components.TwoD
     public VisualizeComponent()
       : base("Visualize 2D", "Vis",
         "Shows a 2D optimisation result: density pixels, iso-contours and the loads and supports that were applied.",
-        "2D")
+        Panels.TwoD)
     {
     }
 

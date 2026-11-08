@@ -192,9 +192,10 @@ def wiring(lang, dim):
 
 
 def ribbon(lang):
-    groups = [("2D", SETS["2d"][1:], 4), ("3D", SETS["3d"], 4), ("Massing", SETS["massing"], 2),
-              ("Landscape", SETS["landscape"], 1), ("Facade", SETS["facade"], 1), ("Section", SETS["section"], 1),
-              ("Examples", SETS["examples"], 1)]
+    # The numbered panels in Grasshopper's (name) order: the Examples launcher first, then as they were built.
+    groups = [("0 | Examples", SETS["examples"], 1), ("1 | 2D", SETS["2d"][1:], 4), ("2 | 3D", SETS["3d"], 4),
+              ("3 | Massing", SETS["massing"], 2), ("4 | Landscape", SETS["landscape"], 1), ("5 | Facade", SETS["facade"], 1),
+              ("6 | Section", SETS["section"], 1)]
     # Seven panels must fit the 760-wide strip.
     cell, pad, minw = 38, 14, 62
     out = ['<svg viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">',

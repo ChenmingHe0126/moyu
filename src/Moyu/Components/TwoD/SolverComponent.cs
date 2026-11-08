@@ -13,7 +13,7 @@ namespace Moyu.Components.TwoD
       : base("SIMP Solver 2D", "Solver",
         "Minimum-compliance topology optimisation (SIMP + optimality criteria) on the pixel domain. " +
         "Drive it with a Timer (Params › Util › Trigger): every tick with Run = true performs Steps iterations.",
-        "2D")
+        Panels.TwoD)
     {
     }
 

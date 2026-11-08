@@ -33,6 +33,10 @@ namespace Moyu.RhinoTests
         Check(bmp != null && bmp.Width == 24 && bmp.Height == 24, $"{p.Desc.SubCategory} {p.Desc.Name}: {p.Type.Name}.png {(bmp == null ? "missing" : $"{bmp.Width}×{bmp.Height}")}");
       }
       Check(proxies.Count == 24, $"{proxies.Count} components (7 × 2D, 7 × 3D, 3 × Massing, 2 × Landscape, 2 × Facade, 2 × Section, 1 × Examples)");
+      // Grasshopper sorts panels by name: the numbers put Examples first, then the parts in the order they were built.
+      var panels = proxies.Select(p => p.Desc.SubCategory).Distinct().OrderBy(n => n, StringComparer.Ordinal).ToList();
+      var expected = new[] { "0 | Examples", "1 | 2D", "2 | 3D", "3 | Massing", "4 | Landscape", "5 | Facade", "6 | Section" };
+      Check(panels.SequenceEqual(expected), $"panels in ribbon order: {string.Join(", ", panels)}");
       Check(Instances.ComponentServer.GetCategoryIcon("Moyu") != null, "Moyu tab has its icon");
       Console.WriteLine(_failures == 0 ? "ALL PASSED" : $"{_failures} FAILURE(S)");
       return _failures == 0 ? 0 : 1;
@@ -46,8 +50,8 @@ namespace Moyu.RhinoTests
       var proxies = Instances.ComponentServer.ObjectProxies.Where(p => p.Desc.Category == "Moyu").ToList();
       foreach (var p in proxies.OrderBy(p => p.Exposure).ThenBy(p => p.Desc.Name))
         Console.WriteLine($"  ribbon: {p.Desc.Category} > {p.Desc.SubCategory} [{p.Exposure}] {p.Desc.Name} ({p.Desc.NickName})");
-      Check(proxies.Count(p => p.Desc.SubCategory == "2D") == 7 && proxies.Count(p => p.Desc.SubCategory == "3D") == 7,
-        "7 components each in Moyu > 2D and Moyu > 3D");
+      Check(proxies.Count(p => p.Desc.SubCategory == "1 | 2D") == 7 && proxies.Count(p => p.Desc.SubCategory == "2 | 3D") == 7,
+        "7 components each in Moyu > 1 | 2D and Moyu > 2 | 3D");
       var icons = System.Reflection.Assembly.LoadFrom(gha).GetType("Moyu.Components.Icons").GetMethod("Get");
       var withIcon = proxies.Where(p => icons.Invoke(null, new object[] { p.Type.Name }) != null).Select(p => p.Desc.NickName).ToList();
       Console.WriteLine($"  info: embedded icons for {withIcon.Count} of {proxies.Count} components [{string.Join(", ", withIcon)}]");
@@ -70,7 +74,7 @@ namespace Moyu.RhinoTests
     {
       Console.WriteLine("Examples component: the six embedded example definitions");
       var proxy = Instances.ComponentServer.ObjectProxies.FirstOrDefault(p => p.Guid == new Guid("a106111d-3409-475f-99ce-8a0d65cdfc47"));
-      Check(proxy != null && proxy.Desc.Category == "Moyu" && proxy.Desc.SubCategory == "Examples", "Examples component in Moyu > Examples");
+      Check(proxy != null && proxy.Desc.Category == "Moyu" && proxy.Desc.SubCategory == "0 | Examples", "Examples component in Moyu > 0 | Examples");
       var asm = System.Reflection.Assembly.LoadFrom(gha);
       var files = asm.GetType("Moyu.Components.Examples.ExampleFiles");
       var all = ((Array)files.GetField("All").GetValue(null)).Cast<object>().ToList();

@@ -23,7 +23,7 @@ namespace Moyu.Components.Massing
     public VoxelUnitComponent()
       : base("Voxel Unit", "Unit",
         "Turns sketched solids, points or a text pattern into a voxel unit for Massing Study. One face-connected piece, up to 10 voxels, at most 4 along any side.",
-        "Massing")
+        Panels.Massing)
     {
     }
 

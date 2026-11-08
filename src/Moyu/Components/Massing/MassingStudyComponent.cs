@@ -41,7 +41,7 @@ namespace Moyu.Components.Massing
     public MassingStudyComponent()
       : base("Massing Study", "Mass",
         "Stacks voxel units inside a site well and reports planning metrics. Press Run on the component to start.",
-        "Massing")
+        Panels.Massing)
     {
     }
 

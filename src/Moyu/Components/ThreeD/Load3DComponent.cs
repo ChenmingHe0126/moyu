@@ -11,7 +11,7 @@ namespace Moyu.Components.ThreeD
     public Load3DComponent()
       : base("Load 3D", "Load",
         "Force on the voxel domain. A point loads the nearest node; a curve or surface spreads the force evenly over the nodes it touches.",
-        "3D")
+        Panels.ThreeD)
     {
     }
 

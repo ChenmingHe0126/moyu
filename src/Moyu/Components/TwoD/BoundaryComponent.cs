@@ -11,7 +11,7 @@ namespace Moyu.Components.TwoD
     public BoundaryComponent()
       : base("Boundary 2D", "Bnd2D",
         "Design domain: closed planar curves rasterised into a square pixel grid. Nested curves become holes.",
-        "2D")
+        Panels.TwoD)
     {
     }
 

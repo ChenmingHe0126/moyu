@@ -13,7 +13,7 @@ namespace Moyu.Components.ThreeD
       : base("SIMP Solver 3D", "Solver",
         "Minimum-compliance topology optimisation (SIMP + optimality criteria) on the voxel domain, solved with multigrid CG. " +
         "Drive it with a Timer (Params › Util › Trigger): every tick with Run = true performs Steps iterations.",
-        "3D")
+        Panels.ThreeD)
     {
     }
 

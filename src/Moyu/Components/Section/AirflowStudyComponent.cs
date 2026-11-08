@@ -37,7 +37,7 @@ namespace Moyu.Components.Section
     public AirflowStudyComponent()
       : base("Airflow Study", "Airflow",
         "Simulates cross and stack ventilation and daylight through a building section, and reports air changes and daylight factors. Press Run on the component to start.",
-        "Section")
+        Panels.Section)
     {
     }
 

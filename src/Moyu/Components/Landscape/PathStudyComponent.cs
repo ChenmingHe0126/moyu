@@ -46,7 +46,7 @@ namespace Moyu.Components.Landscape
     public PathStudyComponent()
       : base("Path Study", "Path",
         "Traces a circulation route over a site surface and reports its length and slopes. Press Run on the component to start.",
-        "Landscape")
+        Panels.Landscape)
     {
     }
 

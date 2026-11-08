@@ -12,7 +12,7 @@ namespace Moyu.Components.ThreeD
     public Boundary3DComponent()
       : base("Boundary 3D", "Bnd3D",
         "Design domain: closed solids (breps or meshes) voxelised into a cube grid. A solid nested inside another becomes a hole.",
-        "3D")
+        Panels.ThreeD)
     {
     }
 

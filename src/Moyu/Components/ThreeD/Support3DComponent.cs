@@ -10,7 +10,7 @@ namespace Moyu.Components.ThreeD
     public Support3DComponent()
       : base("Support 3D", "Support",
         "Fixed displacement on the voxel domain. A point fixes the nearest node; a curve or surface fixes every node it touches.",
-        "3D")
+        Panels.ThreeD)
     {
     }
 

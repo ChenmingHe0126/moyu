@@ -20,7 +20,7 @@ namespace Moyu.Components.Examples
       : base("Examples", "Examples",
         "Opens a Moyu example in a new Grasshopper tab: click one of the buttons on the component. " +
         "点组件上的按钮，在新标签页里打开对应的示例。",
-        "Examples")
+        Panels.Examples)
     {
     }
 

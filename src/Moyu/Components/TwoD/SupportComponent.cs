@@ -10,7 +10,7 @@ namespace Moyu.Components.TwoD
     public SupportComponent()
       : base("Support 2D", "Support",
         "Fixed displacement on the design domain. A point fixes the nearest node; a curve fixes every node it passes.",
-        "2D")
+        Panels.TwoD)
     {
     }
 
