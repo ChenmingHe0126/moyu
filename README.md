@@ -214,7 +214,7 @@ Material 2D ─┘        └── Timer (Params › Util › Trigger) + Toggle
 2. **.yak 文件**：从 GitHub Releases 或 food4rhino 下载 `moyu-<版本>-rh8_0-win.yak`，拖进打开的 Rhino 窗口（或 `_PackageManager` → *Install from file*），重启 Rhino。
 3. **手动复制 .gha**：新建 `%APPDATA%\Grasshopper\Libraries\Moyu\`，把发布包里对应运行时的那一个 `Moyu.gha` 复制进去（Rhino 跑在 .NET Core 上用 `net7.0\Moyu.gha`，跑在 .NET Framework 上用 `net48\Moyu.gha`；`_SetDotNetRuntime` 能看到当前是哪种）。文件被 Windows 标成"已阻止"的话先右键 → 属性 → 解除锁定，再重启 Rhino。
 
-装好后组件在 Grasshopper 工具栏的 **Moyu** 页签下（七个面板按编号排：`0 | Examples`、`1 | 2D`、`2 | 3D`、`3 | Massing`、`4 | Landscape`、`5 | Facade`、`6 | Section`；示例启动器在最前面，其余按开发顺序。Grasshopper 按名字排面板，编号就是为了固定这个顺序）。**打开示例最快的办法**：把最前面 `0 | Examples` 面板里的 **Examples** 组件拖到画布上（或者在画布上双击搜 `example` / `示例`），点上面的按钮（2D 拓扑优化、3D 拓扑优化、叠楼、蜿蜒、回弹、雨燕），示例就在新标签页里打开；打开的是未命名的副本，保存时会问存到哪里，示例本身不会被改。示例文件编进了插件里，不管用哪种方式安装都能打开。卸载：`_PackageManager` → Installed → moyu → Uninstall，或删掉 `Libraries\Moyu` 文件夹；最高分在 `%APPDATA%\Moyu\`，可以一起删。发布包里也带一份 [packaging/INSTALL.md](packaging/INSTALL.md)（中英双语）。
+装好后组件在 Grasshopper 工具栏的 **Moyu** 页签下（七个面板按编号排：`0 | Examples`、`1 | Topo2D`、`2 | Topo3D`、`3 | Massing`、`4 | Landscape`、`5 | Facade`、`6 | Section`；示例启动器在最前面，其余按开发顺序。Grasshopper 按名字排面板，编号就是为了固定这个顺序）。**打开示例最快的办法**：把最前面 `0 | Examples` 面板里的 **Examples** 组件拖到画布上（或者在画布上双击搜 `example` / `示例`），点上面的按钮（2D 拓扑优化、3D 拓扑优化、叠楼、蜿蜒、回弹、雨燕），示例就在新标签页里打开；打开的是未命名的副本，保存时会问存到哪里，示例本身不会被改。示例文件编进了插件里，不管用哪种方式安装都能打开。卸载：`_PackageManager` → Installed → moyu → Uninstall，或删掉 `Libraries\Moyu` 文件夹；最高分在 `%APPDATA%\Moyu\`，可以一起删。发布包里也带一份 [packaging/INSTALL.md](packaging/INSTALL.md)（中英双语）。
 
 ## 构建与加载
 

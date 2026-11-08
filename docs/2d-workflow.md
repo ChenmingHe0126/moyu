@@ -4,7 +4,7 @@
 
 ## 一页结论
 
-- **已建成**：用 Rhino 官方 `dotnet new grasshopper` 模版（Rhino 8）建了插件 **Moyu**。Ribbon 页签 `Moyu › 2D` 下 7 个组件，分三行：
+- **已建成**：用 Rhino 官方 `dotnet new grasshopper` 模版（Rhino 8）建了插件 **Moyu**。Ribbon 页签 `Moyu › 1 | Topo2D`（原 2D）下 7 个组件，分三行：
   条件（Boundary / Load / Support / Area / Material）→ 求解（SIMP Solver，Timer 驱动）→ 显示（Visualize）。
 - **算法自写**：纯 C#，没有参考 TorchSharp 论文代码。Q4 平面应力有限元 + 带状 Cholesky 直接求解 + 密度过滤 + OC 更新（经典 SIMP）。
 - **实测**：在 Rhino 8.36 里（无界面）加载真实 Grasshopper，跑悬臂、XZ 立面桥、带孔 L 形支架、错误输入 4 个场景；核心算法测试 22 项 + 集成测试 35 项全部通过。均匀拉伸 patch test 与解析解误差 < 1e-9。

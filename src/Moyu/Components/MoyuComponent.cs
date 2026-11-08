@@ -11,10 +11,11 @@ namespace Moyu.Components
   /// <summary>
   /// The Moyu tab's panels. Grasshopper sorts panels by name, so each starts with its number: the Examples launcher
   /// first, then the parts in the order they were built (topology 2D and 3D, then VoxStack, Serpentine, Rebound, Swift).
+  /// A game panel keeps its study component and its helper in two columns, so the numbered name fits under them.
   /// </summary>
   public static class Panels
   {
-    public const string Examples = "0 | Examples", TwoD = "1 | 2D", ThreeD = "2 | 3D", Massing = "3 | Massing",
+    public const string Examples = "0 | Examples", TwoD = "1 | Topo2D", ThreeD = "2 | Topo3D", Massing = "3 | Massing",
       Landscape = "4 | Landscape", Facade = "5 | Facade", Section = "6 | Section";
   }
 

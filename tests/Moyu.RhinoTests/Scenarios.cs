@@ -35,7 +35,7 @@ namespace Moyu.RhinoTests
       Check(proxies.Count == 24, $"{proxies.Count} components (7 × 2D, 7 × 3D, 3 × Massing, 2 × Landscape, 2 × Facade, 2 × Section, 1 × Examples)");
       // Grasshopper sorts panels by name: the numbers put Examples first, then the parts in the order they were built.
       var panels = proxies.Select(p => p.Desc.SubCategory).Distinct().OrderBy(n => n, StringComparer.Ordinal).ToList();
-      var expected = new[] { "0 | Examples", "1 | 2D", "2 | 3D", "3 | Massing", "4 | Landscape", "5 | Facade", "6 | Section" };
+      var expected = new[] { "0 | Examples", "1 | Topo2D", "2 | Topo3D", "3 | Massing", "4 | Landscape", "5 | Facade", "6 | Section" };
       Check(panels.SequenceEqual(expected), $"panels in ribbon order: {string.Join(", ", panels)}");
       Check(Instances.ComponentServer.GetCategoryIcon("Moyu") != null, "Moyu tab has its icon");
       Console.WriteLine(_failures == 0 ? "ALL PASSED" : $"{_failures} FAILURE(S)");
@@ -50,8 +50,8 @@ namespace Moyu.RhinoTests
       var proxies = Instances.ComponentServer.ObjectProxies.Where(p => p.Desc.Category == "Moyu").ToList();
       foreach (var p in proxies.OrderBy(p => p.Exposure).ThenBy(p => p.Desc.Name))
         Console.WriteLine($"  ribbon: {p.Desc.Category} > {p.Desc.SubCategory} [{p.Exposure}] {p.Desc.Name} ({p.Desc.NickName})");
-      Check(proxies.Count(p => p.Desc.SubCategory == "1 | 2D") == 7 && proxies.Count(p => p.Desc.SubCategory == "2 | 3D") == 7,
-        "7 components each in Moyu > 1 | 2D and Moyu > 2 | 3D");
+      Check(proxies.Count(p => p.Desc.SubCategory == "1 | Topo2D") == 7 && proxies.Count(p => p.Desc.SubCategory == "2 | Topo3D") == 7,
+        "7 components each in Moyu > 1 | Topo2D and Moyu > 2 | Topo3D");
       var icons = System.Reflection.Assembly.LoadFrom(gha).GetType("Moyu.Components.Icons").GetMethod("Get");
       var withIcon = proxies.Where(p => icons.Invoke(null, new object[] { p.Type.Name }) != null).Select(p => p.Desc.NickName).ToList();
       Console.WriteLine($"  info: embedded icons for {withIcon.Count} of {proxies.Count} components [{string.Join(", ", withIcon)}]");

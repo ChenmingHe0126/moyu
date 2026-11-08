@@ -18,7 +18,7 @@ namespace Moyu.Components.Landscape
     {
     }
 
-    public override GH_Exposure Exposure => GH_Exposure.primary;
+    public override GH_Exposure Exposure => GH_Exposure.secondary;
     protected override bool NativePreview => true;
 
     protected override void RegisterInputParams(GH_InputParamManager pManager)

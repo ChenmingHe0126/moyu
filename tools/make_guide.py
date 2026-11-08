@@ -193,11 +193,11 @@ def wiring(lang, dim):
 
 def ribbon(lang):
     # The numbered panels in Grasshopper's (name) order: the Examples launcher first, then as they were built.
-    groups = [("0 | Examples", SETS["examples"], 1), ("1 | 2D", SETS["2d"][1:], 4), ("2 | 3D", SETS["3d"], 4),
-              ("3 | Massing", SETS["massing"], 2), ("4 | Landscape", SETS["landscape"], 1), ("5 | Facade", SETS["facade"], 1),
-              ("6 | Section", SETS["section"], 1)]
-    # Seven panels must fit the 760-wide strip.
-    cell, pad, minw = 38, 14, 62
+    groups = [("0 | Examples", SETS["examples"], 1), ("1 | Topo2D", SETS["2d"][1:], 4), ("2 | Topo3D", SETS["3d"], 4),
+              ("3 | Massing", SETS["massing"], 2), ("4 | Landscape", SETS["landscape"], 2), ("5 | Facade", SETS["facade"], 2),
+              ("6 | Section", SETS["section"], 2)]
+    # Seven panels (four of them two columns wide) must fit the 760-wide strip.
+    cell, pad, minw = 36, 12, 62
     out = ['<svg viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">',
            '<rect x="0.5" y="0.5" width="759" height="159" rx="9" fill="#F4F5F8" stroke="#D3D8E2"/>']
     x = 12
@@ -215,7 +215,7 @@ def ribbon(lang):
         x0 = x + (w - cols * cell) / 2
         for i, ic in enumerate(icons):
             cx, cy = x0 + (i % cols) * cell, 42 + (i // cols) * cell + (2 - rows) * cell / 2
-            out.append(f'<image href="icons/{ic}.png" x="{cx + 3}" y="{cy}" width="32" height="32"/>')
+            out.append(f'<image href="icons/{ic}.png" x="{cx + 3}" y="{cy}" width="30" height="30"/>')
         out.append(text(x + w / 2, 146, name, 11.5, MUTED, 600, "middle"))
         x += w + pad
         out.append(f'<line x1="{x - pad / 2}" y1="42" x2="{x - pad / 2}" y2="150" stroke="#D3D8E2"/>')
