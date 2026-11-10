@@ -1,0 +1,27 @@
+<Project>
+  <!-- Shared settings of the recorder libraries: each shot folder (rebound, voxstack, …) builds its own DLL from
+       common\*.cs plus its own *.cs, so several can be developed and loaded side by side. Never shipped. -->
+  <PropertyGroup>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <NoWarn>NU1701;NETSDK1086;NETSDK1138;CA1416;MSB3277</NoWarn>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OutputPath>bin\</OutputPath>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DebugType>embedded</DebugType>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\common\*.cs" />
+    <Compile Include="*.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Grasshopper" Version="8.0.23304.9001" ExcludeAssets="runtime" />
+    <!-- A copy of the installed Moyu.gha (%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\1.0.1\net7.0), for its types only. -->
+    <Reference Include="Moyu" HintPath="..\ref\Moyu.dll" Private="false" />
+  </ItemGroup>
+</Project>

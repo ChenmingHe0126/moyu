@@ -1,0 +1,276 @@
+<title>Moyu 竖屏短片分镜</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Space+Grotesk:wght@500;700&display=swap">
+<style>
+/* Layout: a phone-shaped player beside the summary, then the cut as a beat-timed strip, then one card per shot. */
+:root {
+  --bg: #F1F4F1; --panel: #FFFFFF; --ink: #1D2A30; --muted: #5E6C70; --line: #D5DDD8;
+  --coral: #E4664A; --teal: #2C8780; --sand: #E9C46A; --violet: #8E7CC3; --slate: #6F8A99; --sage: #9FB89E;
+  --display: "Space Grotesk", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --body: "Noto Sans SC", "Microsoft YaHei", "PingFang SC", sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141B1E; --panel: #1C2529; --ink: #E7EEEC; --muted: #9AAAAA; --line: #2E3A3F;
+  --coral: #F08068; --teal: #4FB3AA; --sand: #E2C06E; --violet: #A795DA; --slate: #8FA9B7; --sage: #8DAA8C; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141B1E; --panel: #1C2529; --ink: #E7EEEC; --muted: #9AAAAA; --line: #2E3A3F;
+  --coral: #F08068; --teal: #4FB3AA; --sand: #E2C06E; --violet: #A795DA; --slate: #8FA9B7; --sage: #8DAA8C; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.7 var(--body); }
+.wrap { max-width: 1120px; margin: 0 auto; padding-block: 40px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.15; letter-spacing: 0.5px; }
+h2 { font-size: 26px; margin-bottom: 6px; }
+h3 { font-size: 18px; }
+p { margin: 0; }
+.lede { color: var(--muted); max-width: 62ch; margin-top: 10px; }
+section { margin-top: 64px; }
+.sub { color: var(--muted); max-width: 70ch; margin-bottom: 22px; }
+.eyebrow { font: 600 12px/1 var(--display); letter-spacing: 2px; text-transform: uppercase; color: var(--teal); }
+
+.hero { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 40px; margin-top: 28px; align-items: start; }
+.phone { background: #0E1416; border-radius: 34px; padding: 10px; box-shadow: 0 24px 60px rgba(20, 30, 34, 0.25); }
+.phone video { display: block; width: 100%; aspect-ratio: 9 / 16; border-radius: 26px; background: #000; }
+.facts { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 22px; }
+.facts span { background: var(--panel); border: 1px solid var(--line); border-radius: 999px; padding: 4px 14px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.conclusion { display: grid; gap: 14px; padding: 0; margin: 0; list-style: none; }
+.conclusion li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 14px; }
+.conclusion b { font-family: var(--display); color: var(--teal); font-weight: 700; }
+
+.strip-scroll { overflow-x: auto; padding-bottom: 6px; }
+.strip { position: relative; min-width: 760px; }
+.bars { display: flex; height: 54px; border-radius: 10px; overflow: hidden; }
+.bars div { border-right: 2px solid var(--bg); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; line-height: 1.2; text-align: center; padding: 0 2px; }
+.bars div:last-child { border-right: 0; }
+.ticks { position: relative; height: 26px; font: 12px var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.ticks span { position: absolute; top: 6px; transform: translateX(-50%); }
+.ticks i { position: absolute; top: 0; width: 1px; height: 6px; background: var(--muted); }
+.legend { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px; font-size: 14px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; background: var(--c); }
+
+.pairs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+.pair { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 12px; }
+.pair .imgs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.pair img { width: 100%; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 8px; display: block; }
+.pair p { margin-top: 10px; font-size: 14px; display: flex; justify-content: space-between; gap: 8px; }
+.pair small { color: var(--muted); font-size: 12px; }
+
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; grid-template-columns: 132px minmax(0, 1fr); gap: 16px; }
+.card img { width: 132px; aspect-ratio: 9 / 16; object-fit: cover; border-radius: 10px; display: block; }
+.card .meta { display: flex; align-items: center; gap: 10px; font: 500 13px var(--display); color: var(--muted); font-variant-numeric: tabular-nums; }
+.tag { color: #fff; border-radius: 999px; padding: 1px 10px; font: 500 12px var(--body); background: var(--c); }
+.card h3 { margin: 6px 0 4px; }
+.cap { font-weight: 700; margin-bottom: 8px; }
+.card dl { margin: 0; display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 4px 8px; font-size: 14px; }
+.card dt { color: var(--muted); }
+.card dd { margin: 0; }
+
+.chart-box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px; overflow-x: auto; }
+.chart-box svg { display: block; min-width: 640px; width: 100%; height: auto; }
+.chart-box text { fill: var(--ink); font: 12px var(--body); }
+.chart-box .mut { fill: var(--muted); }
+.chart-box .grid { stroke: var(--line); }
+.notes { margin-top: 14px; display: grid; gap: 8px; font-size: 15px; }
+
+.flow { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 18px; overflow-x: auto; }
+.flow svg { display: block; min-width: 720px; width: 100%; height: auto; }
+.flow .box { fill: var(--bg); stroke: var(--line); }
+.flow .hl { fill: none; stroke: var(--teal); stroke-width: 2; }
+.flow text { fill: var(--ink); font: 13px var(--body); }
+.flow .t { font: 700 15px var(--display); }
+.flow .m { fill: var(--muted); font-size: 12px; }
+.flow .arrow { stroke: var(--muted); stroke-width: 1.6; fill: none; marker-end: url(#ah); }
+
+.decide { display: grid; gap: 12px; padding: 0; margin: 0; list-style: none; }
+.langs { display: flex; gap: 8px; justify-content: center; margin-top: 12px; }
+.langs button { font: 500 14px var(--body); padding: 6px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); cursor: pointer; }
+.langs button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.langs button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+.decide li { background: var(--panel); border: 1px solid var(--line); border-left: 4px solid var(--coral); border-radius: 12px; padding: 12px 16px; }
+.decide b { display: block; }
+.decide span { color: var(--muted); font-size: 15px; }
+
+@media (max-width: 860px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .phone { max-width: 300px; margin: 0 auto; }
+  .pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cards { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 440px) {
+  .card { grid-template-columns: 96px minmax(0, 1fr); }
+  .card img { width: 96px; }
+  .conclusion li { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Moyu 1.0.1 · 竖屏介绍短片 · 抖音 / 小红书</div>
+  <h1>一半拓扑优化，一半摸鱼：66 秒竖屏短片</h1>
+  <p class="lede">文案、分镜和成片。素材是在 Rhino 8 里重新逐帧录制的 1080×1920 满屏画面，不是裁出来的横屏录屏。</p>
+
+  <div class="hero">
+    <div><div class="phone"><video id="player" controls playsinline preload="metadata" src="moyu-intro.mp4"></video></div>
+      <div class="langs" role="group" aria-label="版本"><button type="button" id="v-zh" aria-pressed="true">中文版</button><button type="button" id="v-en" aria-pressed="false">English</button></div></div>
+    <div>
+      <div class="facts">
+        <span>66 秒 · 中英两版</span><span>1080 × 1920 · 60 fps</span><span>19 个镜头</span><span>94 BPM，每个切点都在拍上</span><span>配乐 −19.5 LUFS，开头 3 秒渐入</span>
+      </div>
+      <ul class="conclusion">
+        <li><b>结构</b><span>开场 3 秒就演招牌功能：打砖块多球混战，按老板键一帧变成幕墙立面。第 6 秒交代「一半拓扑优化，一半摸鱼」，然后三个游戏各走一遍「高光 → 一帧变图纸」，再「摸够了，干正事」转到 2D / 3D 拓扑优化，最后是 AI 开发、安装和片尾。</span></li>
+        <li><b>素材</b><span>写了一个在 Rhino 里运行的录制工具：接管游戏的时钟，每帧推进 1/60 秒并截图。机器人在玩，高光（多球、双层消除、连击 ×5、升级）按剪辑需要准时发生，老板键是游戏真实的一帧切换。拓扑优化每一帧都是真实的某一步迭代。</span></li>
+        <li><b>文案</b><span>三个方向各写一稿，由「短视频剪辑」和「建筑师观众」两个视角打分，取反转稿的主线、高光稿的开场。评审挑出的事实问题都改了：3-2-1 是真实 3 秒不加速，拓扑优化标出倍速，用时写明「1.0.0 版」。</span></li>
+        <li><b>第四版</b><span>换成更退后的配乐 Kevin MacLeod《Pamgaea》（你从三首试听里选的），响度降到 −19.5 LUFS，剪切点按它的 94 BPM 重新对拍；去掉说教味的句子，改成调侃的口吻（片尾改成「祝摸鱼愉快 / 老板路过？按 ` 就好」）；另做一版英文：字幕全部英文，游戏和实机画面用英文界面重录。</span></li>
+        <li><b>第三版</b><span>加了 8 秒实机画面：Rhino 和 Grasshopper 窗口原样出现，在 GH 里点 ▶ Run、视口里开玩、按老板键时视口、命令行和电池输出一起伪装。字幕整体上移到画面 67–78% 高度，避开抖音、小红书底部的标题和简介。</span></li>
+        <li><b>第二版</b><span>按你的意见放慢：总长从 47.5 秒放到 60 秒，每个镜头和字幕多停 1–2 拍；画面从浅色淡入，音乐用 3 秒渐入，整体响度从 −14 降到 −16 LUFS。</span></li>
+        <li><b>文件</b><span>成片 <code>docs/video/moyu-intro.mp4</code>；文案分镜 <code>docs/intro-video-storyboard.md</code>；录制工具 <code>tools/intro-video/rec</code>；剪辑工程 <code>tools/intro-video/edit</code>。都没有提交。</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <section>
+    <h2>整片节奏</h2>
+    <p class="sub">横轴是秒，每格是一小节（四拍，约 2.55 秒）。颜色是镜头的作用：老板键切换（深色）在整片里均匀出现四次。每条字幕至少停 2.5 秒，多数 3–5 秒，够看清。</p>
+    <div class="strip-scroll"><div class="strip"><div class="bars" id="bars"></div><div class="ticks" id="ticks"></div></div></div>
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <section>
+    <h2>老板键：切换前一帧 → 切换那一帧</h2>
+    <p class="sub">四个游戏的切换都是游戏自己的一帧切换，剪辑没有加任何转场。伪装图原本按横屏构图，录制时在切换的同一帧把相机按竖屏重新取景（只动相机，不改画的内容）。</p>
+    <div class="pairs" id="pairs"></div>
+  </section>
+
+  <section>
+    <h2>分镜</h2>
+    <p class="sub">每镜一张成片截图。「画面」是镜头里实际发生的事，「为什么」是这样安排的理由，「坑」是录制或剪辑时遇到的问题和处理办法。</p>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <section>
+    <h2>文案是怎么选出来的</h2>
+    <p class="sub">三个方向各写一稿：反转（同事在画幕墙？其实在打砖块）、高光快剪、AI 一句话故事。两位评审各自打分（1–10 分）。</p>
+    <div class="chart-box"><svg id="scores" viewBox="0 0 900 300" role="img" aria-label="三稿在五个维度上的评分"></svg></div>
+    <div class="notes">
+      <p>两位评审都把<b>反转稿排第一</b>（结构最好：每个游戏都是「玩 → 一帧 → 图纸」），但都认为<b>高光稿的开场最强</b>（第一帧就是多球混战，第 2 秒切立面）。故事稿最老实，但老板键到 29 秒才出现，「AI 写的」也不是观众装插件的理由。</p>
+      <p>成片取反转稿的主线、高光稿的开场和片名定义句「一半拓扑优化 · 一半摸鱼」、故事稿的「方块能自己建模」「Examples 电池」。四宫格「同时伪装」被评审否掉（四段素材对齐冒充同时，不真实），改成雨燕段里一个小标签「Alt+Tab 切走，也会自动伪装」。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>怎么做出来的</h2>
+    <p class="sub">游戏和求解器本来按真实时间跑、画在屏幕大小的视口里。离线逐帧录制让每一帧都完整渲染、时间完全可控。</p>
+    <div class="flow">
+      <svg viewBox="0 0 980 250" role="img" aria-label="录制与剪辑流程">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="currentColor" style="color: var(--muted)"></path></marker></defs>
+        <rect class="box" x="10" y="20" width="210" height="200" rx="14"></rect>
+        <text class="t" x="28" y="50">Rhino 8 + Moyu 1.0.1</text>
+        <text x="28" y="80">浮动视口 540×960</text>
+        <text x="28" y="104">游戏会话照常启动</text>
+        <text x="28" y="128">接管时钟、关掉自动老板键</text>
+        <text class="m" x="28" y="160">镜头脚本 (C#) 编译成 DLL，</text>
+        <text class="m" x="28" y="178">run_csharp 载入 Rhino</text>
+        <rect class="box" x="260" y="20" width="230" height="200" rx="14"></rect>
+        <rect class="hl" x="260" y="20" width="230" height="200" rx="14"></rect>
+        <text class="t" x="278" y="50">每帧 1/60 秒</text>
+        <text x="278" y="80">机器人输入 → 推进规则</text>
+        <text x="278" y="104">在指定帧按老板键</text>
+        <text x="278" y="128">CaptureToBitmap 1080×1920</text>
+        <text class="m" x="278" y="160">实机段：PrintWindow 截整个</text>
+        <text class="m" x="278" y="178">Rhino 和 GH 窗口</text>
+        <text class="m" x="278" y="196">拓扑：每帧是真实的第 n 步</text>
+        <rect class="box" x="530" y="20" width="200" height="200" rx="14"></rect>
+        <text class="t" x="548" y="50">ffmpeg</text>
+        <text x="548" y="80">原始帧走管道</text>
+        <text x="548" y="104">H.264，每段 4–17 秒</text>
+        <text class="m" x="548" y="160">8 段素材</text>
+        <text class="m" x="548" y="178">dist/intro-video/footage</text>
+        <rect class="box" x="770" y="20" width="200" height="200" rx="14"></rect>
+        <text class="t" x="788" y="50">Remotion 剪辑</text>
+        <text x="788" y="80">按 96 BPM 拍点排镜头</text>
+        <text x="788" y="104">字幕、面板标签、键帽</text>
+        <text x="788" y="128">配乐 Pamgaea 第 38–63 小节</text>
+        <text class="m" x="788" y="160">成片 docs/video/</text>
+        <text class="m" x="788" y="178">moyu-intro.mp4</text>
+        <path class="arrow" d="M222 120 H256"></path>
+        <path class="arrow" d="M492 120 H526"></path>
+        <path class="arrow" d="M732 120 H766"></path>
+      </svg>
+    </div>
+    <div class="notes">
+      <p>字幕统一放在画面 67–78% 的高度、左对齐：上面是游戏自己的分数 HUD；抖音、小红书会在最下面约 20% 叠加标题和简介，右边约 12% 是点赞、评论按钮。</p>
+      <p>配乐 Kevin MacLeod《Pamgaea》，CC BY 4.0，片尾和简介都署了名。整曲正好 94 BPM；取第 38–63 小节：开头 6 小节没有低音，正好用来渐入，结尾是曲子自己的收尾。</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>需要你决定</h2>
+    <ul class="decide">
+      <li><b>要不要配人声？</b><span>现在是字幕 + 配乐。每镜都写好了口播句（在 docs/intro-video-storyboard.md），可以用你自己的声音录一遍再混进去。</span></li>
+      <li><b>标题用哪个？</b><span>备选：①同事在认真画幕墙？其实他在 Rhino 里打砖块 ②给 Rhino 装了个老板键：一帧从小游戏变回图纸 ③一个 Grasshopper 插件：一半拓扑优化，一半摸鱼。封面字「老板一来，变图纸」。</span></li>
+      <li><b>要不要上传？</b><span>中文版发抖音、小红书；英文版可以发海外平台（如 YouTube Shorts、Instagram Reels）。可以先准备好标题、简介、话题和封面（小红书封面用 3:4），发布按钮留给你点。</span></li>
+      <li><b>安装那两镜要不要重录？</b><span>Package Manager 和 Examples 菜单用的是 11-08 的旧录屏，清晰度比其他镜头低。可以在 Rhino 里按竖屏重录。</span></li>
+    </ul>
+  </section>
+</div>
+
+<script>
+const DATA = /*DATA*/null;
+const COLORS = { real: "var(--sand)", game: "var(--teal)", boss: "var(--ink)", title: "var(--slate)", back: "var(--violet)", topo: "var(--coral)", info: "var(--sage)" };
+const NAMES = { real: "实机画面", game: "玩法高光", boss: "老板键切换", title: "交代 / 片名", back: "回到游戏", topo: "拓扑优化", info: "开发与安装" };
+const TOTAL = 104 * 60 / 94;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = t => t.toFixed(t % 1 ? 2 : 0).replace(/\.?0+$/, "");
+
+if (DATA) {
+  const player = document.getElementById("player");
+  player.poster = DATA.poster;
+  for (const [id, src] of [["v-zh", "moyu-intro.mp4"], ["v-en", "moyu-intro-en.mp4"]]) {
+    document.getElementById(id).addEventListener("click", () => {
+      player.src = src;
+      document.querySelectorAll(".langs button").forEach(b => b.setAttribute("aria-pressed", String(b.id === id)));
+    });
+  }
+  document.getElementById("bars").innerHTML = DATA.cards.map(c =>
+    `<div style="width:${(c.t1 - c.t0) / TOTAL * 100}%;background:${COLORS[c.sec]}" title="${esc(c.title)}">${(c.t1 - c.t0) >= 2.4 ? esc(c.title.split("：")[0]) : ""}</div>`).join("");
+  let ticks = "";
+  const BAR = 4 * 60 / 94;
+  for (let i = 0; i * BAR <= TOTAL + 0.01; i++) { const t = i * BAR; ticks += `<i style="left:${t / TOTAL * 100}%"></i>` + (i % 4 === 0 ? `<span style="left:${t / TOTAL * 100}%">${Math.round(t)}s</span>` : ""); }
+  document.getElementById("ticks").innerHTML = ticks;
+  document.getElementById("legend").innerHTML = Object.keys(NAMES).map(k => `<span style="--c:${COLORS[k]}">${NAMES[k]}</span>`).join("");
+  document.getElementById("pairs").innerHTML = DATA.pairs.map(p =>
+    `<div class="pair"><div class="imgs"><img src="${p.a}" alt="${esc(p.name)} 切换前一帧"><img src="${p.b}" alt="${esc(p.name)} 切换那一帧"></div><p><span>${esc(p.name)}</span><small>前一帧 · 那一帧</small></p></div>`).join("");
+  document.getElementById("cards").innerHTML = DATA.cards.map((c, i) => `
+    <article class="card">
+      <img src="${c.img}" alt="${esc(c.title)}" loading="lazy">
+      <div>
+        <div class="meta"><span>${String(i + 1).padStart(2, "0")}</span><span>${fmt(c.t0)}–${fmt(c.t1)} s</span><span class="tag" style="--c:${COLORS[c.sec]}">${esc(c.secname)}</span></div>
+        <h3>${esc(c.title)}</h3>
+        <p class="cap">「${esc(c.caption)}」</p>
+        <dl><dt>画面</dt><dd>${esc(c.what)}</dd><dt>为什么</dt><dd>${esc(c.why)}</dd><dt>坑</dt><dd>${esc(c.pit)}</dd></dl>
+      </div>
+    </article>`).join("");
+
+  // Grouped bars: five criteria, three drafts each, the two judges' scores side by side (solid / light).
+  const crit = ["钩子", "清晰", "节奏", "高光", "诚实"], drafts = ["反转", "高光", "故事"];
+  const dcol = { "反转": "var(--teal)", "高光": "var(--coral)", "故事": "var(--slate)" };
+  const judges = Object.keys(DATA.scores);
+  const W = 900, H = 300, L = 40, B = 250, T = 30, gw = (W - L - 10) / crit.length, bw = 12;
+  const y = v => B - (v / 10) * (B - T);
+  let svg = "";
+  for (let v = 0; v <= 10; v += 2) svg += `<line class="grid" x1="${L}" x2="${W - 10}" y1="${y(v)}" y2="${y(v)}"></line><text class="mut" x="${L - 8}" y="${y(v) + 4}" text-anchor="end">${v}</text>`;
+  crit.forEach((name, ci) => {
+    const x0 = L + ci * gw + (gw - drafts.length * judges.length * bw - (drafts.length - 1) * 8) / 2;
+    drafts.forEach((d, di) => judges.forEach((j, ji) => {
+      const v = DATA.scores[j][d][ci], x = x0 + di * (judges.length * bw + 8) + ji * bw;
+      svg += `<rect x="${x}" y="${y(v)}" width="${bw - 2}" height="${B - y(v)}" fill="${dcol[d]}" opacity="${ji ? 0.5 : 1}"><title>${j} · ${d} · ${name}: ${v}</title></rect>`;
+    }));
+    svg += `<text x="${L + ci * gw + gw / 2}" y="${B + 22}" text-anchor="middle">${name}</text>`;
+  });
+  let lx = L;
+  drafts.forEach(d => { svg += `<rect x="${lx}" y="6" width="12" height="12" rx="2" fill="${dcol[d]}"></rect><text x="${lx + 18}" y="16">${d}稿</text>`; lx += 80; });
+  svg += `<text class="mut" x="${lx + 10}" y="16">每组左柱：${judges[0]}　右柱（浅色）：${judges[1]}</text>`;
+  document.getElementById("scores").innerHTML = svg;
+}
+</script>

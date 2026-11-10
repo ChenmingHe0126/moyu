@@ -1,0 +1,22 @@
+// Paste into the Rhino MCP tool run_csharp (it cannot take #r references, hence the reflection).
+// Loads a recorder DLL into the running Rhino (again after every rebuild) and calls MoyuRec.Entry:
+//   Run(doc, shotClassName, outPath, "key=value;key=value")  starts recording in the background, returns at once
+//   Status()   progress, the shot's notes and any exception        Cancel()   stops and finalises the file
+//   List()     the shot classes in the DLL
+using System;
+using System.IO;
+using System.Reflection;
+string path = @"<moyu repo>\tools\intro-video\rec\rebound\bin\MoyuRecRebound.dll";
+string key = "moyurec:" + path, stamp = File.GetLastWriteTimeUtc(path).Ticks.ToString();
+var asm = AppDomain.CurrentDomain.GetData(key) as Assembly;
+if (asm == null || (string)AppDomain.CurrentDomain.GetData(key + ":stamp") != stamp) {
+  asm = Assembly.Load(File.ReadAllBytes(path));
+  AppDomain.CurrentDomain.SetData(key, asm);
+  AppDomain.CurrentDomain.SetData(key + ":stamp", stamp);
+}
+var entry = asm.GetType("MoyuRec.Entry");
+try {
+  Console.WriteLine(entry.GetMethod("Run").Invoke(null, new object[] { __rhino_doc__, "Rebound",
+    @"<moyu repo>\dist\intro-video\footage\rebound\test.mp4", "scale=0.5;frames=240" }));
+  // Console.WriteLine(entry.GetMethod("Status").Invoke(null, null));
+} catch (Exception ex) { Console.WriteLine("EX " + ex); }

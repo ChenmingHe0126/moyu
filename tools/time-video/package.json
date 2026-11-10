@@ -1,0 +1,16 @@
+{
+  "name": "moyu-time-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Remotion video: where Moyu's development time went",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts TimeVideo out/moyu-dev-time.mp4"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.541",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.541"
+  }
+}

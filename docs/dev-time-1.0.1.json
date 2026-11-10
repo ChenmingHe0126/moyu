@@ -1,0 +1,530 @@
+{
+  "version": "1.0.1",
+  "source": {
+    "session_id": "6bd43864-dad5-4f28-91f3-28bf914a1a93",
+    "timezone": "America/New_York",
+    "utc_offset": "-05:00",
+    "dates": [
+      "2026-11-07",
+      "2026-11-08"
+    ],
+    "last_message_id": "4abe9626-9684-43e1-aaf9-3ef6abd8bffd",
+    "method": "Union of main-response intervals and six audited background task intervals; background ends at completion notification.",
+    "scope": "Local desktop session only; earlier laptop development logs unavailable."
+  },
+  "summary": {
+    "active_minutes": 207.03633333333335,
+    "primary_minutes": 73.25791666666667,
+    "background_only_minutes": 133.77841666666666,
+    "previous_recorded_minutes": 588,
+    "wall_span_minutes": 839.2804166666666
+  },
+  "stages": [
+    {
+      "label": "语言菜单、双语示例与审查修复",
+      "description": "含全仓审查、61 项问题修复、实测与报告",
+      "primary_turn_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary_minutes": 38.39103333333333,
+      "active_minutes": 167.81588333333332,
+      "active_intervals": [
+        {
+          "start": "2026-11-07T22:52:18.479-05:00",
+          "end": "2026-11-08T01:40:07.432-05:00",
+          "minutes": 167.81588333333332
+        }
+      ]
+    },
+    {
+      "label": "Examples 组件、图标与发布包",
+      "description": "一键打开案例；更新手册、生成图标并验证发布包",
+      "primary_turn_indices": [
+        8,
+        9,
+        10
+      ],
+      "primary_minutes": 15.90475,
+      "active_minutes": 20.258316666666666,
+      "active_intervals": [
+        {
+          "start": "2026-11-08T10:49:59.660-05:00",
+          "end": "2026-11-08T11:10:15.159-05:00",
+          "minutes": 20.258316666666666
+        }
+      ]
+    },
+    {
+      "label": "提交重建与本机安装",
+      "description": "提交 1.0.1、重建发布包、安装并核验",
+      "primary_turn_indices": [
+        11,
+        12
+      ],
+      "primary_minutes": 2.8942,
+      "active_minutes": 2.8942,
+      "active_intervals": [
+        {
+          "start": "2026-11-08T11:13:31.611-05:00",
+          "end": "2026-11-08T11:15:36.270-05:00",
+          "minutes": 2.07765
+        },
+        {
+          "start": "2026-11-08T11:17:08.692-05:00",
+          "end": "2026-11-08T11:17:57.685-05:00",
+          "minutes": 0.81655
+        }
+      ]
+    },
+    {
+      "label": "面板编号、命名与排版",
+      "description": "Examples 排首位；Topo2D / Topo3D 命名与面板加宽",
+      "primary_turn_indices": [
+        13,
+        14
+      ],
+      "primary_minutes": 8.135266666666666,
+      "active_minutes": 8.135266666666666,
+      "active_intervals": [
+        {
+          "start": "2026-11-08T11:26:05.500-05:00",
+          "end": "2026-11-08T11:31:00.483-05:00",
+          "minutes": 4.916383333333333
+        },
+        {
+          "start": "2026-11-08T11:32:08.332-05:00",
+          "end": "2026-11-08T11:35:21.465-05:00",
+          "minutes": 3.2188833333333333
+        }
+      ]
+    },
+    {
+      "label": "双平台发布与合并",
+      "description": "Yak、food4rhino 发布操作、验证与合并推送",
+      "primary_turn_indices": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25
+      ],
+      "primary_minutes": 7.932666666666667,
+      "active_minutes": 7.932666666666667,
+      "active_intervals": [
+        {
+          "start": "2026-11-08T11:36:54.373-05:00",
+          "end": "2026-11-08T11:38:24.629-05:00",
+          "minutes": 1.5042666666666666
+        },
+        {
+          "start": "2026-11-08T11:39:39.481-05:00",
+          "end": "2026-11-08T11:41:56.214-05:00",
+          "minutes": 2.2788833333333334
+        },
+        {
+          "start": "2026-11-08T11:47:27.658-05:00",
+          "end": "2026-11-08T11:47:44.218-05:00",
+          "minutes": 0.27599999999999997
+        },
+        {
+          "start": "2026-11-08T11:48:05.447-05:00",
+          "end": "2026-11-08T11:48:36.337-05:00",
+          "minutes": 0.5148333333333334
+        },
+        {
+          "start": "2026-11-08T11:48:45.012-05:00",
+          "end": "2026-11-08T11:49:02.071-05:00",
+          "minutes": 0.28431666666666666
+        },
+        {
+          "start": "2026-11-08T11:49:30.796-05:00",
+          "end": "2026-11-08T11:50:25.514-05:00",
+          "minutes": 0.9119666666666667
+        },
+        {
+          "start": "2026-11-08T11:53:17.061-05:00",
+          "end": "2026-11-08T11:54:43.866-05:00",
+          "minutes": 1.4467500000000002
+        },
+        {
+          "start": "2026-11-08T12:50:52.365-05:00",
+          "end": "2026-11-08T12:51:35.304-05:00",
+          "minutes": 0.71565
+        }
+      ]
+    }
+  ],
+  "exclusions": [
+    "用户等待、登录、手动上传、验收及过夜空闲不计。",
+    "不含笔记本上先前的按键修复与语言初版（缺少日志）。",
+    "本次统计与制图不计；并行代理及图标重叠区间只计一次。"
+  ],
+  "primary_turns": [
+    {
+      "index": 0,
+      "start_message_id": "1ef92641-1869-47a2-b9cd-e7da7199437d",
+      "end_message_id": "9cc653bd-8a26-49fc-b59b-d5740f1afecf",
+      "start": "2026-11-07T22:52:18.479-05:00",
+      "end": "2026-11-07T23:05:43.908-05:00",
+      "minutes": 13.423816666666665
+    },
+    {
+      "index": 1,
+      "start_message_id": "5e126e03-acc2-45b6-9cdf-d1ea3ea975fe",
+      "end_message_id": "9e30f92e-61c9-4406-9a9b-a23bc49d988f",
+      "start": "2026-11-07T23:13:12.968-05:00",
+      "end": "2026-11-07T23:13:34.970-05:00",
+      "minutes": 0.36669999999999997
+    },
+    {
+      "index": 2,
+      "start_message_id": "6987b34b-287c-40d5-863b-20e1a5eaf1e3",
+      "end_message_id": "6062ff4a-ebb4-4360-a131-72d54985055c",
+      "start": "2026-11-07T23:33:37.964-05:00",
+      "end": "2026-11-07T23:34:50.462-05:00",
+      "minutes": 1.2083000000000002
+    },
+    {
+      "index": 3,
+      "start_message_id": "5b167fa3-8908-4a7e-85d9-bd22d88ce555",
+      "end_message_id": "8250414c-807c-4ecf-b1ce-2c27e088663a",
+      "start": "2026-11-07T23:54:48.746-05:00",
+      "end": "2026-11-07T23:58:12.345-05:00",
+      "minutes": 3.3933166666666663
+    },
+    {
+      "index": 4,
+      "start_message_id": "d8a6bec0-423a-43d9-a09d-d4576045271c",
+      "end_message_id": "da0756be-69cc-4257-acb9-158c3db66060",
+      "start": "2026-11-08T00:23:58.920-05:00",
+      "end": "2026-11-08T00:24:44.307-05:00",
+      "minutes": 0.75645
+    },
+    {
+      "index": 5,
+      "start_message_id": "40b8bee2-5583-4446-9048-830461d77980",
+      "end_message_id": "e60ec002-6073-4254-bacc-951b7bfe9dce",
+      "start": "2026-11-08T00:27:35.714-05:00",
+      "end": "2026-11-08T00:29:29.554-05:00",
+      "minutes": 1.8973333333333333
+    },
+    {
+      "index": 6,
+      "start_message_id": "346ed644-cebb-4b47-b4e2-ddf128a79285",
+      "end_message_id": "00dce95e-0d9c-4deb-85ef-d650d4d9ccc3",
+      "start": "2026-11-08T01:12:33.796-05:00",
+      "end": "2026-11-08T01:26:07.873-05:00",
+      "minutes": 13.56795
+    },
+    {
+      "index": 7,
+      "start_message_id": "a93aec53-a9a3-475b-8b1b-6577028c2971",
+      "end_message_id": "c6d1304c-3e21-4ad8-8e86-e3a5b341f356",
+      "start": "2026-11-08T01:36:20.802-05:00",
+      "end": "2026-11-08T01:40:07.432-05:00",
+      "minutes": 3.7771666666666666
+    },
+    {
+      "index": 8,
+      "start_message_id": "e7cbbbf6-d7cf-4d7f-9cb7-66b97a32f713",
+      "end_message_id": "506c4cfc-dcc6-4552-9b31-77424f83b690",
+      "start": "2026-11-08T10:49:59.660-05:00",
+      "end": "2026-11-08T10:59:06.547-05:00",
+      "minutes": 9.114783333333332
+    },
+    {
+      "index": 9,
+      "start_message_id": "8e3510c5-39ca-437b-b026-0ef8b700b189",
+      "end_message_id": "b842b632-ba13-4d08-82d1-8cdc8b8fff60",
+      "start": "2026-11-08T11:02:02.713-05:00",
+      "end": "2026-11-08T11:02:45.397-05:00",
+      "minutes": 0.7113999999999999
+    },
+    {
+      "index": 10,
+      "start_message_id": "58c5df83-9d22-4af1-92a4-a58686539cd6",
+      "end_message_id": "1e759fa2-11c7-4b23-afcd-dc008bddb42c",
+      "start": "2026-11-08T11:04:10.445-05:00",
+      "end": "2026-11-08T11:10:15.159-05:00",
+      "minutes": 6.078566666666666
+    },
+    {
+      "index": 11,
+      "start_message_id": "aa4e7288-58f8-4f23-955d-e521cb4e45a6",
+      "end_message_id": "880b3327-8a7d-4730-a72b-67062c54a809",
+      "start": "2026-11-08T11:13:31.611-05:00",
+      "end": "2026-11-08T11:15:36.270-05:00",
+      "minutes": 2.07765
+    },
+    {
+      "index": 12,
+      "start_message_id": "03bf9ecf-0e28-4676-8008-cc7f70e88761",
+      "end_message_id": "cedb6582-0de5-4bb2-8fb9-6debd7291797",
+      "start": "2026-11-08T11:17:08.692-05:00",
+      "end": "2026-11-08T11:17:57.685-05:00",
+      "minutes": 0.81655
+    },
+    {
+      "index": 13,
+      "start_message_id": "ee9f899c-cbe3-4540-ba70-9b7d3f17fab5",
+      "end_message_id": "0836d1cc-a742-4235-b7af-13a6a5aba50a",
+      "start": "2026-11-08T11:26:05.500-05:00",
+      "end": "2026-11-08T11:31:00.483-05:00",
+      "minutes": 4.916383333333333
+    },
+    {
+      "index": 14,
+      "start_message_id": "0d464ef8-dab9-46a1-a90a-d613a0905700",
+      "end_message_id": "3bc6d59d-aa59-418a-b4ec-ad9887a5369e",
+      "start": "2026-11-08T11:32:08.332-05:00",
+      "end": "2026-11-08T11:35:21.465-05:00",
+      "minutes": 3.2188833333333333
+    },
+    {
+      "index": 15,
+      "start_message_id": "47531cb6-7d1f-4f4a-986e-23b62539350f",
+      "end_message_id": "91319879-de18-47d8-92cf-0b379a58f603",
+      "start": "2026-11-08T11:36:54.373-05:00",
+      "end": "2026-11-08T11:38:24.629-05:00",
+      "minutes": 1.5042666666666666
+    },
+    {
+      "index": 16,
+      "start_message_id": "5e7d3b5b-5b9d-4c53-9ef7-3946525f71cb",
+      "end_message_id": "2bff3e6b-a3c3-4eb0-9f19-f040f583a513",
+      "start": "2026-11-08T11:39:39.481-05:00",
+      "end": "2026-11-08T11:41:56.214-05:00",
+      "minutes": 2.2788833333333334
+    },
+    {
+      "index": 17,
+      "start_message_id": "a5c5f346-e412-4c1a-9ce4-8ba1d31c498e",
+      "end_message_id": "a5c5f346-e412-4c1a-9ce4-8ba1d31c498e",
+      "start": "2026-11-08T11:47:23.264-05:00",
+      "end": "2026-11-08T11:47:23.264-05:00",
+      "minutes": 0.0
+    },
+    {
+      "index": 18,
+      "start_message_id": "4315f259-eb1e-497f-8c4f-c67fec9ee2ad",
+      "end_message_id": "4315f259-eb1e-497f-8c4f-c67fec9ee2ad",
+      "start": "2026-11-08T11:47:27.651-05:00",
+      "end": "2026-11-08T11:47:27.651-05:00",
+      "minutes": 0.0
+    },
+    {
+      "index": 19,
+      "start_message_id": "fb844d25-faeb-4343-ad2d-8c9657e36675",
+      "end_message_id": "20a3fd3e-cdb5-48bb-8fe0-accfcf9168bd",
+      "start": "2026-11-08T11:47:27.658-05:00",
+      "end": "2026-11-08T11:47:44.218-05:00",
+      "minutes": 0.27599999999999997
+    },
+    {
+      "index": 20,
+      "start_message_id": "3a6050b0-c821-4673-8bb7-98fd37263572",
+      "end_message_id": "3a6050b0-c821-4673-8bb7-98fd37263572",
+      "start": "2026-11-08T11:47:50.176-05:00",
+      "end": "2026-11-08T11:47:50.176-05:00",
+      "minutes": 0.0
+    },
+    {
+      "index": 21,
+      "start_message_id": "0f630cdd-b331-4593-8fd1-8c6c84f64a8f",
+      "end_message_id": "e7ec81d4-08b1-4d92-b416-15f0e9796646",
+      "start": "2026-11-08T11:48:05.447-05:00",
+      "end": "2026-11-08T11:48:36.337-05:00",
+      "minutes": 0.5148333333333334
+    },
+    {
+      "index": 22,
+      "start_message_id": "5cf22a3b-7181-41d7-9a9a-8f713c59330f",
+      "end_message_id": "6a4ff0ee-9ab8-4dd1-ae87-9960e163610a",
+      "start": "2026-11-08T11:48:45.012-05:00",
+      "end": "2026-11-08T11:49:02.071-05:00",
+      "minutes": 0.28431666666666666
+    },
+    {
+      "index": 23,
+      "start_message_id": "009bb339-a8dd-4953-8c8a-e55b3d024e5d",
+      "end_message_id": "198d4042-7023-47e3-ac71-77a91e3c0679",
+      "start": "2026-11-08T11:49:30.796-05:00",
+      "end": "2026-11-08T11:50:25.514-05:00",
+      "minutes": 0.9119666666666667
+    },
+    {
+      "index": 24,
+      "start_message_id": "bcd4f0a1-d206-4fea-a957-28775c9f0845",
+      "end_message_id": "bebaa903-bb03-4a69-b9c7-beb7b541d4f0",
+      "start": "2026-11-08T11:53:17.061-05:00",
+      "end": "2026-11-08T11:54:43.866-05:00",
+      "minutes": 1.4467500000000002
+    },
+    {
+      "index": 25,
+      "start_message_id": "de470514-f580-4e62-b3f3-73893047110a",
+      "end_message_id": "4abe9626-9684-43e1-aaf9-3ef6abd8bffd",
+      "start": "2026-11-08T12:50:52.365-05:00",
+      "end": "2026-11-08T12:51:35.304-05:00",
+      "minutes": 0.71565
+    }
+  ],
+  "background_tasks": [
+    {
+      "label": "第一轮审查与核查",
+      "tool_use_id": "toolu_01TM5zNqoGsrUEhnoKkxEnMt",
+      "task_id": "wrehp6njr",
+      "stage_index": 0,
+      "start_message_id": "c0aad259-eada-4593-ac55-72ba3d3d9517",
+      "end_message_id": "5b167fa3-8908-4a7e-85d9-bd22d88ce555",
+      "start": "2026-11-07T22:58:49.682-05:00",
+      "end": "2026-11-07T23:54:48.746-05:00",
+      "minutes": 55.9844
+    },
+    {
+      "label": "第二轮审查与核查",
+      "tool_use_id": "toolu_01DqJiq4b2ZEXWawA4eX4pdL",
+      "task_id": "wnyi9wmc0",
+      "stage_index": 0,
+      "start_message_id": "354ee765-df5a-4509-84f4-b30f2f803948",
+      "end_message_id": "d8a6bec0-423a-43d9-a09d-d4576045271c",
+      "start": "2026-11-07T23:56:45.232-05:00",
+      "end": "2026-11-08T00:23:58.920-05:00",
+      "minutes": 27.228133333333336
+    },
+    {
+      "label": "第一轮修复与复查",
+      "tool_use_id": "toolu_01FpYAsNvubJDxhLT1wSDQVd",
+      "task_id": "w4tjdw1a4",
+      "stage_index": 0,
+      "start_message_id": "0d571344-087a-4b3f-a30d-7c80e873c3ad",
+      "end_message_id": "40b8bee2-5583-4446-9048-830461d77980",
+      "start": "2026-11-07T23:57:43.313-05:00",
+      "end": "2026-11-08T00:27:35.714-05:00",
+      "minutes": 29.873350000000002
+    },
+    {
+      "label": "第二轮修复与复查",
+      "tool_use_id": "toolu_01MnqoQrBqZXDoY8TY3gYR38",
+      "task_id": "w82i7ttfb",
+      "stage_index": 0,
+      "start_message_id": "40f7ed64-503d-4616-98e2-c7a345b84fae",
+      "end_message_id": "346ed644-cebb-4b47-b4e2-ddf128a79285",
+      "start": "2026-11-08T00:28:53.522-05:00",
+      "end": "2026-11-08T01:12:33.796-05:00",
+      "minutes": 43.67123333333333
+    },
+    {
+      "label": "最终集成审查",
+      "tool_use_id": "toolu_019UznjJKEUR6YqbvbXSvSnt",
+      "task_id": "w2m9z6as0",
+      "stage_index": 0,
+      "start_message_id": "4b2b6cea-f916-4f79-ae9d-7c4b2b8be66f",
+      "end_message_id": "a93aec53-a9a3-475b-8b1b-6577028c2971",
+      "start": "2026-11-08T01:13:43.123-05:00",
+      "end": "2026-11-08T01:36:20.802-05:00",
+      "minutes": 22.627983333333336
+    },
+    {
+      "label": "Examples 图标生成",
+      "tool_use_id": "toolu_014bhu2NFE2XrKdnVAKEwfF3",
+      "task_id": "bhjzyxwxc",
+      "stage_index": 1,
+      "start_message_id": "45ff11b6-aeab-4968-8e58-61330447da50",
+      "end_message_id": "58c5df83-9d22-4af1-92a4-a58686539cd6",
+      "start": "2026-11-08T10:56:58.692-05:00",
+      "end": "2026-11-08T11:04:10.445-05:00",
+      "minutes": 7.195883333333333
+    }
+  ],
+  "active_intervals": [
+    {
+      "start": "2026-11-07T22:52:18.479-05:00",
+      "end": "2026-11-08T01:40:07.432-05:00",
+      "minutes": 167.81588333333332
+    },
+    {
+      "start": "2026-11-08T10:49:59.660-05:00",
+      "end": "2026-11-08T11:10:15.159-05:00",
+      "minutes": 20.258316666666666
+    },
+    {
+      "start": "2026-11-08T11:13:31.611-05:00",
+      "end": "2026-11-08T11:15:36.270-05:00",
+      "minutes": 2.07765
+    },
+    {
+      "start": "2026-11-08T11:17:08.692-05:00",
+      "end": "2026-11-08T11:17:57.685-05:00",
+      "minutes": 0.81655
+    },
+    {
+      "start": "2026-11-08T11:26:05.500-05:00",
+      "end": "2026-11-08T11:31:00.483-05:00",
+      "minutes": 4.916383333333333
+    },
+    {
+      "start": "2026-11-08T11:32:08.332-05:00",
+      "end": "2026-11-08T11:35:21.465-05:00",
+      "minutes": 3.2188833333333333
+    },
+    {
+      "start": "2026-11-08T11:36:54.373-05:00",
+      "end": "2026-11-08T11:38:24.629-05:00",
+      "minutes": 1.5042666666666666
+    },
+    {
+      "start": "2026-11-08T11:39:39.481-05:00",
+      "end": "2026-11-08T11:41:56.214-05:00",
+      "minutes": 2.2788833333333334
+    },
+    {
+      "start": "2026-11-08T11:47:27.658-05:00",
+      "end": "2026-11-08T11:47:44.218-05:00",
+      "minutes": 0.27599999999999997
+    },
+    {
+      "start": "2026-11-08T11:48:05.447-05:00",
+      "end": "2026-11-08T11:48:36.337-05:00",
+      "minutes": 0.5148333333333334
+    },
+    {
+      "start": "2026-11-08T11:48:45.012-05:00",
+      "end": "2026-11-08T11:49:02.071-05:00",
+      "minutes": 0.28431666666666666
+    },
+    {
+      "start": "2026-11-08T11:49:30.796-05:00",
+      "end": "2026-11-08T11:50:25.514-05:00",
+      "minutes": 0.9119666666666667
+    },
+    {
+      "start": "2026-11-08T11:53:17.061-05:00",
+      "end": "2026-11-08T11:54:43.866-05:00",
+      "minutes": 1.4467500000000002
+    },
+    {
+      "start": "2026-11-08T12:50:52.365-05:00",
+      "end": "2026-11-08T12:51:35.304-05:00",
+      "minutes": 0.71565
+    }
+  ],
+  "notes": [
+    "The six Codex code reviews launched at 22:57:38 and confirmed complete by 23:05:22 fall entirely inside the night interval; they add no further time.",
+    "The original dev_time.py treats completion notifications as turn starts. Preserve that behavior for the 73.3-minute comparison; do not treat every response as a separate human request.",
+    "1.0.0's 588-minute figure uses the prior documented main-response method and has not been re-audited for background gaps. Do not directly add it to the 207.0-minute union figure."
+  ]
+}

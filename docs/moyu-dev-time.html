@@ -1,0 +1,82 @@
+<title>Moyu 用时去向</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: one column — the video first, then the same numbers as a static bar chart, then how they were counted.
+   Colours match the video (and the repo's dev-time charts). */
+:root{
+  --bg:#F7F6F2; --fg:#223936; --muted:#5F6B67; --line:#DFE3DC; --panel:#FFFFFF; --accent:#287F7D;
+  --a-code:#287F7D; --a-docs:#647F9F; --a-rel:#AA744D; --a-test:#C0564A; --a-plan:#7D6AA8; --a-vis:#D99A4E; --a-icon:#7F9A4E;
+  --f-sans:"Bahnschrift","Segoe UI","Microsoft YaHei UI","PingFang SC","Noto Sans SC",system-ui,sans-serif;
+  --f-mono:"Cascadia Mono",Consolas,"Microsoft YaHei UI",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#121817; --fg:#E2EAE7; --muted:#9AA8A3; --line:#28332F; --panel:#1A2220; --accent:#62B3AE;
+    --a-code:#3E9C99; --a-docs:#8099B8; --a-rel:#C68C63; --a-test:#D7705F; --a-plan:#9886C2; --a-vis:#E2A963; --a-icon:#98B266; color-scheme:dark }
+}
+:root[data-theme="dark"]{ --bg:#121817; --fg:#E2EAE7; --muted:#9AA8A3; --line:#28332F; --panel:#1A2220; --accent:#62B3AE;
+  --a-code:#3E9C99; --a-docs:#8099B8; --a-rel:#C68C63; --a-test:#D7705F; --a-plan:#9886C2; --a-vis:#E2A963; --a-icon:#98B266; color-scheme:dark }
+body{ background:var(--bg); color:var(--fg); font-family:var(--f-sans); }
+.wrap{ max-width:1040px; margin:0 auto; padding-block:36px 56px; padding-left:max(16px, env(safe-area-inset-left, 0px)); padding-right:max(16px, env(safe-area-inset-right, 0px)); display:grid; gap:32px; }
+.eyebrow{ margin:0; font:500 12px/1.4 var(--f-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--accent); }
+h1{ margin:6px 0 0; font-size:clamp(26px, 4vw, 36px); line-height:1.2; font-weight:600; text-wrap:balance; }
+.lede{ margin:10px 0 0; max-width:65ch; font-size:16px; line-height:1.65; color:var(--muted); }
+video{ display:block; width:100%; max-width:100%; aspect-ratio:16/9; border-radius:12px; background:#F7F6F2; box-shadow:0 20px 44px -30px rgba(34,57,54,.5); }
+h2{ margin:0 0 6px; font-size:20px; font-weight:600; }
+.note{ margin:0; font-size:14px; line-height:1.6; color:var(--muted); max-width:70ch; }
+.chart{ display:grid; gap:10px; margin-top:16px; }
+.row{ display:grid; grid-template-columns:minmax(0, 190px) minmax(0, 1fr) 96px; gap:14px; align-items:center; }
+.row .lab{ font-size:15px; line-height:1.3; }
+.row .track{ height:22px; }
+.row .bar{ height:100%; border-radius:3px; }
+.row .val{ font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; white-space:nowrap; }
+.row .val span{ font-weight:400; color:var(--muted); }
+.side{ display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:12px; }
+.fig{ padding:14px 16px; border:1px solid var(--line); border-radius:10px; background:var(--panel); display:grid; gap:4px; }
+.fig b{ font-size:26px; font-weight:600; font-variant-numeric:tabular-nums; }
+.fig span{ font-size:14px; line-height:1.5; color:var(--muted); }
+ul{ margin:8px 0 0; padding-left:20px; display:grid; gap:6px; max-width:72ch; font-size:15px; line-height:1.65; }
+code{ font-family:var(--f-mono); font-size:13px; }
+@media (max-width:560px){ .row{ grid-template-columns:minmax(0, 1fr) 80px; } .row .lab{ grid-column:1 / -1; } }
+</style>
+
+<main class="wrap">
+  <header>
+    <p class="eyebrow">Moyu · 开发用时 · Remotion 视频</p>
+    <h1>Moyu 的开发时间花在了哪</h1>
+    <p class="lede">47 秒短片：1.0.0 的 588 分钟先按时间先后排成 588 格（一格一分钟），再按干的活重新排；最后补上 1.0.1 的 207 分钟。用 Remotion 写成代码渲染，和 Higgsfield Vibe Motion 底层是同一个框架。</p>
+  </header>
+
+  <!-- The video file is not kept in the repo (only the final intro shorts are); it lives in the tutorial folder. Render it with tools/time-video. -->
+  <video src="video/moyu-dev-time.mp4" poster="video/moyu-dev-time-poster.jpg" controls autoplay muted loop playsinline preload="metadata" aria-label="Moyu 开发用时动画"></video>
+
+  <section aria-labelledby="h-act">
+    <h2 id="h-act">1.0.0 按活儿分</h2>
+    <p class="note">588 分钟 Claude 开发用时；视频后半段的条形图就是这张。</p>
+    <div class="chart" role="img" aria-label="写代码与自动测试 224 分钟，文档、报告与计时 95，审查与发布 85，Rhino 实机测试与修复 72，方案与原型 54，画面设计与打磨 29，图标 29">
+      <div class="row"><span class="lab">写代码与自动测试</span><div class="track"><div class="bar" style="width:100%;background:var(--a-code)"></div></div><span class="val">224 分 <span>38%</span></span></div>
+      <div class="row"><span class="lab">文档、报告与计时</span><div class="track"><div class="bar" style="width:42.4%;background:var(--a-docs)"></div></div><span class="val">95 分 <span>16%</span></span></div>
+      <div class="row"><span class="lab">审查与发布</span><div class="track"><div class="bar" style="width:37.9%;background:var(--a-rel)"></div></div><span class="val">85 分 <span>14%</span></span></div>
+      <div class="row"><span class="lab">Rhino 实机测试与修复</span><div class="track"><div class="bar" style="width:32.1%;background:var(--a-test)"></div></div><span class="val">72 分 <span>12%</span></span></div>
+      <div class="row"><span class="lab">方案与原型</span><div class="track"><div class="bar" style="width:24.1%;background:var(--a-plan)"></div></div><span class="val">54 分 <span>9%</span></span></div>
+      <div class="row"><span class="lab">画面设计与打磨</span><div class="track"><div class="bar" style="width:12.9%;background:var(--a-vis)"></div></div><span class="val">29 分 <span>5%</span></span></div>
+      <div class="row"><span class="lab">图标</span><div class="track"><div class="bar" style="width:12.9%;background:var(--a-icon)"></div></div><span class="val">29 分 <span>5%</span></span></div>
+    </div>
+  </section>
+
+  <section class="side" aria-label="几个数字">
+    <div class="fig"><b>110 / 224</b><span>写代码的时间里，一半是拓扑优化；每个游戏写代码只要 21 到 25 分钟</span></div>
+    <div class="fig"><b>40 / 72</b><span>实机测试里，三轮调整占了 40 分钟；第四轮在 4K 屏上测 gumball 用了 18 分钟</span></div>
+    <div class="fig"><b>207 分钟</b><span>1.0.1：主代理轮次 73 分钟 + 后台审查与修复任务 134 分钟</span></div>
+    <div class="fig"><b>34 分钟</b><span>Rhino 自身或第三方插件故障，不计入任何一类</span></div>
+  </section>
+
+  <section aria-labelledby="h-how">
+    <h2 id="h-how">怎么算的</h2>
+    <ul>
+      <li>来源是 <code>docs/dev-time-stats.md</code>：每轮请求到 Claude 最后一条回复的时间，逐轮相加。你看结果、想下一步的时间不算，Codex 画图标的时间也不算。</li>
+      <li>表里每个时间段按主要内容整段归到一类，不再细拆。比如拓扑优化 3D 那 59 分钟里也写了报告，但整段算“写代码与自动测试”。完整的部分 × 活儿表在 <code>docs/dev-time-by-activity.md</code>。</li>
+      <li>1.0.1 来自 <code>docs/dev-time-1.0.1.json</code>，把后台任务也算进去了（重叠的时间只算一次），计法和 1.0.0 不同，所以单列。</li>
+      <li>视频源码在 <code>tools/time-video</code>，改完数据跑 <code>npm run render</code> 重新出片。</li>
+    </ul>
+  </section>
+</main>
