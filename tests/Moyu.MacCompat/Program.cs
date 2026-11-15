@@ -40,6 +40,7 @@ namespace Moyu.MacCompat
 
         int failing = 0;
         Console.WriteLine();
+        Console.WriteLine($"Checked {Checked["T"]} types, {Checked["M"]} methods and {Checked["F"]} fields from other assemblies.");
         if (missing.Count == 0) Console.WriteLine("Every type, method and field the plug-in uses exists in Rhino for Mac.");
         foreach (var group in missing.OrderBy(m => m.Key))
         {
@@ -90,6 +91,9 @@ namespace Moyu.MacCompat
 
     static IEnumerable<TypeDefinition> AllTypes(TypeDefinition t) => new[] { t }.Concat(t.NestedTypes.SelectMany(AllTypes));
 
+    /// <summary>How many distinct external types (T), methods (M) and fields (F) the scan resolved.</summary>
+    static readonly Dictionary<string, int> Checked = new Dictionary<string, int> { ["T"] = 0, ["M"] = 0, ["F"] = 0 };
+
     /// <summary>Missing member → the plug-in methods (or types) that use it.</summary>
     static Dictionary<string, List<string>> Scan(ModuleDefinition module)
     {
@@ -121,6 +125,7 @@ namespace Moyu.MacCompat
         {
           ok = Safe(() => t.Resolve()) != null;
           seen["T:" + key] = ok;
+          Checked["T"]++;
         }
         if (!ok) Note($"type {key} [{Scope(t)}]", user);
         return ok;
@@ -141,6 +146,7 @@ namespace Moyu.MacCompat
         {
           ok = Safe(() => m.Resolve()) != null;
           seen["M:" + key] = ok;
+          Checked["M"]++;
         }
         if (!ok) Note($"method {key} [{Scope(m.DeclaringType)}]", user);
       }
@@ -154,6 +160,7 @@ namespace Moyu.MacCompat
         {
           ok = Safe(() => f.Resolve()) != null;
           seen["F:" + key] = ok;
+          Checked["F"]++;
         }
         if (!ok) Note($"field {key} [{Scope(f.DeclaringType)}]", user);
       }

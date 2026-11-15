@@ -20,11 +20,12 @@ def main():
     with open(path, encoding="utf-8", errors="replace") as f:
         lines = f.read().splitlines()
     level = "error" if status else "notice"
-    tail = "\n".join(lines[-300:])[-60000:]
+    # GitHub keeps only the first few KB of an annotation, so post the end of the log, where the verdict is.
+    tail = "\n".join(lines[-300:])[-3500:]
     print(f"::{level} title={title}::{escape(tail)}")
     problems = [line for line in lines if any(m in line for m in MARKERS)]
     if problems:
-        print(f"::warning title={title}: problems::{escape(chr(10).join(problems[:300])[-60000:])}")
+        print(f"::warning title={title}: problems::{escape(chr(10).join(problems[:60])[:3500])}")
 
 
 if __name__ == "__main__":
