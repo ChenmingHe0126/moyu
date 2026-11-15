@@ -8,7 +8,7 @@
 - GitHub 的 Mac（macos-latest，macOS 26.7，Apple 芯片）上四项检查全过：编译 Mac 版（plain `net7.0`）、468 项核心测试、39 项键盘检查（真实按键事件进 AppKit 监视器）、API 核对（插件用到的 257 个类型、1591 个方法、146 个字段，在官方 Rhino 8.36 for Mac 安装包的程序集里都存在）。
 - Windows 没受影响：本机 Rhino 8.36 集成测试 71/71，Windows 版和 Mac 版两份编译都在 Windows Rhino 里跑过；四个游戏也用真实按键各玩了一局（见下面"Windows 实机回归"）。
 - 没验证的：真 Rhino for Mac 里的画面和手感（要许可证，GitHub 上跑不了）。
-- 没发布：没合进 main，没推 Yak，没更新 food4rhino。
+- 已发布 1.0.2（2026-11-15，commit e40c8c9）：合进 main；Windows 和 Mac 两个包推到了 Rhino 包管理器；food4rhino 页面加了 1.0.2 的下载和 Mac 平台。发布记录见 `packaging/food4rhino/release-1.0.2.md`。
 
 ## 每处平台相关的实现
 
@@ -66,8 +66,8 @@ Mac 按键翻译成游戏原本认的 Windows 虚拟键（`Games/Common/Core/Mac
 
 ## 朋友试用
 
-1. 从运行页面底部下载 `moyu-mac-…`（要登录 GitHub），解压出 `Moyu.gha`。
-2. Grasshopper › File › Special Folders › Components Folder，把 `Moyu.gha` 放进去，重启 Rhino。
+1. 在 Mac 版 Rhino 8 里运行 `_PackageManager`，搜索 moyu，Install（Rhino 自己选 Mac 包，版本 1.0.2）。
+2. 重启 Rhino。
 3. Moyu 页签里的 Examples 组件，打开一个游戏例子，点 Run。
 4. 试方向键、空格、Esc、老板键 `、⌘S；截一张游戏画面和一张老板键画面。
 
@@ -75,6 +75,4 @@ Mac 按键翻译成游戏原本认的 Windows 虚拟键（`Games/Common/Core/Mac
 
 ## 需要决定的事
 
-1. 先给朋友试。
-2. 朋友试过后把 `mac-support` 合进 main。
-3. 发 1.0.2：改版本号、重新生成手册 PDF（`packaging/guide/guide.html` 里还写着只支持 Windows）、`python tools/package.py` 打出两个 .yak、推 Yak、更新 food4rhino。
+1.0.2 已发布，剩下的只有朋友在 Mac 上试玩。Mac 上要是有问题，只能出 1.0.3 修（推上去的 Yak 版本不能替换）。

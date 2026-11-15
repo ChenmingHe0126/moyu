@@ -38,7 +38,7 @@ Open source (MIT): https://github.com/ChenmingHe0126/moyu
 
 ## Downloads table
 
-As of 1.0.1 (2026-11-08) the page shows three rows, each with its version in the title:
+As of 1.0.2 (2026-11-15) the page shows the auto row "moyu 1.0.2" (Install for Rhino 8 Mac and Rhino 8 Win), then "Moyu 1.0.2 - Examples, user guide and manual install (zip)" (Windows and Mac), then the 1.0.1 and 1.0.0 zips marked "Previous version"; see `release-1.0.2.md`. Before that, as of 1.0.1 (2026-11-08), it showed three rows, each with its version in the title:
 
 1. **moyu 1.0.1 · Install**: added by food4rhino from the linked Package Manager package. Install hands over to Rhino's Package Manager, which installs the plugin with the examples and the guide. Its description is `packaging/manifest.yml`'s and can only change with a new pushed version.
 2. **Moyu 1.0.1 - Examples, user guide and manual install (zip)**: `dist/Moyu-1.0.1-food4rhino.zip`, listed first (weight −1). Description: "Version 1.0.1 (2026-11-08). Six example .gh files, the illustrated user guide (PDF, English and Chinese) and both Moyu.gha builds for installing by hand. New in 1.0.1: an Examples component that opens any example in one click, a language menu on the game components, and fixes from a full code review. The Install button above gives you the same plugin, examples and guide through Rhino's Package Manager."

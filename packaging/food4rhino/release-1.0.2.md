@@ -32,4 +32,9 @@ Row description for 1.0.2: "Version 1.0.2 (2026-11-15). Six example .gh files, t
 
 ## Status
 
-Not published yet.
+Published 2026-11-15, built from commit e40c8c9 (the same commit is `main` on GitHub, and GitHub's macOS run on it passed):
+
+- `yak push` of `moyu-1.0.2-rh8_0-win.yak` and `moyu-1.0.2-rh8_0-mac.yak`; the server lists moyu 1.0.2, 1.0.1 and 1.0.0.
+- food4rhino (node 5994): the Install row shows moyu 1.0.2 for Rhino 8 Mac and Rhino 8 Win; a new row "Moyu 1.0.2 - Examples, user guide and manual install (zip)" is listed first with both Grasshopper platforms (Windows and Mac, Rhino 8); the 1.0.1 row's description now starts "Previous version 1.0.1 (2026-11-08)."; the description has the Mac line from `listing.md`.
+- Checksums (SHA-256): win yak `d6a770f3be0530168080b16c434d7b4e058b6a489ed0c50e7d7071e3a03d941c`, mac yak `23b68a5f8dd485fcf26bc57ed23f4c335d8effae0b211635d4c42f34706e26cf`, zip `d48469bbfe789314ea8aa22105b92d4e6012947a84e47f83d02063299e293251`.
+- Still open: a play-test in Rhino for Mac. A problem found there needs 1.0.3, because a pushed version cannot be replaced.
