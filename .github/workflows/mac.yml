@@ -33,18 +33,31 @@ jobs:
         run: dotnet build src/Moyu/Moyu.csproj -c Release -f net7.0
 
       - name: Solver and game tests on Apple silicon
-        run: dotnet run -c Release --project tests/Moyu.Core.Tests
+        run: |
+          set +e +o pipefail
+          dotnet run -c Release --project tests/Moyu.Core.Tests 2>&1 | tee "$RUNNER_TEMP/core.txt"
+          status=${PIPESTATUS[0]}
+          python3 .github/annotate.py "$RUNNER_TEMP/core.txt" "Core tests" $status
+          exit $status
 
       - name: AppKit keyboard monitor with real key events
-        run: dotnet run -c Release --project tests/Moyu.MacTests
+        run: |
+          set +e +o pipefail
+          dotnet run -c Release --project tests/Moyu.MacTests 2>&1 | tee "$RUNNER_TEMP/mac.txt"
+          status=${PIPESTATUS[0]}
+          python3 .github/annotate.py "$RUNNER_TEMP/mac.txt" "AppKit tests" $status
+          exit $status
 
       - name: Cache the Rhino for Mac installer
+        # Runs even when an earlier test failed, so one run reports every check.
+        if: ${{ !cancelled() }}
         uses: actions/cache@v4
         with:
           path: ~/rhino-dmg
           key: rhino-mac-${{ env.RHINO_MAC_VERSION }}
 
       - name: Download Rhino for Mac
+        if: ${{ !cancelled() }}
         run: |
           mkdir -p ~/rhino-dmg
           dmg=~/rhino-dmg/rhino_$RHINO_MAC_VERSION.dmg
@@ -54,6 +67,7 @@ jobs:
           ls -l "$dmg"
 
       - name: Mount Rhino for Mac
+        if: ${{ !cancelled() }}
         run: |
           mnt="$RUNNER_TEMP/rhino"
           yes | hdiutil attach -nobrowse -readonly -noautoopen -mountpoint "$mnt" ~/rhino-dmg/rhino_$RHINO_MAC_VERSION.dmg > /dev/null
@@ -65,7 +79,13 @@ jobs:
             | sed "s|$app/||"
 
       - name: Check every API Moyu uses against Rhino for Mac
-        run: dotnet run -c Release --project tests/Moyu.MacCompat -- src/Moyu/bin/Release/net7.0/Moyu.gha "$RHINO_APP" tests/Moyu.MacCompat/windows-only.txt
+        if: ${{ !cancelled() }}
+        run: |
+          set +e +o pipefail
+          dotnet run -c Release --project tests/Moyu.MacCompat -- src/Moyu/bin/Release/net7.0/Moyu.gha "$RHINO_APP" tests/Moyu.MacCompat/windows-only.txt 2>&1 | tee "$RUNNER_TEMP/compat.txt"
+          status=${PIPESTATUS[0]}
+          python3 .github/annotate.py "$RUNNER_TEMP/compat.txt" "Rhino for Mac API check" $status
+          exit $status
 
       - name: Upload the Mac plug-in
         if: always()

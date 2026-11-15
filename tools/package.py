@@ -2,10 +2,14 @@
 
     python tools/package.py            # build the plugin (Rhino must be closed), then package
     python tools/package.py --no-build # package the existing Release outputs (refused when they were built from another <Version>)
+    python tools/package.py --out DIR  # write to DIR instead of dist/
 
-Outputs go to dist/ (ignored by git):
-    dist/moyu-<version>-<dist>.yak        the Package Manager package (net48 + net7.0 builds, examples, guide PDFs, quick start)
-    dist/Moyu-<version>-food4rhino.zip    the same .yak plus the bare .gha files, examples, guide PDFs, QUICKSTART, INSTALL and LICENSE
+Outputs go to dist/ (ignored by git); only these are replaced, anything else in dist/ is left alone:
+    dist/moyu-<version>-rh8_0-win.yak     the Package Manager package for Windows (net48 + net7.0-windows builds, examples,
+                                          guide PDFs, quick start)
+    dist/moyu-<version>-rh8_0-mac.yak     the same for Rhino for Mac (the plain net7.0 build, which carries the Mac code)
+    dist/Moyu-<version>-food4rhino.zip    both .yak files plus the bare .gha files, examples, guide PDFs, QUICKSTART, INSTALL
+                                          and LICENSE
     dist/SHA256SUMS.txt
 
 Every packaged file is checked for this machine's paths and user name before anything is written; examples come from
@@ -26,8 +30,16 @@ SRC = ROOT / "src" / "Moyu"
 PACKAGING = ROOT / "packaging"
 DIST = ROOT / "dist"
 YAK = Path(os.environ.get("YAK_EXE") or next((p for p in (r"C:\Program Files\Rhino 8\System\Yak.exe", r"E:\Rhino 8\System\Yak.exe") if os.path.exists(p)), r"C:\Program Files\Rhino 8\System\Yak.exe"))
-# Rhino 8 loads the build that matches its runtime from these folders inside the package.
-BUILDS = {"net48": SRC / "bin" / "Release" / "net48", "net7.0": SRC / "bin" / "Release" / "net7.0-windows"}
+# One Yak distribution per platform. Rhino 8 loads the build that matches its runtime from these folders inside the
+# package: on Windows net48 (.NET Framework) or net7.0 (.NET Core, built as net7.0-windows); Rhino for Mac only runs .NET
+# Core and gets the plain net7.0 build, which references WinForms and System.Drawing the way Rhino for Mac provides them.
+RELEASE = SRC / "bin" / "Release"
+PLATFORMS = {
+    "win": {"net48": RELEASE / "net48", "net7.0": RELEASE / "net7.0-windows"},
+    "mac": {"net7.0": RELEASE / "net7.0"},
+}
+# Where each build goes in the food4rhino zip, for the hand install INSTALL.md describes.
+ZIP_GHA = {("win", "net48"): "windows/net48", ("win", "net7.0"): "windows/net7.0", ("mac", "net7.0"): "mac"}
 EXAMPLES = PACKAGING / "examples"
 
 
@@ -110,23 +122,34 @@ def gha_version(gha):
     return run.stdout.strip().split("+")[0]
 
 
-def stage(ver):
+def check_builds(ver):
     # A pushed yak version can never be replaced, so stale outputs from another <Version> must not be packaged under this one.
-    for src in BUILDS.values():
-        gha = src / "Moyu.gha"
-        if not gha.exists():
-            sys.exit(f"Missing {gha}; build first")
-        built = gha_version(gha)
-        if built != ver:
-            sys.exit(f"{gha.relative_to(ROOT)} is {built or 'unversioned'} but Moyu.csproj says {ver}; build first (run without --no-build)")
-        check_private(str(gha.relative_to(ROOT)), gha.read_bytes())
+    for builds in PLATFORMS.values():
+        for src in builds.values():
+            gha = src / "Moyu.gha"
+            if not gha.exists():
+                sys.exit(f"Missing {gha}; build first")
+            built = gha_version(gha)
+            if built != ver:
+                sys.exit(f"{gha.relative_to(ROOT)} is {built or 'unversioned'} but Moyu.csproj says {ver}; build first (run without --no-build)")
+            check_private(str(gha.relative_to(ROOT)), gha.read_bytes())
     for name, src in payload():
         check_private(name, src.read_bytes())
-    if DIST.exists():
-        shutil.rmtree(DIST)
-    yak_dir = DIST / "yak"
+
+
+def clean():
+    """Removes what an earlier run wrote, and nothing else (dist/ also holds other work)."""
+    DIST.mkdir(parents=True, exist_ok=True)
+    for p in list(DIST.glob("yak")) + list(DIST.glob("yak-*")):
+        shutil.rmtree(p)
+    for p in list(DIST.glob("moyu-*.yak")) + list(DIST.glob("Moyu-*-food4rhino.zip")) + list(DIST.glob("SHA256SUMS.txt")):
+        p.unlink()
+
+
+def stage(ver, platform):
+    yak_dir = DIST / f"yak-{platform}"
     yak_dir.mkdir(parents=True)
-    for folder, src in BUILDS.items():
+    for folder, src in PLATFORMS[platform].items():
         gha = src / "Moyu.gha"
         (yak_dir / folder).mkdir()
         shutil.copy2(gha, yak_dir / folder / "Moyu.gha")
@@ -140,11 +163,10 @@ def stage(ver):
     return yak_dir
 
 
-def yak_build(yak_dir):
+def yak_build(yak_dir, platform):
     if not YAK.exists():
         sys.exit(f"Yak not found at {YAK}; set YAK_EXE")
-    # The package only contains Grasshopper assemblies that P/Invoke user32, so it is a Windows package.
-    cmd = [str(YAK), "build", "--platform", "win"]
+    cmd = [str(YAK), "build", "--platform", platform]
     print(" ".join(cmd), "in", yak_dir)
     run = subprocess.run(cmd, cwd=yak_dir, capture_output=True, text=True, encoding="utf-8", errors="replace")
     print(run.stdout.strip())
@@ -164,14 +186,18 @@ def yak_build(yak_dir):
     return target
 
 
-def food4rhino_zip(ver, yak_file):
+def food4rhino_zip(ver, yak_files):
     name = f"Moyu-{ver}"
     zpath = DIST / f"{name}-food4rhino.zip"
-    install = (PACKAGING / "INSTALL.md").read_text(encoding="utf-8").replace("{version}", ver).replace("{yak}", yak_file.name)
+    install = (PACKAGING / "INSTALL.md").read_text(encoding="utf-8").replace("{version}", ver)
+    for platform, yak_file in yak_files.items():
+        install = install.replace("{yak_" + platform + "}", yak_file.name)
     with zipfile.ZipFile(zpath, "w", zipfile.ZIP_DEFLATED) as z:
-        z.write(yak_file, f"{name}/{yak_file.name}")
-        for folder, src in BUILDS.items():
-            z.write(src / "Moyu.gha", f"{name}/{folder}/Moyu.gha")
+        for yak_file in yak_files.values():
+            z.write(yak_file, f"{name}/{yak_file.name}")
+        for platform, builds in PLATFORMS.items():
+            for folder, src in builds.items():
+                z.write(src / "Moyu.gha", f"{name}/{ZIP_GHA[(platform, folder)]}/Moyu.gha")
         z.writestr(f"{name}/INSTALL.md", install)
         for arc, src in payload():
             z.write(src, f"{name}/{arc}")
@@ -191,21 +217,27 @@ def main():
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--no-build", action="store_true", help="package the existing Release outputs without building")
+    ap.add_argument("--out", help="write the packages to this folder instead of dist/")
     args = ap.parse_args()
+    global DIST
+    if args.out:
+        DIST = Path(args.out).resolve()
     ver = version()
     print(f"Moyu {ver}")
     if not args.no_build:
         build()
-    yak_dir = stage(ver)
-    yak_file = yak_build(yak_dir)
-    zpath = food4rhino_zip(ver, yak_file)
+    check_builds(ver)
+    clean()
+    yak_files = {platform: yak_build(stage(ver, platform), platform) for platform in PLATFORMS}
+    zpath = food4rhino_zip(ver, yak_files)
     sums = []
-    for p in (yak_file, zpath):
+    for p in list(yak_files.values()) + [zpath]:
         sums.append(f"{sha256(p)}  {p.name}")
-        print(f"{p.relative_to(ROOT)}  {p.stat().st_size:,} bytes")
+        print(f"{p.name}  {p.stat().st_size:,} bytes")
     (DIST / "SHA256SUMS.txt").write_text("\n".join(sums) + "\n", encoding="utf-8")
-    with zipfile.ZipFile(yak_file) as z:
-        print("yak contents:", ", ".join(z.namelist()))
+    for yak_file in yak_files.values():
+        with zipfile.ZipFile(yak_file) as z:
+            print(f"{yak_file.name}:", ", ".join(z.namelist()))
 
 
 if __name__ == "__main__":
