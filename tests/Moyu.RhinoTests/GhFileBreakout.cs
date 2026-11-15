@@ -41,7 +41,7 @@ namespace Moyu.RhinoTests
         "← → / A D 或移动鼠标 控制挡板 · 空格 发球 · Paddle with arrows, A D or the mouse, Space serves\n" +
         "Esc 暂停 / 继续，Shift+Esc 退出 · Home 复位视角 · Esc pause / resume, Shift+Esc quit, Home reset view\n" +
         "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key\n" +
-        "右键游戏组件 › Language · 语言：Auto 跟随 Windows / 中文 / English · Right-click the study › Language: Auto (follows Windows), 中文 or English");
+        "右键游戏组件 › Language · 语言：Auto 跟随系统 / 中文 / English · Right-click the study › Language: Auto (follows the system), 中文 or English");
       QuickStart(b, 0, 0);
       Bonds(b, 0, 300);
       Custom(b, 0, 640);

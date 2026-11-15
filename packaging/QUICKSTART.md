@@ -1,7 +1,7 @@
 # Moyu — quick start / 快速上手
 
-Rhino 8 for Windows. Open an example in Grasshopper, then follow its note at the top of the canvas.
-Windows 版 Rhino 8。在 Grasshopper 里打开一个示例，按画布顶部的说明操作。
+Rhino 8 for Windows and Mac. Open an example in Grasshopper, then follow its note at the top of the canvas.
+Rhino 8（Windows 和 Mac）。在 Grasshopper 里打开一个示例，按画布顶部的说明操作。
 
 **Quickest way / 最快的办法:** drop the **Examples** component (the first panel, Moyu › 0 | Examples, or search `example`) on the canvas and click a button; the example opens in a new tab as an unnamed copy.
 把 **Examples** 组件（最前面的 Moyu › 0 | Examples 面板，或在画布上搜 `example` / `示例`）拖到画布上，点一个按钮，示例就在新标签页里打开（未命名的副本）。
@@ -33,7 +33,7 @@ Click **▶ Run** under the study component; it plays in the active Rhino viewpo
 | Shift+Esc (paused) | quit · 退出 |
 | Enter / Space (game over) | play again · 再来一局 |
 | Home | reset the view · 复位视角 |
-| key left of 1 (` on US keyboards) | boss key: a serious-looking study drawing, press again to return · 老板键：切成正经的研究图，再按一次回来 |
+| key left of 1 (` on US keyboards, § on Mac ISO keyboards) | boss key: a serious-looking study drawing, press again to return · 老板键：切成正经的研究图，再按一次回来 |
 | left / right drag | orbit · 转视角 |
 
 | Game / 游戏 | Keys / 按键 |
@@ -43,7 +43,7 @@ Click **▶ Run** under the study component; it plays in the active Rhino viewpo
 | Rebound | ← → / A D or the mouse move the paddle · Space serves · 挡板 / 发球 |
 | Swift | Space / ↑ / W / left click flap · 扇翅 |
 
-While a dialog, the Grasshopper window or a Rhino command has the keyboard, the game pauses. High scores: `%APPDATA%\Moyu\`.
-对话框、Grasshopper 窗口或 Rhino 命令占用键盘时游戏自动暂停。最高分存在 `%APPDATA%\Moyu\`。
+While a dialog, the Grasshopper window or a Rhino command has the keyboard, the game pauses. High scores: `%APPDATA%\Moyu\` (Mac: `~/Library/Application Support/Moyu/`).
+对话框、Grasshopper 窗口或 Rhino 命令占用键盘时游戏自动暂停。最高分存在 `%APPDATA%\Moyu\`（Mac：`~/Library/Application Support/Moyu/`）。
 
 Illustrated guide / 图文手册: `Moyu-Guide-EN.pdf`, `Moyu-Guide-ZH.pdf` · More: https://github.com/ChenmingHe0126/moyu · Install / uninstall: `INSTALL.md` · Licence: MIT

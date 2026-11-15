@@ -26,7 +26,7 @@
          without the "+commit" metadata, pre-release suffix kept) back from the assembly, and tools/package.py reads Version
          and refuses Release outputs built from a different one, so the Grasshopper library dialog, manifest.yml and the
          packages all agree. -->
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <Title>Moyu</Title>
     <Authors>Ming</Authors>
     <Company>Ming</Company>

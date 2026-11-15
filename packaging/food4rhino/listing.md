@@ -1,4 +1,4 @@
-# food4rhino listing copy — Moyu (1.0.0, updated for 1.0.1)
+# food4rhino listing copy — Moyu (1.0.0, updated for 1.0.1 and 1.0.2)
 
 Paste these into the food4rhino app form. The page is English only (food4rhino takes English); the Chinese block below is for reference and is not uploaded. Screenshots to upload are listed at the end.
 
@@ -19,6 +19,7 @@ Live 2D/3D topology optimisation for Grasshopper, plus four Rhino viewport games
 - **Serpentine**: a snake on any surface (about 1 h 10 min).
 - **Rebound**: brick breaker on real brick bonds (about 25 min).
 - **Swift**: one-key flight through a building section (about 55 min).
+- **Rhino 8 for Windows and Mac.** Mac support is new in 1.0.2 (about 40 min); it passed automated checks on macOS and awaits play-testing in Rhino for Mac.
 
 Open source (MIT): https://github.com/ChenmingHe0126/moyu
 
@@ -31,6 +32,7 @@ Open source (MIT): https://github.com/ChenmingHe0126/moyu
 - **Serpentine 蜿蜒**：任意曲面上的贪吃蛇（约 1 小时 10 分）。
 - **Rebound 回弹**：按真实砌法排砖的打砖块（约 25 分钟）。
 - **Swift 雨燕**：在建筑剖面里单键飞行（约 55 分钟）。
+- **支持 Rhino 8 的 Windows 版和 Mac 版。**Mac 版是 1.0.2 新加的（约 40 分钟），通过了 macOS 上的自动检查，还没在 Rhino for Mac 里实际试玩。
 
 开源（MIT）：https://github.com/ChenmingHe0126/moyu
 
@@ -50,7 +52,7 @@ As of 1.0.1 (2026-11-08) the page shows three rows, each with its version in the
 | Licence | MIT (open source) |
 | Price | Free |
 | Rhino version | 8 |
-| Platform | Windows |
+| Platform | Windows, Mac (from 1.0.2) |
 | Keywords | topology optimisation, SIMP, structural, voxel, grasshopper, game, viewport, interaction, AI agent, Claude Code, teaching, research |
 | Website / source | https://github.com/ChenmingHe0126/moyu |
 | Support Email | mandatory on food4rhino: use an address you are willing to publish (it is shown on the app page) |

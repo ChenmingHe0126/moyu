@@ -13,7 +13,7 @@
   <div class="top">
     <img class="fish" src="icons/Moyu.png" alt="">
     <div>
-      <div class="kick">GRASSHOPPER PLUGIN · RHINO 8 FOR WINDOWS</div>
+      <div class="kick">GRASSHOPPER PLUGIN · RHINO 8 FOR WINDOWS AND MAC</div>
       <h1>Moyu<span>@@VERSION@@</span></h1>
       <p class="lead"><zh>交互式拓扑优化，加上四个伪装成建筑研究工具的视口小游戏</zh><en>Interactive topology optimisation, plus four viewport games disguised as architecture study tools</en></p>
       <p class="sub"><zh>用户手册 · 一个用 AI 编程代理快速开发插件的研究与教学项目</zh><en>User guide · a research and teaching project on building a plugin quickly with an AI coding agent</en></p>
@@ -42,8 +42,8 @@
     <li><span><zh>常见问题与卸载</zh><en>Troubleshooting and uninstall</en></span><span>12</span></li>
   </ol>
   <div class="note mt">
-    <zh><b>研究与教学项目。</b>代码、测试和文档几乎都由 Claude Code（Anthropic 的编程代理）编写，作者提需求、看结果、试玩。拓扑优化的结果只用于学习和概念设计，不能替代工程分析。插件不联网，只在 <code>%APPDATA%\Moyu\</code> 写最高分。MIT 许可，源码与开发记录：https://github.com/ChenmingHe0126/moyu</zh>
-    <en><b>A research and teaching project.</b> Almost all of the code, tests and documentation were written by Claude Code (Anthropic's coding agent); the author asked for each part, reviewed it and play-tested it. Optimisation results are for study and concept design, not a substitute for engineering analysis. The plugin never goes online and only writes high scores to <code>%APPDATA%\Moyu\</code>. MIT licence; source and development logs: https://github.com/ChenmingHe0126/moyu</en>
+    <zh><b>研究与教学项目。</b>代码、测试和文档几乎都由 Claude Code（Anthropic 的编程代理）编写，作者提需求、看结果、试玩。拓扑优化的结果只用于学习和概念设计，不能替代工程分析。插件不联网，只在 <code>%APPDATA%\Moyu\</code>（Mac：<code>~/Library/Application Support/Moyu/</code>）写最高分。MIT 许可，源码与开发记录：https://github.com/ChenmingHe0126/moyu</zh>
+    <en><b>A research and teaching project.</b> Almost all of the code, tests and documentation were written by Claude Code (Anthropic's coding agent); the author asked for each part, reviewed it and play-tested it. Optimisation results are for study and concept design, not a substitute for engineering analysis. The plugin never goes online and only writes high scores to <code>%APPDATA%\Moyu\</code> (Mac: <code>~/Library/Application Support/Moyu/</code>). MIT licence; source and development logs: https://github.com/ChenmingHe0126/moyu</en>
   </div>
   <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>1</span></footer>
 </section>
@@ -91,18 +91,19 @@
 <section class="page">
   <div class="ph"><span class="num">02</span><span><zh>安装与面板</zh><en>Install and panels</en></span></div>
   <h2><zh>安装</zh><en>Install</en></h2>
-  <p class="lead"><zh>需要 Windows 版 Rhino 8。两种运行时（默认的 .NET Core 和 .NET Framework）都能用；没有在 Mac 版上测试过。</zh><en>Needs Rhino 8 for Windows, in either runtime (.NET Core, the default, or .NET Framework). Not tested on Rhino for Mac.</en></p>
+  <p class="lead"><zh>需要 Rhino 8，Windows 版或 Mac 版。Windows 上两种运行时（默认的 .NET Core 和 .NET Framework）都能用。Mac 版从 1.0.2 开始支持：通过了 macOS 上的自动检查，还没有在 Rhino for Mac 里实际试玩过，遇到问题请到 GitHub 提。</zh><en>Needs Rhino 8 for Windows or Mac. On Windows either runtime works (.NET Core, the default, or .NET Framework). Mac support is new in 1.0.2: it passed automated checks on macOS but has not yet been play-tested in Rhino for Mac, so please report problems on GitHub.</en></p>
   <div class="install">
     <div><h4><zh>A · 包管理器（推荐）</zh><en>A · Package Manager (recommended)</en></h4><ol>
       <li><zh>在 Rhino 里运行</zh><en>In Rhino run</en> <code>_PackageManager</code></li>
       <li><zh>搜索</zh><en>Search for</en> <b>moyu</b> → Install</li>
       <li><zh>重启 Rhino</zh><en>Restart Rhino</en></li></ol></div>
     <div><h4><zh>B · .yak 文件</zh><en>B · The .yak file</en></h4><ol>
-      <li><zh>把 food4rhino 下载的</zh><en>Drag the</en> <code>moyu-@@VERSION@@-rh8_0-win.yak</code> <zh>拖进 Rhino 窗口</zh><en>from food4rhino into a Rhino window</en></li>
+      <li><zh>把 food4rhino 下载的</zh><en>Drag the</en> <code>moyu-@@VERSION@@-rh8_0-win.yak</code> <zh>（Mac 是 <code>…-mac.yak</code>）拖进 Rhino 窗口</zh><en>(<code>…-mac.yak</code> on a Mac) from food4rhino into a Rhino window</en></li>
       <li><zh>重启 Rhino</zh><en>Restart Rhino</en></li></ol></div>
     <div><h4><zh>C · 手动复制</zh><en>C · By hand</en></h4><ol>
       <li><zh>把</zh><en>Copy</en> <b><zh>一个</zh><en>one</en></b> <code>Moyu.gha</code> <zh>复制到</zh><en>to</en> <code>%APPDATA%\Grasshopper\Libraries\Moyu\</code></li>
-      <li><zh>.NET Core 用 net7.0，.NET Framework 用 net48（</zh><en>net7.0 for .NET Core, net48 for .NET Framework (</en><code>_SetDotNetRuntime</code><zh> 可查）</zh><en> tells which)</en></li>
+      <li><zh>Windows：.NET Core 用 windows\net7.0，.NET Framework 用 windows\net48（</zh><en>Windows: windows\net7.0 for .NET Core, windows\net48 for .NET Framework (</en><code>_SetDotNetRuntime</code><zh> 可查）</zh><en> tells which)</en></li>
+      <li><zh>Mac：把 mac\Moyu.gha 放进 Grasshopper › File › Special Folders › Components Folder</zh><en>Mac: put mac\Moyu.gha into Grasshopper › File › Special Folders › Components Folder</en></li>
       <li><zh>被 Windows 阻止时：右键 › 属性 › 解除锁定，重启 Rhino</zh><en>If Windows blocks it: right-click › Properties › Unblock; restart Rhino</en></li></ol></div>
   </div>
 
@@ -127,7 +128,7 @@
   <div class="g23" style="grid-template-columns: 1fr 46mm">
     <div>
     <p class="lead"><zh>Moyu 带 6 个现成的示例。最快的打开办法：把最前面 <b>Moyu › 0 | Examples</b> 面板里的 <b>Examples</b> 组件拖到画布上（或在画布上双击搜“示例”），点上面的按钮，示例就在新标签页里打开；那是一份未命名的副本，保存时会问存到哪里。画布顶部有几行中英文说明。</zh><en>Moyu comes with six ready-made examples. The quickest way in: drop the <b>Examples</b> component (the first panel, <b>Moyu › 0 | Examples</b>, or search “example” on the canvas) and click a button; the example opens in a new tab as an unnamed copy, so saving asks where to keep it. The lines at the top of the canvas say what to do.</en></p>
-    <div class="note"><zh><b>文件本身在哪（也可以 File › Open 或拖进画布）：</b>包管理器装的在 <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>；food4rhino 压缩包里的在 <code>examples\</code>。</zh><en><b>Where the files are (File › Open or drag them in also works):</b> after a Package Manager install, in <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>; in the food4rhino archive, in <code>examples\</code>.</en></div>
+    <div class="note"><zh><b>文件本身在哪（也可以 File › Open 或拖进画布）：</b>包管理器装的在 <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code>（Mac 把 <code>%APPDATA%</code> 换成 <code>~/Library/Application Support</code>）；food4rhino 压缩包里的在 <code>examples\</code>。</zh><en><b>Where the files are (File › Open or drag them in also works):</b> after a Package Manager install, in <code>%APPDATA%\McNeel\Rhinoceros\packages\8.0\moyu\@@VERSION@@\examples\</code> (on a Mac, <code>~/Library/Application Support</code> in place of <code>%APPDATA%</code>); in the food4rhino archive, in <code>examples\</code>.</en></div>
     </div>
     <figure><img src="img/examples_component.jpg" alt=""><figcaption><zh>Examples 组件：每个按钮打开一个示例。</zh><en>The Examples component: each button opens one example.</en></figcaption></figure>
   </div>
@@ -229,7 +230,7 @@
     <span><kbd>Esc</kbd><kbd>P</kbd></span><span><zh>暂停。暂停时 <kbd>Esc</kbd> 继续，<kbd>Shift</kbd>+<kbd>Esc</kbd> 退出。</zh><en>Pause. While paused, <kbd>Esc</kbd> resumes and <kbd>Shift</kbd>+<kbd>Esc</kbd> quits.</en></span>
     <span><kbd>Enter</kbd><kbd>Space</kbd></span><span><zh>结算画面上再来一局（Esc 退出）。</zh><en>Play again on the results screen (Esc quits).</en></span>
     <span><kbd>Home</kbd></span><span><zh>镜头回到游戏的默认视角。</zh><en>Back to the game's default view.</en></span>
-    <span><kbd>`</kbd></span><span><zh>老板键：1 左边的那个键（美式键盘上是 `）。</zh><en>The boss key: the key left of 1 (` on a US keyboard).</en></span>
+    <span><kbd>`</kbd></span><span><zh>老板键：1 左边的那个键（美式键盘上是 `，Mac 的 ISO 键盘上是 §）。</zh><en>The boss key: the key left of 1 (` on a US keyboard, § on a Mac ISO keyboard).</en></span>
     <span><zh>鼠标左键 / 右键拖动</zh><en>Left / right drag</en></span><span><zh>转视角；中键在游戏视口里不起作用。</zh><en>Orbit the view; the middle button does nothing in the game viewport.</en></span>
   </div>
   <h3><zh>老板键</zh><en>The boss key</en></h3>
@@ -239,7 +240,7 @@
     <figure><img src="img/rebound_boss.jpg" alt=""><figcaption><zh>老板模式：同一面墙画成塔楼幕墙立面</zh><en>Boss screen: the same wall drawn as a tower elevation</en></figcaption></figure>
   </div>
   <p class="mt2" style="font-size:8.3pt"><zh>一帧之内切成一张正经的设计图，指标按游戏里的数据实算；再按一次 3-2-1 回来。Rhino 失去焦点（Alt+Tab 到别的程序）时自动切过去。老板模式里键盘全部还给 Rhino。</zh><en>One frame turns the game into a serious drawing whose numbers come from the game state; press again for a 3-2-1 countdown back. It also switches by itself when Rhino loses focus (Alt+Tab). In the boss screen the keyboard belongs to Rhino.</en></p>
-  <div class="note warm"><zh><b>键盘让给谁。</b>只有焦点在 Rhino 主窗口（或游戏所在的浮动视口）时按键才归游戏；Ctrl / Alt 组合键任何时候都放行。对话框、Grasshopper 窗口或 Rhino 命令拿走键盘时，游戏自动暂停（倒计时也停住）；点回视口、按 Esc 继续。中文输入法开着也能玩。最高分存在 <code>%APPDATA%\Moyu\</code>。</zh><en><b>Who gets the keyboard.</b> Keys go to the game only while the Rhino window (or the game's floating viewport) has the focus; Ctrl and Alt shortcuts always pass. When a dialog, the Grasshopper window or a Rhino command takes the keyboard, the game pauses (countdowns too); click the viewport and press Esc to carry on. An East Asian input method can stay on. High scores are kept in <code>%APPDATA%\Moyu\</code>.</en></div>
+  <div class="note warm"><zh><b>键盘让给谁。</b>只有焦点在 Rhino 主窗口（或游戏所在的浮动视口）时按键才归游戏；Ctrl / Alt 组合键（Mac 上还有 ⌘）任何时候都放行。对话框、Grasshopper 窗口或 Rhino 命令拿走键盘时，游戏自动暂停（倒计时也停住）；点回视口、按 Esc 继续。中文输入法开着也能玩。最高分存在 <code>%APPDATA%\Moyu\</code>。</zh><en><b>Who gets the keyboard.</b> Keys go to the game only while the Rhino window (or the game's floating viewport) has the focus; Ctrl and Alt shortcuts (and ⌘ on a Mac) always pass. When a dialog, the Grasshopper window or a Rhino command takes the keyboard, the game pauses (countdowns too); click the viewport and press Esc to carry on. An East Asian input method can stay on. High scores are kept in <code>%APPDATA%\Moyu\</code>.</en></div>
   <footer class="pf"><span>Moyu @@VERSION@@ · <zh>用户手册</zh><en>User guide</en></span><span>7</span></footer>
 </section>
 
@@ -392,6 +393,7 @@
     <div><h4><zh>手动安装</zh><en>Copied by hand</en></h4><code>%APPDATA%\Grasshopper\Libraries\Moyu\</code><zh>你复制进去的那一份 Moyu.gha。</zh><en>The one Moyu.gha you copied.</en></div>
     <div><h4><zh>最高分</zh><en>High scores</en></h4><code>%APPDATA%\Moyu\</code><zh>每个游戏一个纯文本文件，例如 swift-scores.txt。插件只写这里。</zh><en>One plain-text file per game, such as swift-scores.txt. The plugin writes nowhere else.</en></div>
   </div>
+  <p class="mt2" style="font-size:8.3pt"><zh><b>Mac：</b>上面的 <code>%APPDATA%</code> 换成 <code>~/Library/Application Support</code>，包里只有 net7.0 一份插件；手动安装的那份在 Grasshopper › File › Special Folders › Components Folder 打开的文件夹里。</zh><en><b>On a Mac:</b> read <code>~/Library/Application Support</code> for <code>%APPDATA%</code>; the package holds one build (net7.0), and a hand-copied Moyu.gha is in the folder that Grasshopper › File › Special Folders › Components Folder opens.</en></p>
   <h2 class="mt"><zh>卸载</zh><en>Uninstall</en></h2>
   <div class="install mt2">
     <div><h4><zh>包管理器</zh><en>Package Manager</en></h4><code>_PackageManager</code> › Installed › moyu › Uninstall</div>

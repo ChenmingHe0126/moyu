@@ -10,13 +10,13 @@ namespace Moyu.Components
   /// <summary>
   /// Base for the four game components (Massing, Path, Facade and Airflow Study): the Run button, and the language of
   /// the text the game draws, picked from the component's right-click menu (Auto, 中文 or English) and saved with the
-  /// definition. Auto, the default, follows the Windows display language.
+  /// definition. Auto, the default, follows the system's display language.
   /// </summary>
   public abstract class GameComponent : MoyuComponent, IRunnable, ILanguageOwner
   {
     const string LanguageKey = "MoyuLanguage";
 
-    /// <summary>The right-click menu's choice; null is Auto (follows the Windows display language).</summary>
+    /// <summary>The right-click menu's choice; null is Auto (follows the system's display language).</summary>
     UiLanguage? _language;
 
     protected GameComponent(string name, string nickname, string description, string subCategory)

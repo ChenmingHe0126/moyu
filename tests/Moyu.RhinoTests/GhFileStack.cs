@@ -43,7 +43,7 @@ namespace Moyu.RhinoTests
         "← ↑ ↓ → 移动 · 拖右下角 gumball 圆环或 Q E / W S / A D 旋转 · 空格 落下 · C 暂存 · Move, rotate (gumball or keys), Space drop, C hold\n" +
         "Esc 暂停 / 继续，Shift+Esc 退出 · Home 复位视角 · Esc pause / resume, Shift+Esc quit, Home reset view\n" +
         "1 左边的键（美式键盘 `）老板键：切成研究图，再按一次回来 · Key left of 1 (` on US keyboards): boss key\n" +
-        "右键游戏组件 › Language · 语言：Auto 跟随 Windows / 中文 / English · Right-click the study › Language: Auto (follows Windows), 中文 or English");
+        "右键游戏组件 › Language · 语言：Auto 跟随系统 / 中文 / English · Right-click the study › Language: Auto (follows the system), 中文 or English");
       QuickStart(b, 0, 0);
       Custom(b, 0, 330);
 

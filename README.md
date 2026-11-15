@@ -309,7 +309,7 @@ dotnet run -c Release --project tests/Moyu.RhinoTests -- --write-gh
 
 ## 发布
 
-版本号只写在 `src/Moyu/Moyu.csproj` 的 `<Version>` 里（当前 1.0.1），程序集、`manifest.yml` 和包名都从它来；Grasshopper 库对话框里显示的版本就是 `<Version>` 原样（预发布后缀如 `1.0.1-beta` 也保留）。发布包由一个脚本生成：
+版本号只写在 `src/Moyu/Moyu.csproj` 的 `<Version>` 里（当前 1.0.2），程序集、`manifest.yml` 和包名都从它来；Grasshopper 库对话框里显示的版本就是 `<Version>` 原样（预发布后缀如 `1.0.1-beta` 也保留）。发布包由一个脚本生成：
 
 ```bash
 python tools/package.py            # 关掉 Rhino 后：Release 构建（要求 0 警告）→ 打包
@@ -322,9 +322,10 @@ python tools/package.py --no-build # 只用已有的 Release 产物打包
 
 | 文件 | 内容 | 用途 |
 |---|---|---|
-| `moyu-<版本>-rh8_0-win.yak` | `net48/Moyu.gha` + `net7.0/Moyu.gha`、`manifest.yml`、`icon.png`、`LICENSE.txt`、`QUICKSTART.md`、`Moyu-Guide-ZH.pdf` / `Moyu-Guide-EN.pdf`（图文手册）、`examples/`（6 个示例 .gh），一个包同时装两种运行时 | Rhino 包管理器：`yak push`，或在 food4rhino 上作为附件 |
-| `Moyu-<版本>-food4rhino.zip` | 上面的 .yak、两个裸 `.gha`、`examples/`、两份手册 PDF、`QUICKSTART.md`、`INSTALL.md`、`LICENSE.txt` | food4rhino 的下载包 |
-| `SHA256SUMS.txt` | 两个包的校验和 | 发布说明里贴 |
+| `moyu-<版本>-rh8_0-win.yak` | `net48/Moyu.gha` + `net7.0/Moyu.gha`、`manifest.yml`、`icon.png`、`LICENSE.txt`、`QUICKSTART.md`、`Moyu-Guide-ZH.pdf` / `Moyu-Guide-EN.pdf`（图文手册）、`examples/`（6 个示例 .gh），一个包同时装两种运行时 | Rhino 包管理器（Windows）：`yak push`，或在 food4rhino 上作为附件 |
+| `moyu-<版本>-rh8_0-mac.yak` | `net7.0/Moyu.gha`（plain `net7.0` 编出的 Mac 版），其余文件同上 | Rhino 包管理器（Mac）：`yak push` |
+| `Moyu-<版本>-food4rhino.zip` | 上面两个 .yak、三个裸 `.gha`（`windows/net48`、`windows/net7.0`、`mac`）、`examples/`、两份手册 PDF、`QUICKSTART.md`、`INSTALL.md`、`LICENSE.txt` | food4rhino 的下载包 |
+| `SHA256SUMS.txt` | 三个包的校验和 | 发布说明里贴 |
 
 示例 .gh 由 `dotnet run -c Release --project tests/Moyu.RhinoTests -- --examples packaging/examples` 生成（不碰 `tests/gh`）；它们同时作为资源编进 `Moyu.gha`（Examples 组件从这里打开），所以重新生成示例后要再编译一次插件，Rhino 场景测试会检查编进去的和 `packaging/examples` 是否一致。图文手册的源文件是 `packaging/guide/guide.html`（中英文写在一起），`python tools/make_guide.py` 用 Edge / Chrome 无界面打印出两份 PDF（加 `--preview` 另存每页 PNG 检查排版），图片取自 `docs/images`。打包前脚本会检查每个文件里有没有本机路径或用户名，有就拒绝；插件用 `PathMap` 编译，`.gha` 里只留 `/_/Moyu/...`。
 
