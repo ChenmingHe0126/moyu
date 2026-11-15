@@ -6,8 +6,8 @@
 
 - 整个插件（拓扑优化和四个游戏）改成了 Mac 也能用。拓扑优化本来就没有 Windows 专属写法；四个游戏按平台分开了九处实现，规则、画面、老板键伪装全部共用。
 - GitHub 的 Mac（macos-latest，macOS 26.7，Apple 芯片）上四项检查全过：编译 Mac 版（plain `net7.0`）、468 项核心测试、39 项键盘检查（真实按键事件进 AppKit 监视器）、API 核对（插件用到的 257 个类型、1591 个方法、146 个字段，在官方 Rhino 8.36 for Mac 安装包的程序集里都存在）。
-- Windows 没受影响：本机 Rhino 8.36 集成测试 71/71，Windows 版和 Mac 版两份编译都在 Windows Rhino 里跑过。
-- 没验证的：真 Rhino for Mac 里的画面和手感（要许可证，GitHub 上跑不了）；Windows 上的游戏这次没有实际重玩（自动测试不启动游戏）。
+- Windows 没受影响：本机 Rhino 8.36 集成测试 71/71，Windows 版和 Mac 版两份编译都在 Windows Rhino 里跑过；四个游戏也用真实按键各玩了一局（见下面"Windows 实机回归"）。
+- 没验证的：真 Rhino for Mac 里的画面和手感（要许可证，GitHub 上跑不了）。
 - 没发布：没合进 main，没推 Yak，没更新 food4rhino。
 
 ## 每处平台相关的实现
@@ -42,6 +42,28 @@ Mac 按键翻译成游戏原本认的 Windows 虚拟键（`Games/Common/Core/Mac
 
 顺带确认：Rhino 8.36 for Mac 跑在 .NET 10.0.8 上，自带 McNeel 的 System.Windows.Forms 7.0、System.Drawing.Common 7.0、Eto 2.11。
 
+## Windows 实机回归
+
+2026-11-15，本机 Rhino 8，`mac-support` 分支编出的 `net7.0-windows` 版（已安装的 1.0.1 包临时挪开，测完放回），用真实按键玩：
+
+| 游戏 | 试过的 | 结果 |
+|---|---|---|
+| VoxStack 叠楼 | 移动、旋转、翻转、落下、暂存、老板键来回、Esc 暂停、Shift+Esc 退出 | 正常 |
+| Serpentine 蜿蜒 | 左右转、C 切视角、老板键、结算画面、Esc 退出 | 正常 |
+| Rebound 回弹 | 发球、按住左右移动挡板、打砖得分、老板键来回（倒计时）、暂停、退出 | 正常 |
+| Swift 雨燕 | 空格和 ↑ 扇翅、老板键来回、结算画面 Enter 重开、组件上的 Stop | 正常 |
+
+另外：切到别的程序（记事本）时自动切到老板键画面；最高分照常读写 `%APPDATA%\Moyu\`；Examples 组件能打开例子。
+
+没有逐项试的：Ctrl / Alt 快捷键放行、中文输入法开着时的按键、鼠标转视角（这几处的 Windows 代码这次没改）。
+
+![VoxStack](images/mac-port/win-voxstack.jpg)
+![Serpentine](images/mac-port/win-serpentine.jpg)
+![Rebound](images/mac-port/win-rebound.jpg)
+![Swift](images/mac-port/win-swift.jpg)
+![VoxStack 暂停](images/mac-port/win-voxstack-paused.jpg)
+![Rebound 老板键](images/mac-port/win-rebound-boss.jpg)
+
 ## 朋友试用
 
 1. 从运行页面底部下载 `moyu-mac-…`（要登录 GitHub），解压出 `Moyu.gha`。
@@ -54,6 +76,5 @@ Mac 按键翻译成游戏原本认的 Windows 虚拟键（`Games/Common/Core/Mac
 ## 需要决定的事
 
 1. 先给朋友试。
-2. Windows 上要不要实际玩一遍游戏回归。
-3. 朋友试过后把 `mac-support` 合进 main。
-4. 发 1.0.2：改版本号、重新生成手册 PDF（`packaging/guide/guide.html` 里还写着只支持 Windows）、`python tools/package.py` 打出两个 .yak、推 Yak、更新 food4rhino。
+2. 朋友试过后把 `mac-support` 合进 main。
+3. 发 1.0.2：改版本号、重新生成手册 PDF（`packaging/guide/guide.html` 里还写着只支持 Windows）、`python tools/package.py` 打出两个 .yak、推 Yak、更新 food4rhino。
