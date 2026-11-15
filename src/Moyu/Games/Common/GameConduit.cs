@@ -21,9 +21,23 @@ namespace Moyu.Games.Common
   /// </summary>
   public abstract class GameConduit : DisplayConduit
   {
-    /// <summary>Bahnschrift: a DIN-style face, at home on drawings.</summary>
-    public const string Display = "Bahnschrift Light", UiLight = "Bahnschrift SemiLight", UiStrong = "Bahnschrift",
-      CjkLight = "Microsoft YaHei UI Light", Cjk = "Microsoft YaHei UI", Latin = "Segoe UI", LatinBold = "Segoe UI Semibold";
+    /// <summary>
+    /// Bahnschrift: a DIN-style face, at home on drawings. The Mac has neither Bahnschrift, Segoe UI nor YaHei, so it
+    /// gets its own closest families (Avenir Next, Helvetica Neue, PingFang SC), named by family so Rhino finds them.
+    /// </summary>
+    public static readonly string
+      Display = Mac ? "Avenir Next" : "Bahnschrift Light",
+      UiLight = Mac ? "Avenir Next" : "Bahnschrift SemiLight",
+      UiStrong = Mac ? "Avenir Next" : "Bahnschrift",
+      CjkLight = Mac ? "PingFang SC" : "Microsoft YaHei UI Light",
+      Cjk = Mac ? "PingFang SC" : "Microsoft YaHei UI",
+      Latin = Mac ? "Helvetica Neue" : "Segoe UI",
+      LatinBold = Mac ? "Helvetica Neue" : "Segoe UI Semibold";
+
+    static bool Mac => Moyu.Platform.OS.IsMac;
+
+    /// <summary>The DPI scale of the last frame drawn, for code with no display pipeline to ask (the gumball's hit test).</summary>
+    public static double LastDpiScale { get; private set; } = 1;
     const double HintSeconds = 7;
     const int MaxSprites = 200, MaxBalls = 400, MaxFlats = 300;
 
@@ -33,7 +47,11 @@ namespace Moyu.Games.Common
     /// </summary>
     public static double UiScale(double dpiScale, Size frame) => Math.Max(1, Math.Min(dpiScale, frame.Height / 720.0));
 
-    protected static double Ui(DisplayPipeline d) => UiScale(d.DpiScale, d.FrameSize);
+    protected static double Ui(DisplayPipeline d)
+    {
+      LastDpiScale = d.DpiScale;
+      return UiScale(d.DpiScale, d.FrameSize);
+    }
 
     /// <summary>A HUD length in whole pixels (text heights must be integers).</summary>
     protected static int Px(double v) => (int)Math.Round(v);
@@ -373,12 +391,14 @@ namespace Moyu.Games.Common
 
     // ---------------------------------------------------------------- HUD pieces
 
-    protected static void Text(DisplayPipeline d, string s, Color c, double x, double y, int height, string font = UiLight, bool middle = false) =>
-      d.Draw2dText(s, c, new Point2d(x, y), middle, height, font);
+    /// <summary>2D text; <paramref name="font"/> null is <see cref="UiLight"/>.</summary>
+    protected static void Text(DisplayPipeline d, string s, Color c, double x, double y, int height, string font = null, bool middle = false) =>
+      d.Draw2dText(s, c, new Point2d(x, y), middle, height, font ?? UiLight);
 
-    /// <summary>Right-aligned to <paramref name="right"/>.</summary>
-    protected static void TextRight(DisplayPipeline d, string s, Color c, double right, double y, int height, string font = UiLight)
+    /// <summary>Right-aligned to <paramref name="right"/>; <paramref name="font"/> null is <see cref="UiLight"/>.</summary>
+    protected static void TextRight(DisplayPipeline d, string s, Color c, double right, double y, int height, string font = null)
     {
+      font = font ?? UiLight;
       var r = d.Measure2dText(s, new Point2d(0, 0), false, 0, height, font);
       d.Draw2dText(s, c, new Point2d(right - r.Width, y), false, height, font);
     }

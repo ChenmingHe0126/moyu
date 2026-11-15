@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Checks a Moyu.gha against the assemblies of an unpacked Rhino for Mac (Rhino 8.app): every type, method and field
+    the plug-in uses must exist in the versions Rhino for Mac ships (its own System.Windows.Forms, System.Drawing, Eto,
+    RhinoCommon, Grasshopper). Run by the macOS GitHub workflow; works on any OS given the .app folder.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+  </ItemGroup>
+
+</Project>

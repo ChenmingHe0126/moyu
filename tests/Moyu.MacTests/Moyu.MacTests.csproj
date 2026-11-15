@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Runs the Mac keyboard monitor and the other AppKit calls on a real macOS (GitHub's macos-latest runner): real key
+    events go through NSApplication into the monitor. Rhino-free, like the code it tests. Prints "skipped" elsewhere.
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\src\Moyu\Platform\**\*.cs" Link="Platform\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\Moyu\Games\Common\Core\KeyTransitions.cs" Link="Core\KeyTransitions.cs" />
+    <Compile Include="..\..\src\Moyu\Games\Common\Core\MacKeys.cs" Link="Core\MacKeys.cs" />
+    <Compile Include="..\..\src\Moyu\Games\Common\Core\UiLanguage.cs" Link="Core\UiLanguage.cs" />
+  </ItemGroup>
+
+</Project>

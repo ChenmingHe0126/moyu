@@ -5,6 +5,8 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Moyu.Games.Common.Core;
+using Moyu.Platform;
+using Moyu.Platform.Mac;
 using Rhino;
 using Rhino.Display;
 using Rhino.DocObjects;
@@ -67,13 +69,25 @@ namespace Moyu.Games.Common
     [DllImport("kernel32.dll")]
     static extern ushort GetUserDefaultUILanguage();
 
-    /// <summary>The Windows display language (Settings › Time &amp; language), else the UI culture: Chinese for any Chinese, English otherwise.</summary>
+    /// <summary>
+    /// The system's display language (Windows: Settings › Time &amp; language; Mac: the first preferred language in
+    /// System Settings › General › Language &amp; Region), else the UI culture: Chinese for any Chinese, English otherwise.
+    /// </summary>
     public static UiLanguage SystemLanguage()
     {
-      if (System.Environment.OSVersion.Platform == PlatformID.Win32NT)
+      if (OS.IsWindows)
       {
         try { return UiLanguages.FromCulture(new CultureInfo(GetUserDefaultUILanguage()).Name); }
         catch (Exception) { /* an unknown language id: fall back to the UI culture */ }
+      }
+      else if (OS.IsMac)
+      {
+        try
+        {
+          string preferred = MacInterop.PreferredLanguage();
+          if (!string.IsNullOrEmpty(preferred)) return UiLanguages.FromCulture(preferred);
+        }
+        catch (Exception) { /* fall back to the UI culture */ }
       }
       return UiLanguages.FromCulture(CultureInfo.CurrentUICulture.Name);
     }
@@ -146,11 +160,9 @@ namespace Moyu.Games.Common
       _hook = new KeyboardHook(OnKey);
       if (!_hook.Installed)
       {
-        int code = _hook.InstallError;
+        string problem = _hook.Problem;
         Stop();
-        error = code != 0
-          ? $"Keyboard capture could not be installed (Win32 error {code})."
-          : "Keyboard capture is not available here (Moyu games need Rhino for Windows).";
+        error = problem;
         return false;
       }
       try
@@ -298,9 +310,26 @@ namespace Moyu.Games.Common
     /// </summary>
     bool OwnsFocus()
     {
+      if (!OS.IsWindows)
+      {
+        // A failure here must not lock the player out: without an answer the keys stay the game's.
+        try { return DocumentWindowHasFocus(); }
+        catch (Exception) { return true; }
+      }
       var root = KeyboardHook.FocusRoot();
       if (root == IntPtr.Zero) return false;
       return root == RhinoApp.MainWindowHandle() || root == KeyboardHook.Root(View.Handle);
+    }
+
+    /// <summary>
+    /// On the Mac every document has its own window holding its viewports and command line; Grasshopper, dialogs and
+    /// panels are windows of their own. The keys are the game's while the document's window is the key window.
+    /// </summary>
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    bool DocumentWindowHasFocus()
+    {
+      var window = RhinoEtoApp.MainWindowForDocument(Doc) ?? RhinoEtoApp.MainWindow;
+      return window == null || window.HasFocus;
     }
 
     /// <summary>A Rhino command is running (a prompt, a point pick): its keys and clicks are Rhino's.</summary>

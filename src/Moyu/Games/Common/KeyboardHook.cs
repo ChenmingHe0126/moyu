@@ -4,14 +4,17 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Moyu.Games.Common.Core;
+using Moyu.Platform;
+using Moyu.Platform.Mac;
 
 namespace Moyu.Games.Common
 {
   /// <summary>
-  /// Thread keyboard hook on Rhino's UI thread (Windows only). The handler sees every key press and release before
-  /// Rhino, the viewport or the Grasshopper canvas do, and decides whether to swallow it: that is what stops the
-  /// arrow keys panning the view and Space repeating the last command while a game runs. Only keys sent to this
-  /// thread arrive, so other programs are never affected.
+  /// Keyboard capture on Rhino's UI thread. The handler sees every key press and release before Rhino, the viewport
+  /// or the Grasshopper canvas do, and decides whether to swallow it: that is what stops the arrow keys panning the
+  /// view and Space repeating the last command while a game runs. Only Rhino's own keys arrive, so other programs are
+  /// never affected. On Windows this is a thread keyboard hook; on the Mac an AppKit event monitor
+  /// (<see cref="MacKeyMonitor"/>) reports the same keys as Windows virtual keys.
   /// </summary>
   public sealed class KeyboardHook : IDisposable
   {
@@ -75,25 +78,48 @@ namespace Moyu.Games.Common
     // Held in a field so the garbage collector cannot free the delegate while Windows still calls it.
     readonly HookProc _proc;
     IntPtr _hook;
+    readonly MacKeyMonitor _mac;
 
     public KeyboardHook(Handler handler)
     {
       _handler = handler;
       _proc = Proc;
-      if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+      if (OS.IsWindows)
       {
         _hook = SetWindowsHookEx(WH_KEYBOARD, _proc, IntPtr.Zero, GetCurrentThreadId());
         if (_hook == IntPtr.Zero) InstallError = Marshal.GetLastWin32Error();
       }
+      else if (OS.IsMac) _mac = new MacKeyMonitor(OnMacKey);
     }
 
-    public bool Installed => _hook != IntPtr.Zero;
+    public bool Installed => _hook != IntPtr.Zero || (_mac?.Installed ?? false);
 
     /// <summary>The Win32 error when the hook could not be set on Windows; 0 otherwise.</summary>
     public int InstallError { get; }
 
-    /// <summary>Ctrl or Alt held: shortcuts such as Ctrl+S and Alt+Tab always go through.</summary>
-    public static bool CtrlOrAltDown => (GetKeyState(VK_CONTROL) & 0x8000) != 0 || (GetKeyState(VK_MENU) & 0x8000) != 0;
+    /// <summary>Why keyboard capture is not installed, in a sentence for the component's message; null when it is.</summary>
+    public string Problem =>
+      Installed ? null
+      : InstallError != 0 ? $"Keyboard capture could not be installed (Win32 error {InstallError})."
+      : _mac != null ? $"Keyboard capture could not be installed ({_mac.InstallError})."
+      : "Keyboard capture is not available here (Moyu games need Rhino for Windows or Mac).";
+
+    /// <summary>
+    /// Ctrl or Alt held (on the Mac also Command): shortcuts such as Ctrl+S, Alt+Tab and ⌘S always go through.
+    /// </summary>
+    public static bool CtrlOrAltDown =>
+      OS.IsWindows ? (GetKeyState(VK_CONTROL) & 0x8000) != 0 || (GetKeyState(VK_MENU) & 0x8000) != 0
+      : OS.IsMac && MacKeyMonitor.ShortcutModifierDown;
+
+    bool OnMacKey(int virtualKey, bool down, bool repeat, bool act)
+    {
+      try { return _handler((Keys)virtualKey, down, repeat, act); }
+      catch (Exception ex)
+      {
+        Rhino.RhinoApp.WriteLine($"Moyu keyboard: {ex.Message}");
+        return false;
+      }
+    }
 
     /// <summary>The top-level window owning the focused control, or zero when nothing on this thread has focus.</summary>
     public static IntPtr FocusRoot()
@@ -144,7 +170,11 @@ namespace Moyu.Games.Common
     }
 
     /// <summary>Forgets which keys are down, e.g. after the app lost focus and missed their release.</summary>
-    public void Reset() => _keys.Reset();
+    public void Reset()
+    {
+      _keys.Reset();
+      _mac?.Reset();
+    }
 
     /// <summary>
     /// Drops any half-typed IME text and switches the focused window's IME to direct (English) input. Once the
@@ -169,6 +199,7 @@ namespace Moyu.Games.Common
     /// <summary>Unhooks and gives back the input method state it switched off (unless the user switched it since).</summary>
     public void Dispose()
     {
+      _mac?.Dispose();
       foreach (var hwnd in _imeClosed)
       {
         var himc = ImmGetContext(hwnd);

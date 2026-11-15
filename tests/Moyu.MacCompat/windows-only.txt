@@ -1,0 +1,2 @@
+# Members Moyu.gha uses only on Windows (behind OS checks), so Rhino for Mac may lack them.
+# One full name per line, exactly as Moyu.MacCompat prints it after "MISSING: ".

@@ -371,7 +371,7 @@ namespace Moyu.Games.Breakout
       foreach (var (at, text, size, bold, align) in _labels)
       {
         var p = vp.WorldToClient(at);
-        var font = bold ? "Segoe UI Semibold" : "Segoe UI";
+        var font = bold ? GameConduit.LatinBold : GameConduit.Latin;
         int px = Px(size);
         if (align == 1)
         {
@@ -394,15 +394,15 @@ namespace Moyu.Games.Breakout
       int x = Px(24), y = Px(24), w = Px(330), pad = Px(16), pitch = Px(22);
       int h = Px(112) + rows.Length * pitch;
       d.Draw2dRectangle(new Rectangle(x, y, w, h), Color.FromArgb(206, 212, 218), 1, Color.FromArgb(240, 255, 255, 255));
-      d.Draw2dText("Facade Study  ·  Elevation B", ink, new Point2d(x + pad, y + Px(14)), false, Px(15), "Segoe UI Semibold");
-      d.Draw2dText($"Unitised curtain wall, 1.5 m module · pattern from {pattern}", grey, new Point2d(x + pad, y + Px(38)), false, Px(11), "Segoe UI");
+      d.Draw2dText("Facade Study  ·  Elevation B", ink, new Point2d(x + pad, y + Px(14)), false, Px(15), GameConduit.LatinBold);
+      d.Draw2dText($"Unitised curtain wall, 1.5 m module · pattern from {pattern}", grey, new Point2d(x + pad, y + Px(38)), false, Px(11), GameConduit.Latin);
       for (int r = 0; r < rows.Length; r++)
       {
-        d.Draw2dText(rows[r].Item1, grey, new Point2d(x + pad, y + Px(64) + r * pitch), false, Px(13), "Segoe UI");
-        d.Draw2dText(rows[r].Item2, ink, new Point2d(x + Px(196), y + Px(64) + r * pitch), false, Px(13), "Segoe UI Semibold");
+        d.Draw2dText(rows[r].Item1, grey, new Point2d(x + pad, y + Px(64) + r * pitch), false, Px(13), GameConduit.Latin);
+        d.Draw2dText(rows[r].Item2, ink, new Point2d(x + Px(196), y + Px(64) + r * pitch), false, Px(13), GameConduit.LatinBold);
       }
       int py = y + Px(64) + rows.Length * pitch + Px(10);
-      d.Draw2dText($"Optimizing frit pattern for glare…  iter {iter} / 120", grey, new Point2d(x + pad, py), false, Px(11), "Segoe UI");
+      d.Draw2dText($"Optimizing frit pattern for glare…  iter {iter} / 120", grey, new Point2d(x + pad, py), false, Px(11), GameConduit.Latin);
       d.Draw2dRectangle(new Rectangle(x + pad, py + Px(20), w - 2 * pad, Px(5)), Color.FromArgb(222, 226, 230), 0, Color.FromArgb(222, 226, 230));
       d.Draw2dRectangle(new Rectangle(x + pad, py + Px(20), (int)((w - 2 * pad) * iter / 120.0), Px(5)), Color.FromArgb(73, 80, 87), 0, Color.FromArgb(73, 80, 87));
 
@@ -410,10 +410,10 @@ namespace Moyu.Games.Breakout
       var frame = d.FrameSize;
       double tx = Math.Max(frame.Width - 380 * k, x), ty = Math.Max(frame.Height - 70 * k, y);
       if (ty < y + h + Px(12)) tx = Math.Max(tx, x + w + pad);
-      d.Draw2dText("ELEVATION B  —  SOUTH", ink, new Point2d(tx, ty), false, Px(18), "Segoe UI Semibold");
-      d.Draw2dText("1:500", ink, new Point2d(tx + 250 * k, ty + 4 * k), false, Px(13), "Segoe UI");
+      d.Draw2dText("ELEVATION B  —  SOUTH", ink, new Point2d(tx, ty), false, Px(18), GameConduit.LatinBold);
+      d.Draw2dText("1:500", ink, new Point2d(tx + 250 * k, ty + 4 * k), false, Px(13), GameConduit.Latin);
       d.Draw2dLine(new PointF((float)tx, (float)(ty + 28 * k)), new PointF((float)(tx + 330 * k), (float)(ty + 28 * k)), ink, 1);
-      d.Draw2dText("Office tower, 24 storeys  ·  curtain wall and podium", grey, new Point2d(tx, ty + 36 * k), false, Px(11), "Segoe UI");
+      d.Draw2dText("Office tower, 24 storeys  ·  curtain wall and podium", grey, new Point2d(tx, ty + 36 * k), false, Px(11), GameConduit.Latin);
     }
 
     /// <summary>Straight on to the elevation with a long lens, the sheet set right of the metrics card.</summary>

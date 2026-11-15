@@ -298,7 +298,7 @@ namespace Moyu.Games.Swift
       foreach (var (at, text, size, bold, colour, align, masked) in _labels)
       {
         var p = vp.WorldToClient(at);
-        var font = bold ? "Segoe UI Semibold" : "Segoe UI";
+        var font = bold ? GameConduit.LatinBold : GameConduit.Latin;
         int px = (int)Math.Round(size * k);
         var box = d.Measure2dText(text, new Point2d(0, 0), false, 0, px, font);
         double left = align == 1 ? p.X - box.Width / 2.0 : align == 2 ? p.X - box.Width : p.X, top = p.Y - px * 0.7;
@@ -312,10 +312,10 @@ namespace Moyu.Games.Swift
       DrawCard(d, k, iter, m);
       Legend(d, k, frame);
       double tx = frame.Width - 380 * k, ty = frame.Height - 62 * k;
-      d.Draw2dText("SECTION A–A", Ink, new Point2d(tx, ty), false, (int)Math.Round(17 * k), "Segoe UI Semibold");
-      d.Draw2dText("1:100", Ink, new Point2d(tx + 140 * k, ty + 4 * k), false, (int)Math.Round(12 * k), "Segoe UI");
+      d.Draw2dText("SECTION A–A", Ink, new Point2d(tx, ty), false, (int)Math.Round(17 * k), GameConduit.LatinBold);
+      d.Draw2dText("1:100", Ink, new Point2d(tx + 140 * k, ty + 4 * k), false, (int)Math.Round(12 * k), GameConduit.Latin);
       d.Draw2dLine(new PointF((float)tx, (float)(ty + 26 * k)), new PointF((float)(tx + 340 * k), (float)(ty + 26 * k)), Ink, 1);
-      d.Draw2dText($"Long gallery  ·  daylight & natural ventilation  ·  lat {SectionModel.Latitude:F1}° N", Color.FromArgb(110, 116, 124), new Point2d(tx, ty + 32 * k), false, (int)Math.Round(11 * k), "Segoe UI");
+      d.Draw2dText($"Long gallery  ·  daylight & natural ventilation  ·  lat {SectionModel.Latitude:F1}° N", Color.FromArgb(110, 116, 124), new Point2d(tx, ty + 32 * k), false, (int)Math.Round(11 * k), GameConduit.Latin);
     }
 
     static void DrawCard(DisplayPipeline d, double k, int iter, ClimateMetrics m)
@@ -330,15 +330,15 @@ namespace Moyu.Games.Swift
       int Px(double units) => (int)Math.Round(units * k);
       int x = Px(24), y = Px(24), w = Px(300), h = Px(112 + rows.Length * 22);
       d.Draw2dRectangle(new Rectangle(x, y, w, h), Color.FromArgb(206, 212, 218), 1, Color.FromArgb(242, 255, 255, 255));
-      d.Draw2dText("Climate Study  ·  Section A–A", ink, new Point2d(x + Px(16), y + Px(14)), false, Px(15), "Segoe UI Semibold");
-      d.Draw2dText($"Noon, 21 Jun / 21 Dec · wind {m.Wind:F1} m/s from S · ΔT 2.5 K", grey, new Point2d(x + Px(16), y + Px(38)), false, Px(11), "Segoe UI");
+      d.Draw2dText("Climate Study  ·  Section A–A", ink, new Point2d(x + Px(16), y + Px(14)), false, Px(15), GameConduit.LatinBold);
+      d.Draw2dText($"Noon, 21 Jun / 21 Dec · wind {m.Wind:F1} m/s from S · ΔT 2.5 K", grey, new Point2d(x + Px(16), y + Px(38)), false, Px(11), GameConduit.Latin);
       for (int r = 0; r < rows.Length; r++)
       {
-        d.Draw2dText(rows[r].Item1, grey, new Point2d(x + Px(16), y + Px(64 + r * 22)), false, Px(13), "Segoe UI");
-        d.Draw2dText(rows[r].Item2, ink, new Point2d(x + Px(186), y + Px(64 + r * 22)), false, Px(13), "Segoe UI Semibold");
+        d.Draw2dText(rows[r].Item1, grey, new Point2d(x + Px(16), y + Px(64 + r * 22)), false, Px(13), GameConduit.Latin);
+        d.Draw2dText(rows[r].Item2, ink, new Point2d(x + Px(186), y + Px(64 + r * 22)), false, Px(13), GameConduit.LatinBold);
       }
       int py = y + Px(64 + rows.Length * 22 + 10);
-      d.Draw2dText($"Solving airflow (k-ε)…  iteration {iter} / 400", grey, new Point2d(x + Px(16), py), false, Px(11), "Segoe UI");
+      d.Draw2dText($"Solving airflow (k-ε)…  iteration {iter} / 400", grey, new Point2d(x + Px(16), py), false, Px(11), GameConduit.Latin);
       d.Draw2dRectangle(new Rectangle(x + Px(16), py + Px(20), w - Px(32), Px(5)), Color.FromArgb(222, 226, 230), 0, Color.FromArgb(222, 226, 230));
       d.Draw2dRectangle(new Rectangle(x + Px(16), py + Px(20), (int)((w - Px(32)) * iter / 400.0), Px(5)), Color.FromArgb(73, 80, 87), 0, Color.FromArgb(73, 80, 87));
     }
@@ -353,21 +353,21 @@ namespace Moyu.Games.Swift
       d.Draw2dRectangle(new Rectangle(x, y, Px(560), Px(44)), Color.FromArgb(206, 212, 218), 1, Color.FromArgb(242, 255, 255, 255));
       void Bar(int bx, string title, (double at, Color c)[] ramp, string lo, string hi)
       {
-        d.Draw2dText(title, grey, new Point2d(bx, y + Px(7)), false, Px(10), "Segoe UI");
+        d.Draw2dText(title, grey, new Point2d(bx, y + Px(7)), false, Px(10), GameConduit.Latin);
         int bw = Px(110);
         double max = ramp[ramp.Length - 1].at;
         for (int i = 0; i < bw; i++) d.Draw2dLine(new PointF(bx + i, y + Px(24)), new PointF(bx + i, y + Px(31)), Ramp(ramp, max * i / (bw - 1)), 1);
-        d.Draw2dText(lo, ink, new Point2d(bx - Px(2), y + Px(31)), false, Px(9), "Segoe UI");
-        d.Draw2dText(hi, ink, new Point2d(bx + bw - Px(14), y + Px(31)), false, Px(9), "Segoe UI");
+        d.Draw2dText(lo, ink, new Point2d(bx - Px(2), y + Px(31)), false, Px(9), GameConduit.Latin);
+        d.Draw2dText(hi, ink, new Point2d(bx + bw - Px(14), y + Px(31)), false, Px(9), GameConduit.Latin);
       }
       Bar(x + Px(12), "Daylight factor %", DfRamp, "0", "5+");
       Bar(x + Px(148), "Air speed m/s", AirRamp, "0", "1.2+");
       d.Draw2dLine(new PointF(x + Px(290), y + Px(16)), new PointF(x + Px(314), y + Px(16)), Summer, 2);
-      d.Draw2dText("Sun 21 Jun", ink, new Point2d(x + Px(320), y + Px(9)), false, Px(10), "Segoe UI");
+      d.Draw2dText("Sun 21 Jun", ink, new Point2d(x + Px(320), y + Px(9)), false, Px(10), GameConduit.Latin);
       d.Draw2dLine(new PointF(x + Px(290), y + Px(31)), new PointF(x + Px(314), y + Px(31)), Winter, 2);
-      d.Draw2dText("Sun 21 Dec", ink, new Point2d(x + Px(320), y + Px(24)), false, Px(10), "Segoe UI");
+      d.Draw2dText("Sun 21 Dec", ink, new Point2d(x + Px(320), y + Px(24)), false, Px(10), GameConduit.Latin);
       d.Draw2dLine(new PointF(x + Px(412), y + Px(22)), new PointF(x + Px(436), y + Px(22)), Color.FromArgb(52, 190, 200), 4);
-      d.Draw2dText("P1 = flight path", ink, new Point2d(x + Px(442), y + Px(15)), false, Px(10), "Segoe UI");
+      d.Draw2dText("P1 = flight path", ink, new Point2d(x + Px(442), y + Px(15)), false, Px(10), GameConduit.Latin);
     }
 
     /// <summary>Straight on to the section, framed as the game frames the course, a touch further back.</summary>

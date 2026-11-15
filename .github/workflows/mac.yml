@@ -1,0 +1,76 @@
+name: macOS
+
+# Checks Moyu for Rhino 8 for Mac on a real Mac (Apple silicon): builds the Mac plug-in, runs the solver and game tests,
+# drives the games' AppKit keyboard monitor with real key events, and checks every API the plug-in uses against the
+# assemblies of the official Rhino for Mac installer. Rhino itself is not run (it needs a licence).
+on:
+  push:
+    branches: [main, mac-support]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: mac-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  mac:
+    runs-on: macos-latest
+    timeout-minutes: 40
+    env:
+      # The Rhino 8 for Mac build to check against (files.mcneel.com/rhino/8/mac/releases/rhino_<version>.dmg).
+      RHINO_MAC_VERSION: 8.36.26296.17002
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build the Mac plug-in (net7.0)
+        run: dotnet build src/Moyu/Moyu.csproj -c Release -f net7.0
+
+      - name: Solver and game tests on Apple silicon
+        run: dotnet run -c Release --project tests/Moyu.Core.Tests
+
+      - name: AppKit keyboard monitor with real key events
+        run: dotnet run -c Release --project tests/Moyu.MacTests
+
+      - name: Cache the Rhino for Mac installer
+        uses: actions/cache@v4
+        with:
+          path: ~/rhino-dmg
+          key: rhino-mac-${{ env.RHINO_MAC_VERSION }}
+
+      - name: Download Rhino for Mac
+        run: |
+          mkdir -p ~/rhino-dmg
+          dmg=~/rhino-dmg/rhino_$RHINO_MAC_VERSION.dmg
+          if [ ! -f "$dmg" ]; then
+            curl -fL --retry 3 --silent --show-error -o "$dmg" "https://files.mcneel.com/rhino/8/mac/releases/rhino_$RHINO_MAC_VERSION.dmg"
+          fi
+          ls -l "$dmg"
+
+      - name: Mount Rhino for Mac
+        run: |
+          mnt="$RUNNER_TEMP/rhino"
+          yes | hdiutil attach -nobrowse -readonly -noautoopen -mountpoint "$mnt" ~/rhino-dmg/rhino_$RHINO_MAC_VERSION.dmg > /dev/null
+          app=$(find "$mnt" -maxdepth 1 -name "*.app" | head -n 1)
+          echo "RHINO_APP=$app" >> "$GITHUB_ENV"
+          echo "App: $app"
+          find "$app" \( -name "RhinoCommon.dll" -o -name "Grasshopper.dll" -o -name "Eto.dll" -o -name "Rhino.UI.dll" \
+            -o -name "System.Windows.Forms.dll" -o -name "System.Drawing.Common.dll" -o -name "System.Private.CoreLib.dll" \) \
+            | sed "s|$app/||"
+
+      - name: Check every API Moyu uses against Rhino for Mac
+        run: dotnet run -c Release --project tests/Moyu.MacCompat -- src/Moyu/bin/Release/net7.0/Moyu.gha "$RHINO_APP" tests/Moyu.MacCompat/windows-only.txt
+
+      - name: Upload the Mac plug-in
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: moyu-mac-${{ github.sha }}
+          path: src/Moyu/bin/Release/net7.0/Moyu.gha
+          if-no-files-found: ignore

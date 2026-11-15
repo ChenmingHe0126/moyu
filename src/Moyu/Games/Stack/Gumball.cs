@@ -66,6 +66,8 @@ namespace Moyu.Games.Stack
     /// </summary>
     public static double Scale(RhinoViewport vp, Size frame)
     {
+      // Off Windows there is no window DPI to ask: use the scale the conduit last drew the HUD at.
+      if (!Moyu.Platform.OS.IsWindows) return GameConduit.UiScale(GameConduit.LastDpiScale, frame);
       double dpi;
       try
       {
