@@ -35,6 +35,8 @@ namespace Moyu.MacTests
       }
       Console.WriteLine($"macOS {Environment.OSVersion.Version}, {RuntimeInformation.ProcessArchitecture}, .NET {Environment.Version}");
       Check(OS.IsMac && !OS.IsWindows, "OS says Mac");
+      // Rhino has AppKit loaded; this console process has to load it itself.
+      Check(MacInterop.LoadAppKit(), "AppKit loads");
 
       IntPtr pool = MacInterop.PushAutoreleasePool();
       try

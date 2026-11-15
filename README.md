@@ -1,6 +1,6 @@
 # Moyu — Grasshopper 拓扑优化插件（顺带摸鱼）
 
-**Moyu** is a Grasshopper plugin for **Rhino 8 for Windows**: 2D pixel and 3D voxel topology optimisation (SIMP, iterating live on a Timer), plus four small games that run inside the Rhino viewport disguised as massing, landscape, facade and section study tools, each with a boss key. It is a research and teaching project on building a Rhino plugin quickly with an AI coding agent: almost all of the code, tests and documentation were written by Claude Code, and the design notes, development logs and a time log ([docs/dev-time-stats.md](docs/dev-time-stats.md)) are all in this repository. The illustrated user guide is [packaging/guide/Moyu-Guide-EN.pdf](packaging/guide/Moyu-Guide-EN.pdf) ([中文](packaging/guide/Moyu-Guide-ZH.pdf)). Licence: MIT ([LICENSE](LICENSE)). Install it from Rhino's Package Manager (`_PackageManager`, search *moyu*) or see [packaging/INSTALL.md](packaging/INSTALL.md); the rest of this README is in Chinese.
+**Moyu** is a Grasshopper plugin for **Rhino 8 for Windows and Mac**: 2D pixel and 3D voxel topology optimisation (SIMP, iterating live on a Timer), plus four small games that run inside the Rhino viewport disguised as massing, landscape, facade and section study tools, each with a boss key. It is a research and teaching project on building a Rhino plugin quickly with an AI coding agent: almost all of the code, tests and documentation were written by Claude Code, and the design notes, development logs and a time log ([docs/dev-time-stats.md](docs/dev-time-stats.md)) are all in this repository. The illustrated user guide is [packaging/guide/Moyu-Guide-EN.pdf](packaging/guide/Moyu-Guide-EN.pdf) ([中文](packaging/guide/Moyu-Guide-ZH.pdf)). Licence: MIT ([LICENSE](LICENSE)). Install it from Rhino's Package Manager (`_PackageManager`, search *moyu*) or see [packaging/INSTALL.md](packaging/INSTALL.md); the rest of this README is in Chinese.
 
 基于 Rhino 官方 `dotnet new grasshopper` 模版的 Grasshopper (GH1) 插件，有两套相同结构的工作流：
 
@@ -91,7 +91,7 @@ Material 2D ─┘        └── Timer (Params › Util › Trigger) + Toggle
 | Voxel Unit | Unit | 自定义积木：随手画的封闭体（体素中心在里面就算）、体素中心点、或文本图案（`###/#.#\|#..`，层用 `\|` 分、行用 `/` 分，空格和 `.` 都是空格子，开头的空格和空行也算数）。最多 10 格、每边不超过 4 格、必须面连通；给点时超过 64 个点报错。自定义积木从第 1 块起就会发（开局的"先发简单积木"只管内置积木） |
 | Unit Library | Lib | 内置积木集（-1 只用自定义 / 0 入门 / 1 标准 8 块 / 2 困难）＋ 自定义积木 |
 
-**语言**：四个游戏组件（Massing / Path / Facade / Airflow Study）的**右键菜单**里有 **Language · 语言**，管视口里画的文字（按键提示、倒数、暂停、结果画面、道具提示）：**Auto · 自动**（默认）跟随 Windows 显示语言，中文 Windows 显示中文、其他语言显示英文；**中文**、**English** 固定一种。选择跟着 .gh 文件保存；游戏运行中切换，下一帧就换。老板键的伪装画面始终是英文。
+**语言**：四个游戏组件（Massing / Path / Facade / Airflow Study）的**右键菜单**里有 **Language · 语言**，管视口里画的文字（按键提示、倒数、暂停、结果画面、道具提示）：**Auto · 自动**（默认）跟随系统语言（Windows 的显示语言、Mac 的首选语言），中文系统显示中文、其他语言显示英文；**中文**、**English** 固定一种。选择跟着 .gh 文件保存；游戏运行中切换，下一帧就换。老板键的伪装画面始终是英文。
 
 **操作**：
 
@@ -208,13 +208,15 @@ Material 2D ─┘        └── Timer (Params › Util › Trigger) + Toggle
 
 ## 安装
 
-只想用插件的话不用编译。需要 **Windows 版 Rhino 8**（.NET Core 和 .NET Framework 两种运行时都行；没有在 Mac 上测过）。三种装法任选一种：
+只想用插件的话不用编译。需要 **Rhino 8，Windows 或 Mac**（Windows 上 .NET Core 和 .NET Framework 两种运行时都行）。三种装法任选一种：
 
-1. **包管理器（推荐）**：在 Rhino 里运行 `_PackageManager`，搜索 **moyu**，Install，重启 Rhino。
-2. **.yak 文件**：从 GitHub Releases 或 food4rhino 下载 `moyu-<版本>-rh8_0-win.yak`，拖进打开的 Rhino 窗口（或 `_PackageManager` → *Install from file*），重启 Rhino。
-3. **手动复制 .gha**：新建 `%APPDATA%\Grasshopper\Libraries\Moyu\`，把发布包里对应运行时的那一个 `Moyu.gha` 复制进去（Rhino 跑在 .NET Core 上用 `net7.0\Moyu.gha`，跑在 .NET Framework 上用 `net48\Moyu.gha`；`_SetDotNetRuntime` 能看到当前是哪种）。文件被 Windows 标成"已阻止"的话先右键 → 属性 → 解除锁定，再重启 Rhino。
+1. **包管理器（推荐）**：在 Rhino 里运行 `_PackageManager`，搜索 **moyu**，Install，重启 Rhino。Windows 和 Mac 各有一个包，Rhino 自己选。
+2. **.yak 文件**：从 GitHub Releases 或 food4rhino 下载 `moyu-<版本>-rh8_0-win.yak`（Mac 用 `…-rh8_0-mac.yak`），拖进打开的 Rhino 窗口（或 `_PackageManager` → *Install from file*），重启 Rhino。
+3. **手动复制 .gha**：在 Grasshopper 里点 *File › Special Folders › Components Folder*，把发布包里对应的那一个 `Moyu.gha` 复制进去（Windows 上 Rhino 跑在 .NET Core 上用 `windows/net7.0/Moyu.gha`，跑在 .NET Framework 上用 `windows/net48/Moyu.gha`，`_SetDotNetRuntime` 能看到当前是哪种；Mac 用 `mac/Moyu.gha`）。文件被 Windows 标成"已阻止"的话先右键 → 属性 → 解除锁定，再重启 Rhino。
 
-装好后组件在 Grasshopper 工具栏的 **Moyu** 页签下（七个面板按编号排：`0 | Examples`、`1 | Topo2D`、`2 | Topo3D`、`3 | Massing`、`4 | Landscape`、`5 | Facade`、`6 | Section`；示例启动器在最前面，其余按开发顺序。Grasshopper 按名字排面板，编号就是为了固定这个顺序）。**打开示例最快的办法**：把最前面 `0 | Examples` 面板里的 **Examples** 组件拖到画布上（或者在画布上双击搜 `example` / `示例`），点上面的按钮（2D 拓扑优化、3D 拓扑优化、叠楼、蜿蜒、回弹、雨燕），示例就在新标签页里打开；打开的是未命名的副本，保存时会问存到哪里，示例本身不会被改。示例文件编进了插件里，不管用哪种方式安装都能打开。卸载：`_PackageManager` → Installed → moyu → Uninstall，或删掉 `Libraries\Moyu` 文件夹；最高分在 `%APPDATA%\Moyu\`，可以一起删。发布包里也带一份 [packaging/INSTALL.md](packaging/INSTALL.md)（中英双语）。
+**Mac 版**：游戏的按键和 Windows 一样，老板键是数字 1 左边那个键（` 或 §），⌘ 组合键永远交给 Rhino；按键靠 AppKit 的本地事件监视器拿到（[src/Moyu/Platform/Mac](src/Moyu/Platform/Mac)），字体换成 Mac 自带的 Avenir Next、Helvetica Neue 和苹方，最高分存在 `~/Library/Application Support/Moyu/`。每次推送 GitHub 的 macOS 机器（Apple 芯片）都会自动检查：编译 Mac 版、跑全部核心测试、用真实的按键事件驱动键盘监视器，并把插件用到的每个类型和方法对照官方 Rhino for Mac 安装包里的程序集逐一核对（[.github/workflows/mac.yml](.github/workflows/mac.yml)）。Rhino 本身需要许可证，没有在 GitHub 上运行。
+
+装好后组件在 Grasshopper 工具栏的 **Moyu** 页签下（七个面板按编号排：`0 | Examples`、`1 | Topo2D`、`2 | Topo3D`、`3 | Massing`、`4 | Landscape`、`5 | Facade`、`6 | Section`；示例启动器在最前面，其余按开发顺序。Grasshopper 按名字排面板，编号就是为了固定这个顺序）。**打开示例最快的办法**：把最前面 `0 | Examples` 面板里的 **Examples** 组件拖到画布上（或者在画布上双击搜 `example` / `示例`），点上面的按钮（2D 拓扑优化、3D 拓扑优化、叠楼、蜿蜒、回弹、雨燕），示例就在新标签页里打开；打开的是未命名的副本，保存时会问存到哪里，示例本身不会被改。示例文件编进了插件里，不管用哪种方式安装都能打开。卸载：`_PackageManager` → Installed → moyu → Uninstall，或从 Components Folder 里删掉 `Moyu.gha`；最高分在 `%APPDATA%\Moyu\`（Mac：`~/Library/Application Support/Moyu/`），可以一起删。发布包里也带一份 [packaging/INSTALL.md](packaging/INSTALL.md)（中英双语）。
 
 ## 构建与加载
 

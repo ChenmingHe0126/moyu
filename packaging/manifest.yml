@@ -7,8 +7,8 @@ description: >
   A research and teaching project on developing a Rhino plugin quickly with an AI
   coding agent (written mostly by Claude Code): live 2D/3D topology optimisation for
   Grasshopper, plus four small viewport games that study interaction and display in
-  Rhino, each disguised as an architecture study with a boss key. Source, plans and
-  time logs are on GitHub. Windows only.
+  Rhino, each disguised as an architecture study with a boss key. Rhino 8 for Windows
+  and Mac. Source, plans and time logs are on GitHub.
 url: https://github.com/ChenmingHe0126/moyu
 keywords:
   - topology-optimisation

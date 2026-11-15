@@ -223,10 +223,11 @@ namespace Moyu.MacCompat
 
     public AppResolver(string app)
     {
-      // Several copies of one assembly can sit in a .app (Rhino's core, each plug-in's folder): prefer Rhino's own
-      // folders over plug-in folders, then the shallower path.
+      // Several copies of one assembly can sit in a .app (Rhino's core, each plug-in's folder, reference assemblies for
+      // compiling scripts): prefer Rhino's own folders, then plug-in folders, then ref/ folders, then the shallower path.
+      string refDir = Path.DirectorySeparatorChar + "ref" + Path.DirectorySeparatorChar;
       var files = Directory.EnumerateFiles(app, "*.dll", SearchOption.AllDirectories)
-        .OrderBy(p => p.Contains("PlugIns", StringComparison.OrdinalIgnoreCase) ? 1 : 0)
+        .OrderBy(p => p.Contains(refDir, StringComparison.OrdinalIgnoreCase) ? 2 : p.Contains("PlugIns", StringComparison.OrdinalIgnoreCase) ? 1 : 0)
         .ThenBy(p => p.Count(c => c == Path.DirectorySeparatorChar));
       foreach (var file in files)
       {

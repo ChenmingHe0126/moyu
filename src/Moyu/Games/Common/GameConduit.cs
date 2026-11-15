@@ -192,7 +192,9 @@ namespace Moyu.Games.Common
         using (var light = SkyLight(p))
         using (var attrs = new ImageAttributes())
         {
-          attrs.SetWrapMode(WrapMode.TileFlipXY);
+          // Keeps the stretched edges from fading to transparent. Rhino for Mac's System.Drawing has no SetWrapMode
+          // (its CoreGraphics scaling clamps at the edge anyway), so it is only called on Windows.
+          if (Moyu.Platform.OS.IsWindows) TileEdges(attrs);
           g.InterpolationMode = InterpolationMode.HighQualityBilinear;
           g.PixelOffsetMode = PixelOffsetMode.Half;
           g.DrawImage(light, new Rectangle(0, 0, w, h), 0, 0, light.Width, light.Height, GraphicsUnit.Pixel, attrs);
@@ -200,6 +202,10 @@ namespace Moyu.Games.Common
       }
       return bmp;
     }
+
+    // A method of its own, so the JIT on the Mac never has to find SetWrapMode when it compiles Sky.
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    static void TileEdges(ImageAttributes attrs) => attrs.SetWrapMode(WrapMode.TileFlipXY);
 
     static Bitmap SkyLight(Palette p)
     {

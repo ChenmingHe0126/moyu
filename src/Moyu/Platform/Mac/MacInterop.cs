@@ -31,6 +31,13 @@ namespace Moyu.Platform.Mac
     // BOOL is a signed char on Intel and a bool on Apple silicon: one byte either way.
     [DllImport(ObjC, EntryPoint = "objc_msgSend")] static extern byte SendBool(IntPtr receiver, IntPtr selector);
     [DllImport(LibSystem)] static extern IntPtr dlsym(IntPtr handle, string symbol);
+    [DllImport(LibSystem)] static extern IntPtr dlopen(string path, int mode);
+
+    /// <summary>
+    /// Loads AppKit into the process. Rhino has it loaded already; a plain .NET process (the tests) does not, and until
+    /// then objc_getClass finds no NSApplication, NSEvent or NSFontManager.
+    /// </summary>
+    public static bool LoadAppKit() => dlopen("/System/Library/Frameworks/AppKit.framework/AppKit", 2 /* RTLD_NOW */) != IntPtr.Zero;
 
     /// <summary>The class object of an Objective-C class (zero when it does not exist).</summary>
     public static IntPtr Class(string name) => objc_getClass(name);
@@ -164,6 +171,7 @@ namespace Moyu.Platform.Mac
     public static IntPtr AddKeyMonitor(Func<IntPtr, IntPtr> handler)
     {
       ulong mask = (1UL << (int)KeyDown) | (1UL << (int)KeyUp) | (1UL << (int)FlagsChanged);
+      if (Class("NSEvent") == IntPtr.Zero && !LoadAppKit()) throw new InvalidOperationException("AppKit could not be loaded.");
       IntPtr block = GlobalBlock();
       s_handler = handler;
       IntPtr monitor = Send(Class("NSEvent"), Selector("addLocalMonitorForEventsMatchingMask:handler:"), mask, block);

@@ -7,16 +7,21 @@ using System.Linq;
 namespace Moyu.Games.Common
 {
   /// <summary>
-  /// Local best scores, one file per game in %APPDATA%\Moyu\&lt;game&gt;-scores.txt, one "key|score|date" line per
-  /// finished game. The best per key is read from the file once and then kept in memory, since the study components
-  /// ask for it on every solve.
+  /// Local best scores, one file per game in %APPDATA%\Moyu\&lt;game&gt;-scores.txt (on the Mac in
+  /// ~/Library/Application Support/Moyu/), one "key|score|date" line per finished game. The best per key is read from
+  /// the file once and then kept in memory, since the study components ask for it on every solve.
   /// </summary>
   public static class GameScores
   {
     static readonly Dictionary<(string game, string key), long> _best = new Dictionary<(string, string), long>();
     static readonly object _lock = new object();
 
-    static string FilePath(string game) => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Moyu", $"{game}-scores.txt");
+    /// <summary>Where the score files live: %APPDATA%\Moyu on Windows, the Mac's Application Support folder there.</summary>
+    public static string Folder => Moyu.Platform.OS.IsMac
+      ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Library", "Application Support", "Moyu")
+      : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Moyu");
+
+    static string FilePath(string game) => Path.Combine(Folder, $"{game}-scores.txt");
 
     public static long Best(string game, string key)
     {
